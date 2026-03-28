@@ -1,0 +1,13 @@
+<footer class="app-footer">
+  <div class="container">
+    <div class="app-footer-copyright">
+      &copy; {{ generated_at[:4] if generated_at else "2026" }} <a class="app-footer-author" href="https://polprog.pl/" target="_blank">POLPROG</a>.
+      <span>{{ t("ui.footer.all_rights") }}</span>
+    </div>
+    <div class="app-footer-tools">
+      <span>{{ t("ui.footer.built_with") }}</span>
+      <a class="app-footer-brand" href="https://github.com/polprog-tech/FlowBoard" target="_blank">FlowBoard</a>
+      v{{ version }}
+    </div>
+  </div>
+</footer>

@@ -1,0 +1,12 @@
+{% if "phases" in visible_tabs %}
+<div role="tabpanel" class="section {% if default_tab == 'phases' %}active{% endif %}" id="tab-phases" aria-labelledby="tab-phases-btn">
+  <h2 class="section-title">{{ t("waterfall.phases", fallback="Phases") }}</h2>
+  <p class="section-subtitle">{{ t("waterfall.phases_desc", fallback="Phase progress, milestones, and critical path") }}</p>
+
+  {% if waterfall_phases_html and waterfall_phases_html|trim %}
+  {{ waterfall_phases_html }}
+  {% else %}
+  <div class="empty-state" role="status">{{ t("ui.empty_state.no_phase_data", fallback="No phase data available. Phases are inferred from fix versions or epic groupings.") }}</div>
+  {% endif %}
+</div>
+{% endif %}

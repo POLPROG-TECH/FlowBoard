@@ -1,0 +1,51 @@
+{% if "insights" in visible_tabs %}
+<div role="tabpanel" class="section {% if default_tab == 'insights' %}active{% endif %}" id="tab-insights" aria-labelledby="tab-insights-btn">
+  <h2 class="section-title">{{ t("section.insights") }}</h2>
+  <p class="section-subtitle">{{ t("section.insights_desc") }}</p>
+
+  <div class="insights-tabs" role="tablist">
+    <button class="insights-tab-btn insights-tab-active" role="tab" aria-selected="true" aria-controls="insightsRisks" data-insights-view="risks" onclick="switchInsights('risks')"><span aria-hidden="true">⚠️</span> {{ t("section.risks") }}</button>
+    <button class="insights-tab-btn" role="tab" aria-selected="false" aria-controls="insightsConflicts" data-insights-view="conflicts" onclick="switchInsights('conflicts')"><span aria-hidden="true">⚡</span> {{ t("section.conflicts") }}</button>
+    {% if methodology in ('scrum', 'hybrid') %}
+    <button class="insights-tab-btn" role="tab" aria-selected="false" aria-controls="insightsBlockers" data-insights-view="blockers" onclick="switchInsights('blockers')"><span aria-hidden="true">🚫</span> {{ t("scrum.blockers") }}</button>
+    {% endif %}
+    <button class="insights-tab-btn" role="tab" aria-selected="false" aria-controls="insightsDepsBlockers" data-insights-view="deps-blockers" onclick="switchInsights('deps-blockers')"><span aria-hidden="true">🔗</span> {{ t("section.deps_blockers") }}</button>
+    <button class="insights-tab-btn" role="tab" aria-selected="false" aria-controls="insightsDeps" data-insights-view="deps" onclick="switchInsights('deps')"><span aria-hidden="true">📋</span> {{ t("section.dependencies") }}</button>
+    <button class="insights-tab-btn" role="tab" aria-selected="false" aria-controls="insightsDepHeatmap" data-insights-view="dep-heatmap" onclick="switchInsights('dep-heatmap')"><span aria-hidden="true">🔥</span> {{ t("scrum.dep_heatmap") }}</button>
+    {% if methodology in ('scrum', 'hybrid') %}
+    <button class="insights-tab-btn" role="tab" aria-selected="false" aria-controls="insightsForecast" data-insights-view="forecast" onclick="switchInsights('forecast')"><span aria-hidden="true">📈</span> {{ t("scrum.delivery_forecast") }}</button>
+    {% endif %}
+  </div>
+
+  <div class="insights-panel" aria-live="polite" id="insightsRisks" role="tabpanel" style="display:block">
+    {{ risk_table_html }}
+  </div>
+  <div class="insights-panel" aria-live="polite" id="insightsConflicts" role="tabpanel" class="hidden">
+    {{ conflict_html }}
+  </div>
+  {% if methodology in ('scrum', 'hybrid') %}
+  <div class="insights-panel" aria-live="polite" id="insightsBlockers" role="tabpanel" class="hidden">
+    <h3 class="section-title"><span aria-hidden="true">🚫</span> {{ t("scrum.blocker_aging") }}</h3>
+    {{ scrum_blockers_html }}
+  </div>
+  {% endif %}
+  <div class="insights-panel" aria-live="polite" id="insightsDepsBlockers" role="tabpanel" class="hidden">
+    <h3 class="section-title"><span aria-hidden="true">🔗</span> {{ t("section.deps_blockers") }}</h3>
+    {{ deps_blockers_html }}
+  </div>
+  <div class="insights-panel" aria-live="polite" id="insightsDeps" role="tabpanel" class="hidden">
+    <h3 class="section-title"><span aria-hidden="true">📋</span> {{ t("section.dependencies") }}</h3>
+    {{ dependency_html }}
+  </div>
+  <div class="insights-panel" aria-live="polite" id="insightsDepHeatmap" role="tabpanel" class="hidden">
+    <h3 class="section-title"><span aria-hidden="true">🔥</span> {{ t("scrum.dep_heatmap") }}</h3>
+    {{ scrum_dep_heatmap_html }}
+  </div>
+  {% if methodology in ('scrum', 'hybrid') %}
+  <div class="insights-panel" aria-live="polite" id="insightsForecast" role="tabpanel" class="hidden">
+    <h3 class="section-title"><span aria-hidden="true">📈</span> {{ t("scrum.delivery_forecast") }}</h3>
+    {{ scrum_delivery_risks_html }}
+  </div>
+  {% endif %}
+</div>
+{% endif %}

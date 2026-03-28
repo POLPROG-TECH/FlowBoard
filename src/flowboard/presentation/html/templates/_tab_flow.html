@@ -1,0 +1,58 @@
+{% if "flow" in visible_tabs %}
+<div role="tabpanel" class="section {% if default_tab == 'flow' %}active{% endif %}" id="tab-flow" aria-labelledby="tab-flow-btn">
+  <h2 class="section-title">{{ t("kanban.flow_metrics", fallback="Flow Metrics") }}</h2>
+  <p class="section-subtitle">{{ t("kanban.flow_desc", fallback="Cycle time, throughput, WIP, and flow efficiency") }}</p>
+
+  {% if kanban_flow_html and kanban_flow_html|trim %}
+  {{ kanban_flow_html }}
+  {% else %}
+  <div class="empty-state" role="status">{{ t("ui.empty_state.no_flow_data", fallback="No flow data available yet. Issues need resolved dates to compute cycle time and throughput.") }}</div>
+  {% endif %}
+
+  {% if kanban_throughput_data and kanban_throughput_data != 'null' %}
+  <script>
+  (function() {
+    var tpCtx = document.getElementById('throughputChart');
+    if (tpCtx && typeof Chart !== 'undefined') {
+      var tpData = {{ kanban_throughput_data }};
+      new Chart(tpCtx, {
+        type: 'line',
+        data: tpData,
+        options: {
+          responsive: true,
+          plugins: { legend: { position: 'bottom' } },
+          scales: {
+            x: { type: 'category', title: { display: true, text: '{{ t("kanban.week", fallback="Week") }}' } },
+            y: { beginAtZero: true, title: { display: true, text: '{{ t("kanban.count", fallback="Count") }}' } }
+          }
+        }
+      });
+    }
+  })();
+  </script>
+  {% endif %}
+
+  {% if kanban_cfd_data and kanban_cfd_data != 'null' %}
+  <script>
+  (function() {
+    var cfdCtx = document.getElementById('cfdChart');
+    if (cfdCtx && typeof Chart !== 'undefined') {
+      var cfdData = {{ kanban_cfd_data }};
+      new Chart(cfdCtx, {
+        type: 'line',
+        data: cfdData,
+        options: {
+          responsive: true,
+          plugins: { legend: { position: 'bottom' } },
+          scales: {
+            x: { type: 'category', title: { display: true, text: '{{ t("kanban.date", fallback="Date") }}' } },
+            y: { stacked: true, beginAtZero: true, title: { display: true, text: '{{ t("kanban.issues", fallback="Issues") }}' } }
+          }
+        }
+      });
+    }
+  })();
+  </script>
+  {% endif %}
+</div>
+{% endif %}

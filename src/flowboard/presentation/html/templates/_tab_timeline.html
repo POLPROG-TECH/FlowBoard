@@ -1,0 +1,56 @@
+{% if "timeline" in visible_tabs %}
+<div role="tabpanel" class="section {% if default_tab == 'timeline' %}active{% endif %}" id="tab-timeline" aria-labelledby="tab-timeline-btn">
+  <h2 class="section-title">{{ t("section.timeline") }}</h2>
+  <p class="section-subtitle">{{ t("section.timeline_desc") }}</p>
+
+  <div class="zoom-controls" id="timelineZoom">
+    <button class="zoom-btn" onclick="zoomTimeline('timeline', -25)" aria-label="{{ t("zoom.out") }}">−</button>
+    <span class="zoom-level" id="timelineZoomLevel">{{ charts_cfg.timeline.default_zoom }}%</span>
+    <button class="zoom-btn" onclick="zoomTimeline('timeline', 25)" aria-label="{{ t("zoom.in") }}">+</button>
+    <button class="zoom-btn" onclick="resetZoom('timeline')">{{ t("zoom.reset") }}</button>
+    <button class="zoom-btn" onclick="fitZoom('timeline')">{{ t("zoom.fit") }}</button>
+    <span class="zoom-separator"></span>
+    <button class="zoom-btn" id="tlBarSizeBtn" onclick="cycleBarSize()" title="Change bar height">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="4" width="12" height="6" rx="1.5"/><path d="M7 1v2M7 11v2"/></svg>
+    </button>
+    <button class="zoom-btn" id="tlFullscreenBtn" onclick="toggleTimelineFullscreen()" title="Fullscreen">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 5V1h4M9 1h4v4M13 9v4H9M5 13H1V9"/></svg>
+    </button>
+  </div>
+
+  <div class="tl-internal-area tl-fullscreen-target" id="tlInternalTimeline" style="display:block">
+    <div class="zoom-controls tl-fs-zoom" id="timelineZoomFs" class="hidden">
+      <button class="zoom-btn" onclick="zoomTimeline('timeline', -25)" aria-label="{{ t("zoom.out") }}">−</button>
+      <span class="zoom-level" id="timelineZoomLevelFs">{{ charts_cfg.timeline.default_zoom }}%</span>
+      <button class="zoom-btn" onclick="zoomTimeline('timeline', 25)" aria-label="{{ t("zoom.in") }}">+</button>
+      <button class="zoom-btn" onclick="resetZoom('timeline')">{{ t("zoom.reset") }}</button>
+      <button class="zoom-btn" onclick="fitZoom('timeline')">{{ t("zoom.fit") }}</button>
+      <span class="zoom-separator"></span>
+      <button class="zoom-btn" onclick="cycleBarSize()" title="Change bar height">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="4" width="12" height="6" rx="1.5"/><path d="M7 1v2M7 11v2"/></svg>
+      </button>
+      <span class="zoom-separator"></span>
+      <button class="zoom-btn tl-fs-exit-btn" onclick="toggleTimelineFullscreen()" title="{{ t("zoom.exit_fullscreen", fallback="Exit") }}">✕</button>
+    </div>
+    <div class="timeline-scroll" id="timelineScroll">
+      <div id="timelineContent" style="transform-origin: left top;">
+        {{ timeline_html }}
+      </div>
+    </div>
+  </div>
+
+  {% if simulation_html %}
+  <div class="tl-internal-area" id="tlInternalSimulation" class="hidden">
+    <div class="sim-internal-wrapper">
+      <div class="sim-exit-banner">
+        <span class="sim-exit-banner-text">🔬 {{ t("sim.exit_banner") }}</span>
+        <button class="sim-exit-btn" onclick="var b=document.querySelector('.tl-mode-btn:not([data-tl-mode=&quot;simulation&quot;])');if(b)b.click();">
+          ✕ {{ t("sim.exit_simulation") }}
+        </button>
+      </div>
+      {{ simulation_html }}
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endif %}

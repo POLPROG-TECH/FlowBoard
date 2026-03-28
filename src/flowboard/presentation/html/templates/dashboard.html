@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="{{ locale }}" dir="{{ 'rtl' if locale in ('ar', 'he') else 'ltr' }}" data-theme="{{ theme }}">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{ title }} — {{ generated_at }}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js" defer
+  integrity="sha384-NrKB+u6Ts6AtkIhwPixiKTzgSKNblyhlk0Sohlgar9UHUBzai/sgnNNWWd291xqt" crossorigin="anonymous"
+  onerror="document.querySelectorAll('.chart-loading').forEach(function(el){el.textContent={{ t('ui.charts_unavailable')|tojson }};el.classList.remove('chart-loading');el.style.cssText='text-align:center;padding:24px;color:#94A3B8;font-style:italic;';})"></script>
+{% include '_styles.html' %}
+</head>
+<body>
+
+<!-- Skip link (a11y) -->
+<a href="#main-content" class="skip-link">{{ t("ui.skip_to_content") }}</a>
+
+{% include '_demo_toolbar.html' %}
+
+{% include '_header.html' %}
+
+{% include '_settings.html' %}
+
+{% include '_nav.html' %}
+
+<main id="main-content" class="container">
+
+{% include '_tab_overview.html' %}
+
+{% include '_tab_workload.html' %}
+
+{% include '_tab_sprints.html' %}
+
+{% include '_tab_flow.html' %}
+
+{% include '_tab_phases.html' %}
+
+{% include '_tab_timeline.html' %}
+
+{% include '_tab_pi.html' %}
+
+{% include '_tab_dependencies.html' %}
+
+{% include '_tab_insights.html' %}
+
+<!-- Simulation is now integrated as an internal mode of the Timeline tab -->
+
+{% include '_tab_issues.html' %}
+
+</main> <!-- /container -->
+
+{% include '_footer.html' %}
+
+{% include '_scripts.html' %}
+</body>
+</html>

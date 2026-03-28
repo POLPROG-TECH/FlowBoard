@@ -1,0 +1,62 @@
+{% if "overview" in visible_tabs %}
+<div role="tabpanel" class="section {% if default_tab == 'overview' %}active{% endif %}" id="tab-overview" aria-labelledby="tab-overview-btn">
+  <h2 class="section-title">{{ t("section.executive_summary") }}</h2>
+  <p class="section-subtitle">{{ t("section.executive_summary_desc") }}</p>
+  {{ summary_cards_html }}
+
+  {% if charts_cfg.charts.enabled %}
+  <div class="chart-grid">
+    {% if charts_cfg.charts.status_distribution %}
+    <div class="chart-card">
+      <h3 class="chart-title">{{ t("section.status_distribution") }}</h3>
+      <div class="chart-loading" id="chartStatusLoading" role="status" aria-live="polite">{{ t("ui.loading_chart") }}</div>
+      <canvas id="chartStatus" height="220" role="img" aria-label="{{ t('section.status_distribution') }}"></canvas>
+    </div>
+    {% endif %}
+    {% if charts_cfg.charts.type_distribution %}
+    <div class="chart-card">
+      <h3 class="chart-title">{{ t("section.issue_types") }}</h3>
+      <div class="chart-loading" id="chartTypesLoading" role="status" aria-live="polite">{{ t("ui.loading_chart") }}</div>
+      <canvas id="chartTypes" height="220" role="img" aria-label="{{ t('section.issue_types') }}"></canvas>
+    </div>
+    {% endif %}
+    {% if charts_cfg.charts.risk_severity %}
+    <div class="chart-card">
+      <h3 class="chart-title">{{ t("section.risk_severity") }}</h3>
+      <div class="chart-loading" id="chartRisksLoading" role="status" aria-live="polite">{{ t("ui.loading_chart") }}</div>
+      <canvas id="chartRisks" height="220" role="img" aria-label="{{ t('section.risk_severity') }}"></canvas>
+    </div>
+    {% endif %}
+    {% if charts_cfg.charts.team_workload %}
+    <div class="chart-card">
+      <h3 class="chart-title">{{ t("section.team_story_points") }}</h3>
+      <div class="chart-loading" id="chartTeamsLoading" role="status" aria-live="polite">{{ t("ui.loading_chart") }}</div>
+      <canvas id="chartTeams" height="220" role="img" aria-label="{{ t('section.team_story_points') }}"></canvas>
+    </div>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  {% if snapshot.risk_signals %}
+  <h3 class="section-title">{{ t("section.top_risk_signals") }}</h3>
+  {{ risk_table_html }}
+  {% endif %}
+
+  {% if methodology in ('scrum', 'hybrid') %}
+  <h3 class="section-title">{{ t("scrum.product_progress") }}</h3>
+  {{ scrum_product_progress_html }}
+  <h3 class="section-title">{{ t("scrum.ceremonies") }}</h3>
+  {{ scrum_ceremonies_html }}
+  {% endif %}
+
+  {% if methodology in ('kanban', 'hybrid') %}
+  <h3 class="section-title">{{ t("kanban.flow_metrics", fallback="Flow Metrics") }}</h3>
+  {{ kanban_flow_html }}
+  {% endif %}
+
+  {% if methodology == 'waterfall' %}
+  <h3 class="section-title">{{ t("waterfall.phase_progress", fallback="Phase Progress") }}</h3>
+  {{ waterfall_phases_html }}
+  {% endif %}
+</div>
+{% endif %}

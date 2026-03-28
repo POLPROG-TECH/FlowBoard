@@ -1,0 +1,20 @@
+services:
+  flowboard:
+    build: .
+    ports:
+      - "8084:8084"
+    volumes:
+      - ./config.json:/app/config.json:ro
+      - ./config.schema.json:/app/config.schema.json:ro
+      - ./output:/app/output
+    environment:
+      - PORT=8084
+      - FLOWBOARD_JIRA_TOKEN=${FLOWBOARD_JIRA_TOKEN}
+      - FLOWBOARD_JIRA_EMAIL=${FLOWBOARD_JIRA_EMAIL}
+      - FLOWBOARD_LOG_FORMAT=json
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8084/health/live')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3

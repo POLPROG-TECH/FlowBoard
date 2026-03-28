@@ -1,0 +1,21 @@
+{
+  "jira": {
+    "base_url": "https://your-org.atlassian.net",
+    "projects": ["PROJ"]
+  },
+  "methodology": "waterfall",
+  "output": {
+    "path": "output/waterfall_dashboard.html",
+    "title": "Waterfall Project Dashboard"
+  },
+  "thresholds": {
+    "aging_days": 21
+  },
+  "dashboard": {
+    "branding": {
+      "title": "Waterfall Project Dashboard",
+      "subtitle": "Phase-Based Delivery Intelligence",
+      "primary_color": "#8b5cf6"
+    }
+  }
+}

@@ -1,0 +1,440 @@
+// ---- i18n strings for JS ----
+const _i18n = {
+  settings_applied: {{ t("toast.settings_applied")|tojson }},
+  reset_defaults: {{ t("toast.reset_defaults")|tojson }},
+  config_exported: {{ t("toast.config_exported")|tojson }},
+  config_imported: {{ t("toast.config_imported")|tojson }},
+  invalid_json: {{ t("toast.invalid_json", error="")|tojson }},
+  chart_unavailable: {{ t("ui.charts_unavailable")|tojson }},
+  chart_no_data: {{ t("ui.chart_no_data")|tojson }},
+  loading_chart: {{ t("ui.loading_chart")|tojson }},
+  table_showing: {{ t("ui.table_showing")|tojson }},
+  table_of: {{ t("ui.table_of")|tojson }},
+  table_all: {{ t("ui.table_all")|tojson }},
+  skip_to_content: {{ t("ui.skip_to_content")|tojson }},
+  close_settings: {{ t("ui.close_settings")|tojson }},
+  panel_title: {{ t("panel.title")|tojson }},
+  panel_close: {{ t("panel.close")|tojson }},
+  panel_click_to_view: {{ t("panel.click_to_view")|tojson }},
+  panel_type: {{ t("panel.type")|tojson }},
+  panel_status: {{ t("panel.status")|tojson }},
+  panel_priority: {{ t("panel.priority")|tojson }},
+  panel_assignee: {{ t("panel.assignee")|tojson }},
+  panel_team: {{ t("panel.team")|tojson }},
+  panel_sprint: {{ t("panel.sprint")|tojson }},
+  panel_epic: {{ t("panel.epic")|tojson }},
+  panel_story_points: {{ t("panel.story_points")|tojson }},
+  panel_start_date: {{ t("panel.start_date")|tojson }},
+  panel_end_date: {{ t("panel.end_date")|tojson }},
+  panel_duration: {{ t("panel.duration")|tojson }},
+  panel_progress: {{ t("panel.progress")|tojson }},
+  panel_blocked: {{ t("panel.blocked")|tojson }},
+  panel_blocked_warning: {{ t("panel.blocked_warning")|tojson }},
+  panel_dates: {{ t("panel.dates")|tojson }},
+  panel_days: {{ t("panel.duration_days", count="")|tojson }},
+  panel_conflict_context: {{ t("panel.conflict_context")|tojson }},
+  panel_conflict_desc: {{ t("panel.conflict_desc")|tojson }},
+  panel_sim_context: {{ t("panel.sim_context")|tojson }},
+  panel_sim_desc: {{ t("panel.sim_desc")|tojson }},
+  lang_changed_en: {{ t("ui.lang_changed_en")|tojson }},
+  lang_changed_pl: {{ t("ui.lang_changed_pl")|tojson }},
+  default_title: {{ t("ui.default_title")|tojson }},
+  default_subtitle: {{ t("ui.default_subtitle")|tojson }},
+  rows_per_page: {{ t("ui.rows_per_page")|tojson }},
+  json_parse_error: {{ t("ui.json_parse_error") | tojson }},
+  error_prefix: {{ t("ui.error_prefix") | tojson }}
+};
+const _prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+// ---- Embedded config for round-trip ----
+const _initialConfig = {{ config_json }};
+let _currentConfig = JSON.parse(JSON.stringify(_initialConfig));
+
+// ---- Theme switching ----
+function setTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  localStorage.setItem('fb-theme', theme);
+  // Update button active states via CSS class
+  document.querySelectorAll('[data-theme-btn]').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.themeBtn === theme);
+  });
+  // Re-render charts for new theme — must destroy old instances first
+  if (typeof Chart !== 'undefined') {
+    Object.values(Chart.instances || {}).forEach(c => { try { c.destroy(); } catch(e){} });
+    chartsInitialized = false;
+    // Reset canvas dimensions to prevent stale sizing / bottom clipping
+    _chartIds.forEach(function(id) {
+      const canvas = document.getElementById(id);
+      if (!canvas) return;
+      canvas.removeAttribute('width');
+      canvas.removeAttribute('height');
+      canvas.style.width = '';
+      canvas.style.height = '';
+      // Force the parent container to recalculate layout
+      const card = canvas.closest('.chart-card');
+      if (card) { card.style.overflow = 'visible'; }
+    });
+    // Wait for CSS variables to settle and layout to reflow, then reinit
+    requestAnimationFrame(function() {
+      setTimeout(function() {
+        requestAnimationFrame(function() { initCharts(); });
+      }, 50);
+    });
+  }
+}
+// Restore theme from localStorage on load
+(function() {
+  const saved = localStorage.getItem('fb-theme');
+  if (saved) document.documentElement.setAttribute('data-theme', saved);
+})();
+
+// Re-render charts when OS color scheme changes (system theme mode)
+(function() {
+  const mql = window.matchMedia('(prefers-color-scheme: dark)');
+  mql.addEventListener('change', function() {
+    if (document.documentElement.getAttribute('data-theme') === 'system') {
+      if (typeof Chart !== 'undefined') {
+        Object.values(Chart.instances || {}).forEach(function(c) { try { c.destroy(); } catch(e){} });
+        chartsInitialized = false;
+        requestAnimationFrame(function() {
+          setTimeout(function() { requestAnimationFrame(function() { initCharts(); }); }, 50);
+        });
+      }
+    }
+  });
+})();
+
+// ---- Language preference (regenerates dashboard with new locale) ----
+function setLanguagePreference(lang) {
+  localStorage.setItem('fb-language', lang);
+  if (_currentConfig) _currentConfig.locale = lang;
+  document.querySelectorAll('[data-lang-btn]').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.langBtn === lang);
+  });
+  // Detect current methodology from demo toolbar or config
+  const methodBtn = document.querySelector('.demo-toolbar-btn[aria-pressed="true"]');
+  let methodology = methodBtn ? methodBtn.textContent.trim().split(' ').pop().toLowerCase() : 'scrum';
+  if (_currentConfig && _currentConfig.methodology) methodology = _currentConfig.methodology;
+  showToast(lang === 'pl' ? (_i18n.lang_changed_pl || 'Zmieniono język na polski') : (_i18n.lang_changed_en || 'Language changed to English'));
+  // Regenerate dashboard with new locale
+  fetch('/api/demo', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'FlowBoard' },
+    body: JSON.stringify({ methodology: methodology, locale: lang })
+  }).then(function(r) { return r.json(); })
+    .then(function(d) { if (d.ok) setTimeout(function() { location.reload(); }, 800); })
+    .catch(function() {});
+}
+
+// ---- Hide loading skeletons and show chart error if Chart.js failed ----
+function _hideLoading(canvasId) {
+  const el = document.getElementById(canvasId + 'Loading');
+  if (el) el.style.display = 'none';
+}
+function _showChartError(canvasId) {
+  const el = document.getElementById(canvasId + 'Loading');
+  if (el) { el.textContent = _i18n.chart_unavailable; el.classList.remove('chart-loading'); el.style.cssText = 'text-align:center;padding:24px;color:#94A3B8;font-style:italic;'; }
+}
+
+// ---- Tab Navigation ----
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => { b.classList.remove('active'); b.setAttribute('aria-selected', 'false'); });
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    btn.classList.add('active');
+    btn.setAttribute('aria-selected', 'true');
+    const tabId = 'tab-' + btn.dataset.tab;
+    const el = document.getElementById(tabId);
+    if (el) {
+      el.classList.add('active');
+      _reinitTablesIn(el);
+    }
+    initCharts();
+  });
+});
+
+// ---- Arrow key navigation for tablists ----
+document.querySelectorAll('[role="tablist"]').forEach(function(tablist) {
+  tablist.addEventListener('keydown', function(e) {
+    if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+    const tabs = Array.from(tablist.querySelectorAll('[role="tab"]:not([style*="display: none"]):not([style*="display:none"])'));
+    if (tabs.length === 0) return;
+    const idx = tabs.indexOf(document.activeElement);
+    if (idx < 0) return;
+    e.preventDefault();
+    const next = e.key === 'ArrowRight' ? (idx + 1) % tabs.length : (idx - 1 + tabs.length) % tabs.length;
+    tabs[next].focus();
+    tabs[next].click();
+  });
+});
+
+// ---- Tab Scroll Indicators (#18) ----
+(function() {
+  const nav = document.querySelector('.tab-nav');
+  const inner = nav && nav.querySelector('.tab-nav-inner');
+  if (!nav || !inner) return;
+  function updateScrollHints() {
+    nav.classList.toggle('scroll-left', inner.scrollLeft > 4);
+    nav.classList.toggle('scroll-right', inner.scrollLeft < inner.scrollWidth - inner.clientWidth - 4);
+  }
+  inner.addEventListener('scroll', updateScrollHints, { passive: true });
+  window.addEventListener('resize', updateScrollHints, { passive: true });
+  updateScrollHints();
+})();
+
+// ---- Issue Filter ----
+function filterIssues() {
+  const q = document.getElementById('issueFilter').value.toLowerCase();
+  const section = document.getElementById('tab-issues');
+  if (!section) return;
+  const table = section.querySelector('.data-table');
+  if (!table) return;
+  table.querySelectorAll('tbody tr').forEach(row => {
+    row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
+  });
+}
+
+// ---- Charts (lazy) ----
+let chartsInitialized = false;
+const _chartIds = ['chartStatus', 'chartTypes', 'chartRisks', 'chartTeams', 'chartWorkload', 'chartSprints'];
+
+function initCharts() {
+  if (chartsInitialized) return;
+  if (typeof Chart === 'undefined') {
+    // Chart.js CDN failed — show error on all chart containers
+    _chartIds.forEach(_showChartError);
+    return;
+  }
+  chartsInitialized = true;
+
+  const defaultOpts = { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, padding: 12 } } }, elements: { arc: { borderWidth: 2, borderColor: 'var(--surface, #fff)' } } };
+
+  function _hasData(cfg) {
+    if (!cfg || !cfg.data) return false;
+    const ds = cfg.data.datasets || [];
+    if (!ds.length) return false;
+    return ds.some(d => (d.data || []).some(v => v > 0));
+  }
+
+  function _initOne(id, cfg) {
+    const ctx = document.getElementById(id);
+    if (!ctx) return;
+    // Reset canvas visibility and dimensions on re-init (theme switch)
+    ctx.style.display = '';
+    ctx.style.width = '100%';
+    ctx.style.height = '';
+    const wrapper = ctx.parentElement;
+    if (wrapper) {
+      wrapper.querySelectorAll('.empty-state').forEach(e => e.remove());
+      wrapper.style.overflow = '';
+    }
+    if (!_hasData(cfg)) {
+      _hideLoading(id);
+      if (wrapper) {
+        ctx.style.display = 'none';
+        const msg = document.createElement('p');
+        msg.className = 'empty-state';
+        msg.setAttribute('role', 'status');
+        msg.textContent = _i18n.chart_no_data || 'No data available';
+        msg.style.cssText = 'text-align:center;padding:32px 16px;color:var(--text-tertiary);font-style:italic;';
+        wrapper.appendChild(msg);
+      }
+      return;
+    }
+    try {
+      new Chart(ctx, cfg);
+      _hideLoading(id);
+    } catch (e) {
+      console.error('Chart init error for ' + id + ':', e);
+      _showChartError(id);
+    }
+  }
+
+  _initOne('chartStatus', { type: 'doughnut', data: {{ status_chart_data }}, options: { ...defaultOpts, cutout: '55%' } });
+  _initOne('chartTypes', { type: 'doughnut', data: {{ type_chart_data }}, options: { ...defaultOpts, cutout: '55%' } });
+  _initOne('chartRisks', { type: 'doughnut', data: {{ risk_chart_data }}, options: { ...defaultOpts, cutout: '55%' } });
+  _initOne('chartTeams', { type: 'bar', data: {{ team_chart_data }}, options: { ...defaultOpts, indexAxis: 'y' } });
+  _initOne('chartWorkload', { type: 'bar', data: {{ workload_chart_data }}, options: { ...defaultOpts, indexAxis: 'y' } });
+  _initOne('chartSprints', { type: 'bar', data: {{ sprint_chart_data }}, options: { ...defaultOpts, scales: { x: { stacked: true }, y: { stacked: true } } } });
+}
+
+window.addEventListener('load', initCharts);
+
+// ---- Settings Panel ----
+let _previousFocus = null;
+function openSettings() {
+  _previousFocus = document.activeElement;
+  document.getElementById('settingsOverlay').classList.add('open');
+  document.getElementById('settingsDrawer').classList.add('open');
+  // Focus the first focusable element inside the drawer
+  const drawer = document.getElementById('settingsDrawer');
+  const first = drawer.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+  if (first) first.focus();
+}
+function closeSettings() {
+  document.getElementById('settingsOverlay').classList.remove('open');
+  document.getElementById('settingsDrawer').classList.remove('open');
+  if (_previousFocus) _previousFocus.focus();
+}
+
+// Focus trap + Escape key for settings drawer
+document.addEventListener('keydown', function(e) {
+  const drawer = document.getElementById('settingsDrawer');
+  if (!drawer.classList.contains('open')) return;
+  if (e.key === 'Escape') { closeSettings(); return; }
+  if (e.key !== 'Tab') return;
+  const focusable = drawer.querySelectorAll('button, [href], input:not([type="hidden"]), select, textarea, [tabindex]:not([tabindex="-1"])');
+  if (focusable.length === 0) return;
+  const first = focusable[0];
+  const last = focusable[focusable.length - 1];
+  if (e.shiftKey) {
+    if (document.activeElement === first) { e.preventDefault(); last.focus(); }
+  } else {
+    if (document.activeElement === last) { e.preventDefault(); first.focus(); }
+  }
+});
+
+let _toastTimer = null;
+function showToast(msg) {
+  const t = document.getElementById('settingsToast');
+  t.textContent = msg;
+  t.style.display = 'block';
+  if (_toastTimer) clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(function() { t.style.display = 'none'; _toastTimer = null; }, 2500);
+}
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    const toast = document.getElementById('settingsToast');
+    if (toast && toast.style.display === 'block') {
+      toast.style.display = 'none';
+      if (_toastTimer) { clearTimeout(_toastTimer); _toastTimer = null; }
+    }
+  }
+});
+
+function applySettings() {
+  // Read values from UI and apply live where possible
+  const title = document.getElementById('cfg-title').value;
+  const accent = document.getElementById('cfg-primary').value;
+  const secondary = document.getElementById('cfg-secondary').value;
+  const tertiary = document.getElementById('cfg-tertiary').value;
+  const company = document.getElementById('cfg-company').value;
+
+  // Update CSS custom properties
+  document.documentElement.style.setProperty('--primary', accent);
+  document.documentElement.style.setProperty('--secondary', secondary);
+  document.documentElement.style.setProperty('--tertiary', tertiary);
+
+  // Update top bar title
+  const h1 = document.querySelector('.header-title');
+  if (h1) h1.textContent = title;
+  document.title = title;
+
+  // Update footer company
+  const subtitle = document.getElementById('cfg-subtitle').value;
+  const sub = document.querySelector('.header-subtitle');
+  if (sub) sub.textContent = subtitle;
+
+  // Toggle tab visibility
+  document.querySelectorAll('[data-tab-toggle]').forEach(cb => {
+    const tabId = cb.dataset.tabToggle;
+    const tabBtn = document.querySelector(`.tab-btn[data-tab="${tabId}"]`);
+    const tabSection = document.getElementById('tab-' + tabId);
+    if (tabBtn) tabBtn.style.display = cb.checked ? '' : 'none';
+    if (tabSection && !cb.checked) tabSection.classList.remove('active');
+  });
+
+  // Toggle chart visibility
+  const chartsEnabled = document.getElementById('cfg-charts-enabled').checked;
+  document.querySelectorAll('.chart-grid').forEach(g => {
+    g.style.display = chartsEnabled ? '' : 'none';
+  });
+
+  // Update in-memory config
+  _currentConfig.dashboard = _currentConfig.dashboard || {};
+  _currentConfig.dashboard.branding = {
+    title: title,
+    subtitle: subtitle,
+    accent_color: accent,
+    secondary_color: secondary,
+    tertiary_color: tertiary,
+    company_name: company
+  };
+  _currentConfig.thresholds = {
+    overload_points: parseFloat(document.getElementById('cfg-overload-points').value) || 20,
+    overload_issues: parseInt(document.getElementById('cfg-overload-issues').value) || 8,
+    wip_limit: parseInt(document.getElementById('cfg-wip-limit').value) || 5,
+    aging_days: parseInt(document.getElementById('cfg-aging-days').value) || 14,
+    capacity_per_person: parseFloat(document.getElementById('cfg-capacity').value) || 13
+  };
+
+  closeSettings();
+  showToast(_i18n.settings_applied);
+}
+
+function resetSettings() {
+  _currentConfig = JSON.parse(JSON.stringify(_initialConfig));
+  const b = _initialConfig.dashboard?.branding || _initialConfig.output || {};
+  document.getElementById('cfg-title').value = b.title || _i18n.default_title;
+  document.getElementById('cfg-subtitle').value = b.subtitle || _i18n.default_subtitle;
+  document.getElementById('cfg-company').value = b.company_name || '';
+  document.getElementById('cfg-primary').value = b.accent_color || b.primary_color || '#4F46E5';
+  const th = _initialConfig.thresholds || {};
+  document.getElementById('cfg-overload-points').value = th.overload_points || 20;
+  document.getElementById('cfg-overload-issues').value = th.overload_issues || 8;
+  document.getElementById('cfg-wip-limit').value = th.wip_limit || 5;
+  document.getElementById('cfg-aging-days').value = th.aging_days || 14;
+  document.getElementById('cfg-capacity').value = th.capacity_per_person || 13;
+  document.querySelectorAll('[data-tab-toggle]').forEach(cb => { cb.checked = true; });
+  document.getElementById('cfg-charts-enabled').checked = true;
+  showToast(_i18n.reset_defaults);
+}
+
+function exportConfig() {
+  const blob = new Blob([JSON.stringify(_currentConfig, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'flowboard-config.json';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast(_i18n.config_exported);
+}
+
+function importConfig() {
+  document.getElementById('importFile').click();
+}
+
+function handleImport(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const imported = JSON.parse(e.target.result);
+      // Basic schema validation
+      if (typeof imported !== 'object' || imported === null || Array.isArray(imported)) {
+        showToast(_i18n.invalid_json + (_i18n.json_parse_error || 'Expected a JSON object, got ') + typeof imported);
+        return;
+      }
+      _currentConfig = imported;
+      // Populate UI fields from imported config
+      const b = imported.dashboard?.branding || imported.output || {};
+      if (b.title) document.getElementById('cfg-title').value = b.title;
+      if (b.subtitle) document.getElementById('cfg-subtitle').value = b.subtitle;
+      if (b.company_name !== undefined) document.getElementById('cfg-company').value = b.company_name;
+      if (b.accent_color || b.primary_color) document.getElementById('cfg-primary').value = b.primary_color || b.accent_color;
+      const th = imported.thresholds || {};
+      if (th.overload_points) document.getElementById('cfg-overload-points').value = th.overload_points;
+      if (th.overload_issues) document.getElementById('cfg-overload-issues').value = th.overload_issues;
+      if (th.wip_limit) document.getElementById('cfg-wip-limit').value = th.wip_limit;
+      if (th.aging_days) document.getElementById('cfg-aging-days').value = th.aging_days;
+      if (th.capacity_per_person) document.getElementById('cfg-capacity').value = th.capacity_per_person;
+      showToast(_i18n.config_imported);
+    } catch (err) {
+      showToast(_i18n.invalid_json + err.message);
+    }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+}
+

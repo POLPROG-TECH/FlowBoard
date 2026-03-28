@@ -1,0 +1,39 @@
+{% if "workload" in visible_tabs %}
+<div role="tabpanel" class="section {% if default_tab == 'workload' %}active{% endif %}" id="tab-workload" aria-labelledby="tab-workload-btn">
+  <h2 class="section-title">{{ t("section.workload") }}</h2>
+  <p class="section-subtitle">{{ t("section.workload_desc") }}</p>
+
+  <div class="insights-tabs" role="tablist">
+    <button class="insights-tab-btn insights-tab-active" role="tab" aria-selected="true" aria-controls="wlWorkload" data-wl-view="workload" onclick="switchWorkload('workload')"><span aria-hidden="true">📋</span> {{ t("section.workload") }}</button>
+    <button class="insights-tab-btn" role="tab" aria-selected="false" aria-controls="wlBacklog" data-wl-view="backlog" onclick="switchWorkload('backlog')"><span aria-hidden="true">📦</span> {{ t("scrum.backlog_quality") }}</button>
+    <button class="insights-tab-btn" role="tab" aria-selected="false" aria-controls="wlReadiness" data-wl-view="readiness" onclick="switchWorkload('readiness')"><span aria-hidden="true">✅</span> {{ t("scrum.sprint_readiness") }}</button>
+  </div>
+
+  <div class="insights-panel" id="wlWorkload" role="tabpanel" style="display:block">
+  {{ summary_cards_html }}
+
+  {% if charts_cfg.charts.enabled and charts_cfg.charts.workload_per_person %}
+  <div class="chart-grid">
+    <div class="chart-card" style="grid-column: span 2;">
+      <h3 class="chart-title">{{ t("section.story_points_per_person") }}</h3>
+      <div class="chart-loading" id="chartWorkloadLoading" role="status" aria-live="polite">{{ t("ui.loading_chart") }}</div>
+      <canvas id="chartWorkload" height="300" role="img" aria-label="{{ t('section.story_points_per_person') }}"></canvas>
+    </div>
+  </div>
+  {% endif %}
+
+  <h3 class="section-title">{{ t("section.individual_workload") }}</h3>
+  {{ workload_table_html }}
+  </div>
+
+  <div class="insights-panel" id="wlBacklog" role="tabpanel" class="hidden">
+    <h3 class="section-title"><span aria-hidden="true">📦</span> {{ t("scrum.backlog_quality") }}</h3>
+    {{ scrum_backlog_quality_html }}
+  </div>
+
+  <div class="insights-panel" id="wlReadiness" role="tabpanel" class="hidden">
+    <h3 class="section-title"><span aria-hidden="true">✅</span> {{ t("scrum.sprint_readiness") }}</h3>
+    {{ scrum_readiness_html }}
+  </div>
+</div>
+{% endif %}

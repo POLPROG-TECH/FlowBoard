@@ -1,0 +1,50 @@
+{% if "sprints" in visible_tabs %}
+<div role="tabpanel" class="section {% if default_tab == 'sprints' %}active{% endif %}" id="tab-sprints" aria-labelledby="tab-sprints-btn">
+  <h2 class="section-title">{{ t("section.sprint_health") }}</h2>
+  <p class="section-subtitle">{{ t("section.sprint_health_desc") }}</p>
+
+  <div class="insights-tabs" role="tablist">
+    <button class="insights-tab-btn insights-tab-active" role="tab" aria-selected="true" aria-controls="spHealth" data-sp-view="health" onclick="switchSprints('health')"><span aria-hidden="true">💚</span> {{ t("section.sprint_health") }}</button>
+    <button class="insights-tab-btn" role="tab" aria-selected="false" aria-controls="spGoals" data-sp-view="goals" onclick="switchSprints('goals')"><span aria-hidden="true">🎯</span> {{ t("scrum.sprint_goals") }}</button>
+    <button class="insights-tab-btn" role="tab" aria-selected="false" aria-controls="spScope" data-sp-view="scope" onclick="switchSprints('scope')"><span aria-hidden="true">🔄</span> {{ t("scrum.scope_changes") }}</button>
+    <button class="insights-tab-btn" role="tab" aria-selected="false" aria-controls="spCapacity" data-sp-view="capacity" onclick="switchSprints('capacity')"><span aria-hidden="true">⚖️</span> {{ t("scrum.capacity_vs_commitment") }}</button>
+    <span class="insights-tab-spacer"></span>
+    <label class="sprint-count-label" for="sprintCountSelect">{{ t("sprints.show_count") }}:</label>
+    <select id="sprintCountSelect" class="sprint-count-select" onchange="filterSprintCount(this.value)" aria-label="{{ t('sprints.show_count') }}">
+      <option value="all">{{ t("sprints.show_all") }}</option>
+      <option value="3" selected>{{ t("sprints.show_last_n", n=3) }}</option>
+      <option value="5">{{ t("sprints.show_last_n", n=5) }}</option>
+      <option value="10">{{ t("sprints.show_last_n", n=10) }}</option>
+    </select>
+  </div>
+
+  <div class="insights-panel" aria-live="polite" id="spHealth" role="tabpanel" style="display:block">
+  {{ sprint_health_html }}
+
+  {% if snapshot.sprint_health and charts_cfg.charts.enabled and charts_cfg.charts.sprint_progress %}
+  <div class="chart-grid">
+    <div class="chart-card" style="grid-column: span 2;">
+      <h3 class="chart-title">{{ t("section.sprint_progress") }}</h3>
+      <div class="chart-loading" id="chartSprintsLoading" role="status" aria-live="polite">{{ t("ui.loading_chart") }}</div>
+      <canvas id="chartSprints" height="280" role="img" aria-label="{{ t('section.sprint_progress') }}"></canvas>
+    </div>
+  </div>
+  {% endif %}
+  </div>
+
+  <div class="insights-panel" aria-live="polite" id="spGoals" role="tabpanel" class="hidden">
+    <h3 class="section-title"><span aria-hidden="true">🎯</span> {{ t("scrum.sprint_goals") }}</h3>
+    {{ scrum_sprint_goals_html }}
+  </div>
+
+  <div class="insights-panel" aria-live="polite" id="spScope" role="tabpanel" class="hidden">
+    <h3 class="section-title"><span aria-hidden="true">🔄</span> {{ t("scrum.scope_changes") }}</h3>
+    {{ scrum_scope_changes_html }}
+  </div>
+
+  <div class="insights-panel" aria-live="polite" id="spCapacity" role="tabpanel" class="hidden">
+    <h3 class="section-title"><span aria-hidden="true">⚖️</span> {{ t("scrum.capacity_vs_commitment") }}</h3>
+    {{ scrum_capacity_html }}
+  </div>
+</div>
+{% endif %}

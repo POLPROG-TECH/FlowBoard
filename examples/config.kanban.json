@@ -1,0 +1,22 @@
+{
+  "jira": {
+    "base_url": "https://your-org.atlassian.net",
+    "projects": ["BOARD"]
+  },
+  "methodology": "kanban",
+  "output": {
+    "path": "output/kanban_dashboard.html",
+    "title": "Kanban Flow Dashboard"
+  },
+  "thresholds": {
+    "wip_limit": 3,
+    "aging_days": 14
+  },
+  "dashboard": {
+    "branding": {
+      "title": "Kanban Flow Dashboard",
+      "subtitle": "Continuous Delivery Intelligence",
+      "primary_color": "#3b82f6"
+    }
+  }
+}

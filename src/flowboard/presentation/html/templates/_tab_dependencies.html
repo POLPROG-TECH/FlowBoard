@@ -1,0 +1,20 @@
+{% if "dependencies" in visible_tabs %}
+<div role="tabpanel" class="section {% if default_tab == 'dependencies' %}active{% endif %}" id="tab-dependencies" aria-labelledby="tab-dependencies-btn">
+  <h2 class="section-title">{{ t("section.dependencies") }}</h2>
+  <p class="section-subtitle">{{ t("section.dependencies_desc") }}</p>
+
+  <div class="insights-tabs" role="tablist">
+    <button class="insights-tab-btn insights-tab-active" role="tab" aria-selected="true" aria-controls="depTable" data-dep-view="table" onclick="switchDeps('table')"><span aria-hidden="true">📋</span> {{ t("scrum.dep_table") }}</button>
+    <button class="insights-tab-btn" role="tab" aria-selected="false" aria-controls="depHeatmap" data-dep-view="heatmap" onclick="switchDeps('heatmap')"><span aria-hidden="true">🔥</span> {{ t("scrum.dep_heatmap") }}</button>
+  </div>
+
+  <div class="insights-panel" id="depTable" role="tabpanel" style="display:block">
+  {{ dependency_html }}
+  </div>
+
+  <div class="insights-panel" id="depHeatmap" role="tabpanel" class="hidden">
+    <h3 class="section-title"><span aria-hidden="true">🔥</span> {{ t("scrum.dep_heatmap") }}</h3>
+    {{ scrum_dep_heatmap_html }}
+  </div>
+</div>
+{% endif %}

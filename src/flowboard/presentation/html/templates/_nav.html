@@ -1,0 +1,20 @@
+<nav class="tab-nav" id="navTabs" role="tablist" aria-label="{{ t("ui.nav_label") }}">
+  <div class="tab-nav-inner">
+  {% set tab_labels = {
+    "overview": t("tab.overview"),
+    "workload": t("tab.workload"),
+    "sprints": t("tab.sprints"),
+    "flow": t("tab.flow", fallback="📊 Flow"),
+    "phases": t("tab.phases", fallback="📋 Phases"),
+    "timeline": t("tab.timeline"),
+    "pi": t("tab.pi"),
+    "insights": t("tab.insights"),
+    "issues": t("tab.issues")
+  } %}
+  {% for tab_id in tab_order %}
+  {% if tab_id in visible_tabs %}
+  <button class="tab-btn {% if tab_id == default_tab %}active{% endif %}" id="tab-{{ tab_id }}-btn" data-tab="{{ tab_id }}" role="tab" aria-selected="{% if tab_id == default_tab %}true{% else %}false{% endif %}" aria-controls="tab-{{ tab_id }}">{{ tab_labels.get(tab_id, tab_id|capitalize) }}</button>
+  {% endif %}
+  {% endfor %}
+  </div>
+</nav>

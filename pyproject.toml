@@ -1,0 +1,77 @@
+[build-system]
+requires = ["setuptools>=68.0", "setuptools-scm>=8.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "flowboard"
+version = "1.0.0"
+description = "Jira-based roadmap, delivery, and workload intelligence dashboard"
+readme = "README.md"
+license = "AGPL-3.0-only"
+requires-python = ">=3.12"
+authors = [
+    { name = "FlowBoard Team" },
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Quality Assurance",
+    "Topic :: Office/Business :: Scheduling",
+    "Typing :: Typed",
+]
+
+dependencies = [
+    "requests>=2.31,<3",
+    "typer>=0.9,<1",
+    "rich>=13.0,<14",
+    "jinja2>=3.1,<4",
+    "markupsafe>=2.1,<3",
+    "jsonschema>=4.20,<5",
+    "pydantic>=2.5,<3",
+    "fastapi>=0.109.0",
+    "uvicorn[standard]>=0.27.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4,<9",
+    "pytest-cov>=4.1,<6",
+    "responses>=0.24,<1",
+    "ruff>=0.4,<1",
+    "mypy>=1.8,<2",
+]
+
+[project.scripts]
+flowboard = "flowboard.cli.main:app"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+flowboard = [
+    "presentation/html/templates/*.html",
+    "presentation/html/templates/**/*.html",
+    "i18n/*.json",
+    "infrastructure/config/*.json",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+addopts = "-v --tb=short"
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W", "UP", "B", "SIM", "RUF"]
+ignore = ["E501", "B008", "RUF001"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+warn_return_any = true
+warn_unused_configs = true

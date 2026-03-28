@@ -1,0 +1,255 @@
+<div class="settings-overlay" id="settingsOverlay" onclick="closeSettings()"></div>
+<div class="settings-drawer" id="settingsDrawer" role="dialog" aria-modal="true" aria-label="{{ t('settings.title') }}">
+  <div class="settings-drawer-header">
+    <div>
+      <h2>{{ t("settings.title") }}</h2>
+    </div>
+    <button class="settings-close-btn" onclick="closeSettings()" aria-label="{{ t("ui.close_settings") }}">✕</button>
+  </div>
+  <div class="settings-body">
+
+    {# ── Appearance ─────────────────────────────────────────── #}
+    <div class="settings-card">
+      <h3 class="settings-card-title">{{ t("ui.quick_settings.theme") }} &amp; {{ t("ui.quick_settings.language") }}</h3>
+
+      <div class="settings-section">
+        <h3>{{ t("ui.quick_settings.theme") }}</h3>
+        <div class="settings-field" style="gap:8px;justify-content:flex-start;flex-wrap:wrap;">
+          {% for th in ["light","system","dark","midnight"] %}
+          <button class="zoom-btn{% if theme == th %} active{% endif %}" data-theme-btn="{{ th }}"
+              onclick="setTheme('{{ th }}')">
+            {{ t("ui.theme." ~ th) }}
+          </button>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <h3>{{ t("ui.quick_settings.language") }}</h3>
+        <div class="settings-field" style="gap:8px;justify-content:flex-start;flex-wrap:wrap;">
+          <button class="zoom-btn{% if locale == 'en' %} active{% endif %}" data-lang-btn="en" onclick="setLanguagePreference('en')">
+            {{ t("ui.lang.en", fallback="English") }}
+          </button>
+          <button class="zoom-btn{% if locale == 'pl' %} active{% endif %}" data-lang-btn="pl" onclick="setLanguagePreference('pl')">
+            {{ t("ui.lang.pl", fallback="Polski") }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    {# ── Branding ──────────────────────────────────────────── #}
+    <div class="settings-card">
+      <h3 class="settings-card-title">{{ t("settings.branding") }}</h3>
+
+      <div class="settings-section">
+        <div class="settings-field">
+          <label for="cfg-title">{{ t("settings.field_title") }}</label>
+          <input type="text" id="cfg-title" value="{{ title }}">
+        </div>
+        <div class="settings-field">
+          <label for="cfg-subtitle">{{ t("settings.field_subtitle") }}</label>
+          <input type="text" id="cfg-subtitle" value="{{ subtitle }}">
+        </div>
+        <div class="settings-field">
+          <label for="cfg-company">{{ t("settings.field_company") }}</label>
+          <input type="text" id="cfg-company" value="{{ company_name }}">
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <h3>{{ t("settings.field_primary_color") }}</h3>
+        <div class="settings-field" style="gap:16px;justify-content:flex-start;">
+          <div>
+            <label for="cfg-primary">{{ t("settings.field_primary_color") }}</label>
+            <input type="color" id="cfg-primary" value="{{ primary_color }}" aria-label="{{ t('settings.field_primary_color') }}">
+          </div>
+          <div>
+            <label for="cfg-secondary">{{ t("settings.field_secondary_color") }}</label>
+            <input type="color" id="cfg-secondary" value="{{ secondary_color }}" aria-label="{{ t('settings.field_secondary_color') }}">
+          </div>
+          <div>
+            <label for="cfg-tertiary">{{ t("settings.field_tertiary_color") }}</label>
+            <input type="color" id="cfg-tertiary" value="{{ tertiary_color }}" aria-label="{{ t('settings.field_tertiary_color') }}">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {# ── Layout & Tabs ─────────────────────────────────────── #}
+    <div class="settings-card">
+      <h3 class="settings-card-title">{{ t("settings.layout") }} &amp; {{ t("settings.visible_tabs") }}</h3>
+
+      <div class="settings-section">
+        <h3>{{ t("settings.layout") }}</h3>
+        <div class="settings-field">
+          <label for="cfg-density">{{ t("settings.field_density") }}</label>
+          <select id="cfg-density">
+            <option value="compact" {% if layout_density == "compact" %}selected{% endif %}>{{ t("settings.density_compact") }}</option>
+            <option value="comfortable" {% if layout_density == "comfortable" %}selected{% endif %}>{{ t("settings.density_comfortable") }}</option>
+            <option value="spacious" {% if layout_density == "spacious" %}selected{% endif %}>{{ t("settings.density_spacious") }}</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <h3>{{ t("settings.visible_tabs") }}</h3>
+        {% set tab_names = {
+          "overview": t("tab.overview"), "workload": t("tab.workload"), "sprints": t("tab.sprints"),
+          "timeline": t("tab.timeline"), "pi": t("tab.pi"),
+          "insights": t("tab.insights"), "dependencies": t("tab.dependencies"), "issues": t("tab.issues")
+        } %}
+        {% for tab_id in ["overview","workload","sprints","timeline","pi","insights","dependencies","issues"] %}
+        <div class="settings-field">
+          <label>{{ tab_names.get(tab_id, tab_id|capitalize) }}</label>
+          <label class="toggle">
+            <input type="checkbox" data-tab-toggle="{{ tab_id }}" {% if tab_id in visible_tabs %}checked{% endif %} aria-label="{{ tab_names.get(tab_id, tab_id|capitalize) }}">
+            <span class="slider"></span>
+          </label>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    {# ── Thresholds ────────────────────────────────────────── #}
+    <div class="settings-card">
+      <h3 class="settings-card-title">{{ t("settings.thresholds") }}</h3>
+
+      <div class="settings-section">
+        <div class="settings-field">
+          <label for="cfg-overload-points">{{ t("settings.overload_points") }}</label>
+          <input type="number" id="cfg-overload-points" value="{{ config.thresholds.overload_points }}" min="1">
+        </div>
+        <div class="settings-field">
+          <label for="cfg-overload-issues">{{ t("settings.overload_issues") }}</label>
+          <input type="number" id="cfg-overload-issues" value="{{ config.thresholds.overload_issues }}" min="1">
+        </div>
+        <div class="settings-field">
+          <label for="cfg-wip-limit">{{ t("settings.wip_limit") }}</label>
+          <input type="number" id="cfg-wip-limit" value="{{ config.thresholds.wip_limit }}" min="1">
+        </div>
+        <div class="settings-field">
+          <label for="cfg-aging-days">{{ t("settings.aging_days") }}</label>
+          <input type="number" id="cfg-aging-days" value="{{ config.thresholds.aging_days }}" min="1">
+        </div>
+        <div class="settings-field">
+          <label for="cfg-capacity">{{ t("settings.capacity_per_person") }}</label>
+          <input type="number" id="cfg-capacity" value="{{ config.thresholds.capacity_per_person }}" min="1" step="0.5">
+        </div>
+      </div>
+    </div>
+
+    {# ── Display Options ───────────────────────────────────── #}
+    <div class="settings-card">
+      <h3 class="settings-card-title">{{ t("settings.charts") }} &amp; {{ t("settings.risk_display") }}</h3>
+
+      <div class="settings-section">
+        <h3>{{ t("settings.charts") }}</h3>
+        <div class="settings-field">
+          <label for="cfg-charts-enabled">{{ t("settings.enable_charts") }}</label>
+          <label class="toggle">
+            <input type="checkbox" id="cfg-charts-enabled" {% if charts_cfg.charts.enabled %}checked{% endif %} aria-label="{{ t('settings.enable_charts') }}">
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <h3>{{ t("settings.risk_display") }}</h3>
+        <div class="settings-field">
+          <label for="cfg-risk-badges">{{ t("settings.severity_badges") }}</label>
+          <label class="toggle">
+            <input type="checkbox" id="cfg-risk-badges" {% if charts_cfg.risk_display.show_severity_badges %}checked{% endif %} aria-label="{{ t('settings.severity_badges') }}">
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="settings-field">
+          <label for="cfg-risk-recs">{{ t("settings.recommendations") }}</label>
+          <label class="toggle">
+            <input type="checkbox" id="cfg-risk-recs" {% if charts_cfg.risk_display.show_recommendations %}checked{% endif %} aria-label="{{ t('settings.recommendations') }}">
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="settings-field">
+          <label for="cfg-highlight-blocked">{{ t("settings.highlight_blocked") }}</label>
+          <label class="toggle">
+            <input type="checkbox" id="cfg-highlight-blocked" {% if charts_cfg.risk_display.highlight_blocked %}checked{% endif %} aria-label="{{ t('settings.highlight_blocked') }}">
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    {# ── Roadmap & Timeline ────────────────────────────────── #}
+    <div class="settings-card">
+      <h3 class="settings-card-title">{{ t("settings.roadmap_timeline") }} &amp; {{ t("settings.timeline") }}</h3>
+
+      <div class="settings-section">
+        <h3>{{ t("settings.roadmap_timeline") }}</h3>
+        <div class="settings-field">
+          <label for="cfg-roadmap-zoom">{{ t("settings.default_zoom") }}</label>
+          <input type="number" id="cfg-roadmap-zoom" value="{{ charts_cfg.roadmap.default_zoom }}" min="25" max="400" step="25">
+        </div>
+        <div class="settings-field">
+          <label for="cfg-roadmap-risk">{{ t("settings.show_risk_badges") }}</label>
+          <label class="toggle">
+            <input type="checkbox" id="cfg-roadmap-risk" {% if charts_cfg.roadmap.show_risk_badges %}checked{% endif %} aria-label="{{ t('settings.show_risk_badges') }}">
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <h3>{{ t("settings.timeline") }}</h3>
+        <div class="settings-field">
+          <label for="cfg-timeline-mode">{{ t("settings.timeline_mode") }}</label>
+          <select id="cfg-timeline-mode">
+            <option value="assignee" {% if charts_cfg.timeline.default_mode == "assignee" %}selected{% endif %}>{{ t("timeline.mode_assignee") }}</option>
+            <option value="team" {% if charts_cfg.timeline.default_mode == "team" %}selected{% endif %}>{{ t("timeline.mode_team") }}</option>
+            <option value="epic" {% if charts_cfg.timeline.default_mode == "epic" %}selected{% endif %}>{{ t("timeline.mode_epic") }}</option>
+            <option value="conflict" {% if charts_cfg.timeline.default_mode == "conflict" %}selected{% endif %}>{{ t("timeline.mode_conflict") }}</option>
+            <option value="executive" {% if charts_cfg.timeline.default_mode == "executive" %}selected{% endif %}>{{ t("timeline.mode_executive") }}</option>
+          </select>
+        </div>
+        <div class="settings-field">
+          <label for="cfg-timeline-overlaps">{{ t("settings.timeline_overlaps") }}</label>
+          <label class="toggle">
+            <input type="checkbox" id="cfg-timeline-overlaps" {% if charts_cfg.timeline.show_overlaps %}checked{% endif %} aria-label="{{ t('settings.timeline_overlaps') }}">
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="settings-field">
+          <label for="cfg-timeline-sprints">{{ t("settings.timeline_sprint_bounds") }}</label>
+          <label class="toggle">
+            <input type="checkbox" id="cfg-timeline-sprints" {% if charts_cfg.timeline.show_sprint_boundaries %}checked{% endif %} aria-label="{{ t('settings.timeline_sprint_bounds') }}">
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="settings-field">
+          <label for="cfg-timeline-today">{{ t("settings.timeline_today") }}</label>
+          <label class="toggle">
+            <input type="checkbox" id="cfg-timeline-today" {% if charts_cfg.timeline.show_today_marker %}checked{% endif %} aria-label="{{ t('settings.timeline_today') }}">
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="settings-field">
+          <label for="cfg-timeline-compact">{{ t("settings.timeline_compact") }}</label>
+          <label class="toggle">
+            <input type="checkbox" id="cfg-timeline-compact" {% if charts_cfg.timeline.compact_bar_height %}checked{% endif %} aria-label="{{ t('settings.timeline_compact') }}">
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="settings-footer">
+    <button class="btn-primary" onclick="applySettings()">{{ t("settings.btn_apply") }}</button>
+    <button onclick="exportConfig()">{{ t("settings.btn_export") }}</button>
+    <button onclick="importConfig()">{{ t("settings.btn_import") }}</button>
+    <button onclick="resetSettings()">{{ t("settings.btn_reset") }}</button>
+    <button class="btn-danger" onclick="closeSettings()">{{ t("settings.btn_cancel") }}</button>
+  </div>
+</div>
+<div class="settings-toast" id="settingsToast" role="status" aria-live="polite"></div>
+<input type="file" id="importFile" accept=".json" style="display:none" onchange="handleImport(event)" aria-label="{{ t("settings.import_config") }}">

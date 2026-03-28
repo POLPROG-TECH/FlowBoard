@@ -1,0 +1,124 @@
+{
+  "jira": {
+    "base_url": "https://yourcompany.atlassian.net",
+    "auth_email": "you@yourcompany.com",
+    "projects": ["PROJ"],
+    "max_results": 100
+  },
+  "field_mappings": {
+    "story_points": "customfield_10016",
+    "epic_link": "customfield_10014",
+    "sprint": "customfield_10020"
+  },
+  "status_mapping": {
+    "Open": "To Do",
+    "In Development": "In Progress",
+    "Code Review": "In Progress",
+    "QA": "In Progress",
+    "Closed": "Done"
+  },
+  "teams": [
+    {
+      "key": "platform",
+      "name": "Platform Team",
+      "members": ["user-1", "user-2", "user-3"]
+    },
+    {
+      "key": "frontend",
+      "name": "Frontend Team",
+      "members": ["user-4", "user-5"]
+    }
+  ],
+  "thresholds": {
+    "overload_points": 20,
+    "overload_issues": 8,
+    "wip_limit": 5,
+    "aging_days": 14,
+    "capacity_per_person": 13
+  },
+  "blocked_link_types": ["Blocks", "is blocked by"],
+  "output": {
+    "path": "output/dashboard.html",
+    "title": "FlowBoard Dashboard",
+    "primary_color": "#fb6400",
+    "company_name": "Your Company"
+  },
+  "dashboard": {
+    "branding": {
+      "title": "FlowBoard Dashboard",
+      "subtitle": "Jira-Based Delivery & Workload Intelligence",
+      "primary_color": "#fb6400",
+      "company_name": "Your Company"
+    },
+    "layout": {
+      "density": "comfortable",
+      "max_width": "1440px"
+    },
+    "tabs": {
+      "visible": ["overview", "workload", "sprints", "timeline", "pi", "insights", "dependencies", "issues"],
+      "order": ["overview", "workload", "sprints", "timeline", "pi", "insights", "dependencies", "issues"],
+      "default_tab": "overview"
+    },
+    "summary_cards": {
+      "visible": ["total_issues", "open_issues", "blocked", "story_points", "completed_sp", "critical_risks", "high_risks", "overloaded", "conflicts"]
+    },
+    "charts": {
+      "enabled": true,
+      "status_distribution": true,
+      "type_distribution": true,
+      "risk_severity": true,
+      "team_workload": true,
+      "sprint_progress": true,
+      "workload_per_person": true
+    },
+    "tables": {
+      "issues_columns": ["key", "summary", "type", "status", "assignee", "sp", "priority", "sprint", "age"],
+      "max_rows": 200,
+      "default_sort": "key",
+      "sort_direction": "asc"
+    },
+    "filters": {
+      "default_teams": [],
+      "default_sprints": [],
+      "default_statuses": [],
+      "default_types": [],
+      "default_priorities": []
+    },
+    "risk_display": {
+      "show_severity_badges": true,
+      "show_recommendations": true,
+      "highlight_blocked": true
+    },
+    "roadmap": {
+      "time_window_months": 3,
+      "default_zoom": 100,
+      "show_dependencies": true,
+      "show_risk_badges": true
+    },
+    "timeline": {
+      "default_mode": "assignee",
+      "default_zoom": 100,
+      "max_swimlanes": 30,
+      "show_overlaps": true,
+      "show_sprint_boundaries": true,
+      "show_today_marker": true,
+      "compact_bar_height": false
+    },
+    "sections_collapsed": [],
+    "refresh_metadata": true
+  },
+  "pi": {
+    "enabled": true,
+    "name": "PI 2026.1",
+    "start_date": "2026-03-02",
+    "sprints_per_pi": 5,
+    "sprint_length_days": 10,
+    "working_days": [1, 2, 3, 4, 5],
+    "show_weekends": false,
+    "date_format": "%b %d",
+    "show_today_marker": true,
+    "show_sprint_boundaries": true,
+    "show_progress_indicator": true,
+    "show_remaining_days": true
+  }
+}

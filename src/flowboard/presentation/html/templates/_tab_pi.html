@@ -1,0 +1,20 @@
+{% if "pi" in visible_tabs %}
+<div role="tabpanel" class="section {% if default_tab == 'pi' %}active{% endif %}" id="tab-pi" aria-labelledby="tab-pi-btn">
+  <h2 class="section-title">{{ t("section.pi") }}</h2>
+  <p class="section-subtitle">{{ t("section.pi_desc") }}</p>
+
+  <div class="zoom-controls" id="piZoom">
+    <button class="zoom-btn" onclick="zoomTimeline('pi', -25)" aria-label="{{ t("zoom.out") }}">−</button>
+    <span class="zoom-level" id="piZoomLevel">100%</span>
+    <button class="zoom-btn" onclick="zoomTimeline('pi', 25)" aria-label="{{ t("zoom.in") }}">+</button>
+    <button class="zoom-btn" onclick="resetZoom('pi')">{{ t("zoom.reset") }}</button>
+    <button class="zoom-btn" onclick="fitZoom('pi')">{{ t("zoom.fit") }}</button>
+  </div>
+
+  <div class="timeline-scroll" id="piScroll">
+    <div id="piContent" style="transform-origin: left top;">
+      {{ pi_timeline_html }}
+    </div>
+  </div>
+</div>
+{% endif %}

@@ -1,0 +1,35 @@
+{% if "issues" in visible_tabs %}
+<div role="tabpanel" class="section {% if default_tab == 'issues' %}active{% endif %}" id="tab-issues" aria-labelledby="tab-issues-btn">
+  <h2 class="section-title">{{ t("section.all_issues") }}</h2>
+  <p class="section-subtitle">{{ t("section.all_issues_desc") }}</p>
+
+  <div class="filter-bar">
+    <label for="issueFilter">{{ t("filter.label") }}</label>
+    <input type="text" id="issueFilter" placeholder="{{ t("filter.placeholder") }}" oninput="filterIssues()">
+  </div>
+
+  {{ issues_table_html }}
+</div>
+{% endif %}
+
+<!-- Timeline Tooltip -->
+<div class="tl-tooltip" id="tlTooltip"></div>
+
+<!-- ============================================================ -->
+<!-- TIMELINE ITEM DETAIL PANEL                                    -->
+<!-- ============================================================ -->
+<div class="detail-overlay" id="detailOverlay" onclick="closeDetailPanel()"></div>
+<div class="detail-panel" id="detailPanel" role="dialog" aria-modal="true" aria-label="{{ t("panel.title") }}">
+  <div class="detail-panel-header">
+    <h3 id="detailPanelTitle">{{ t("panel.title") }}</h3>
+    <button class="detail-close-btn" onclick="closeDetailPanel()" aria-label="{{ t("panel.close") }}">&times;</button>
+  </div>
+  <div class="detail-panel-body" id="detailPanelBody">
+    <div class="detail-empty" id="detailEmpty">
+      <div class="detail-empty-icon" aria-hidden="true">📋</div>
+      <div>{{ t("panel.click_to_view") }}</div>
+    </div>
+    <div id="detailContent" class="hidden"></div>
+  </div>
+</div>
+

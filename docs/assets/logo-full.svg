@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 80" fill="none">
+  <!-- FlowBoard Full Logo — Wide variant for README header -->
+  <defs>
+    <linearGradient id="iconBg" x1="0" y1="10" x2="64" y2="70" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#ff7b1a"/>
+      <stop offset="1" stop-color="#e05800"/>
+    </linearGradient>
+    <linearGradient id="colG" x1="0" y1="16" x2="0" y2="62" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#fff"/>
+      <stop offset="1" stop-color="#fff" stop-opacity=".7"/>
+    </linearGradient>
+  </defs>
+  <!-- Icon background with gradient -->
+  <rect x="4" y="10" width="60" height="60" rx="15" fill="url(#iconBg)"/>
+  <!-- Kanban columns — ascending height = flow/progress -->
+  <rect x="14" y="42" width="10" height="20" rx="3.5" fill="url(#colG)" opacity=".6"/>
+  <rect x="28" y="32" width="10" height="30" rx="3.5" fill="url(#colG)" opacity=".8"/>
+  <rect x="42" y="20" width="10" height="42" rx="3.5" fill="url(#colG)"/>
+  <!-- Flow arrow — smooth curve suggesting movement -->
+  <path d="M15 28 C24 28, 28 20, 46 20" stroke="#fff" stroke-width="2.5" stroke-linecap="round" fill="none" opacity=".5"/>
+  <path d="M42 16 L47 20 L42 24" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity=".5"/>
+  <!-- Wordmark -->
+  <text x="78" y="55" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="44" font-weight="700" fill="#1E293B" letter-spacing="-1">
+    <tspan>Flow</tspan><tspan fill="#fb6400">Board</tspan>
+  </text>
+  <!-- Tagline -->
+  <text x="80" y="72" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="500" fill="#64748B" letter-spacing="2.5" text-transform="uppercase">
+    DELIVERY INTELLIGENCE FOR JIRA
+  </text>
+</svg>

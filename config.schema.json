@@ -1,0 +1,394 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://flowboard.internal/config.schema.json",
+  "title": "FlowBoard Configuration",
+  "description": "Configuration schema for FlowBoard — Jira-based delivery intelligence dashboard.",
+  "type": "object",
+  "required": ["jira"],
+  "properties": {
+    "jira": {
+      "type": "object",
+      "description": "Jira connection and data-source settings.",
+      "required": ["base_url"],
+      "properties": {
+        "base_url": {
+          "type": "string",
+          "description": "Base URL of the Jira instance (e.g. https://mycompany.atlassian.net).",
+          "pattern": "^https?://"
+        },
+        "auth_token": {
+          "type": "string",
+          "description": "Jira API token / PAT. Prefer FLOWBOARD_JIRA_TOKEN env var."
+        },
+        "auth_email": {
+          "type": "string",
+          "description": "Email associated with the token (for Jira Cloud basic auth). Prefer FLOWBOARD_JIRA_EMAIL env var."
+        },
+        "projects": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Project keys to include (e.g. [\"PROJ\", \"TEAM\"])."
+        },
+        "boards": {
+          "type": "array",
+          "items": { "type": "integer" },
+          "description": "Board IDs to include."
+        },
+        "max_results": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 100,
+          "description": "Maximum results per API page."
+        },
+        "jql_filter": {
+          "type": "string",
+          "description": "Optional JQL to further filter issues."
+        },
+        "server_type": {
+          "type": "string",
+          "enum": ["cloud", "server", "datacenter"],
+          "default": "cloud",
+          "description": "Jira deployment type."
+        },
+        "auth_method": {
+          "type": "string",
+          "enum": ["basic", "pat", "oauth"],
+          "default": "basic",
+          "description": "Authentication method for Jira API."
+        },
+        "api_version": {
+          "type": "string",
+          "default": "2",
+          "description": "Jira REST API version."
+        }
+      },
+      "additionalProperties": false
+    },
+    "field_mappings": {
+      "type": "object",
+      "description": "Maps Jira custom field IDs to FlowBoard concepts.",
+      "properties": {
+        "story_points": {
+          "type": "string",
+          "default": "customfield_10016",
+          "description": "Custom field ID for story points."
+        },
+        "epic_link": {
+          "type": "string",
+          "default": "customfield_10014",
+          "description": "Custom field ID for epic link."
+        },
+        "sprint": {
+          "type": "string",
+          "default": "customfield_10020",
+          "description": "Custom field ID for sprint."
+        }
+      },
+      "additionalProperties": { "type": "string" }
+    },
+    "status_mapping": {
+      "type": "object",
+      "description": "Maps Jira status names to FlowBoard status categories (To Do, In Progress, Done).",
+      "additionalProperties": {
+        "type": "string",
+        "enum": ["To Do", "In Progress", "Done"]
+      }
+    },
+    "teams": {
+      "type": "array",
+      "description": "Team definitions for grouping people.",
+      "items": {
+        "type": "object",
+        "required": ["key", "name"],
+        "properties": {
+          "key": { "type": "string" },
+          "name": { "type": "string" },
+          "members": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Jira account IDs or display names of team members."
+          },
+          "thresholds": {
+            "type": "object",
+            "description": "Per-team threshold overrides.",
+            "additionalProperties": { "type": "number" }
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "thresholds": {
+      "type": "object",
+      "description": "Configurable thresholds for risk and workload signals.",
+      "properties": {
+        "overload_points": {
+          "type": "number",
+          "default": 20,
+          "description": "Story points above which a person is considered overloaded."
+        },
+        "overload_issues": {
+          "type": "integer",
+          "default": 8,
+          "description": "Issue count above which a person is considered overloaded."
+        },
+        "wip_limit": {
+          "type": "integer",
+          "default": 5,
+          "description": "Max concurrent in-progress items per person."
+        },
+        "aging_days": {
+          "type": "integer",
+          "default": 14,
+          "description": "Days after which an open issue is considered aging."
+        },
+        "capacity_per_person": {
+          "type": "number",
+          "default": 13,
+          "description": "Default story point capacity per person per sprint."
+        }
+      },
+      "additionalProperties": false
+    },
+    "blocked_link_types": {
+      "type": "array",
+      "items": { "type": "string" },
+      "default": ["Blocks", "is blocked by"],
+      "description": "Link type names that indicate blocking relationships."
+    },
+    "output": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "type": "string",
+          "default": "output/dashboard.html",
+          "description": "Output file path for the generated HTML dashboard."
+        },
+        "title": {
+          "type": "string",
+          "default": "FlowBoard Dashboard",
+          "description": "Title displayed on the dashboard."
+        },
+        "accent_color": {
+          "type": "string",
+          "default": "#fb6400",
+          "description": "Primary color (CSS hex). Alias: primary_color."
+        },
+        "primary_color": {
+          "type": "string",
+          "default": "#fb6400",
+          "description": "Primary color (CSS hex)."
+        },
+        "company_name": {
+          "type": "string",
+          "default": "",
+          "description": "Company name shown in the footer."
+        }
+      },
+      "additionalProperties": false
+    },
+
+    "dashboard": {
+      "type": "object",
+      "description": "Dashboard presentation and UI configuration.",
+      "properties": {
+        "branding": {
+          "type": "object",
+          "description": "Branding overrides. Falls back to output.title / output.primary_color when absent.",
+          "properties": {
+            "title":        { "type": "string", "description": "Dashboard title." },
+            "subtitle":     { "type": "string", "default": "Jira-Based Delivery & Workload Intelligence" },
+            "accent_color": { "type": "string", "pattern": "^#[0-9A-Fa-f]{6,8}$", "description": "Primary color (CSS hex). Alias for primary_color." },
+            "primary_color": { "type": "string", "pattern": "^#[0-9A-Fa-f]{6,8}$", "description": "Primary color (CSS hex)." },
+            "company_name": { "type": "string" },
+            "secondary_color": { "type": "string", "description": "Secondary color (CSS hex)." },
+            "tertiary_color": { "type": "string", "description": "Tertiary color (CSS hex)." }
+          },
+          "additionalProperties": false
+        },
+        "theme": {
+          "type": "string",
+          "enum": ["light", "dark", "midnight", "slate", "system"],
+          "default": "system",
+          "description": "Dashboard color theme."
+        },
+        "layout": {
+          "type": "object",
+          "properties": {
+            "density":   { "type": "string", "enum": ["compact", "comfortable", "spacious"], "default": "comfortable" },
+            "max_width": { "type": "string", "default": "1440px" }
+          },
+          "additionalProperties": false
+        },
+        "tabs": {
+          "type": "object",
+          "description": "Which dashboard tabs are visible and their order.",
+          "properties": {
+            "visible": {
+              "type": "array",
+              "items": { "type": "string", "enum": ["overview","workload","sprints","flow","phases","timeline","pi","insights","dependencies","issues"] },
+              "description": "Tabs to show."
+            },
+            "order": {
+              "type": "array",
+              "items": { "type": "string" },
+              "description": "Tab display order."
+            },
+            "default_tab": {
+              "type": "string",
+              "default": "overview",
+              "description": "Tab shown on load."
+            }
+          },
+          "additionalProperties": false
+        },
+        "summary_cards": {
+          "type": "object",
+          "properties": {
+            "visible": {
+              "type": "array",
+              "items": { "type": "string", "enum": ["total_issues","open_issues","blocked","story_points","completed_sp","critical_risks","high_risks","overloaded","conflicts"] },
+              "description": "Which summary cards to show in the executive overview."
+            }
+          },
+          "additionalProperties": false
+        },
+        "charts": {
+          "type": "object",
+          "description": "Enable or disable individual chart types.",
+          "properties": {
+            "enabled":             { "type": "boolean", "default": true, "description": "Master toggle for all charts." },
+            "status_distribution": { "type": "boolean", "default": true },
+            "type_distribution":   { "type": "boolean", "default": true },
+            "risk_severity":       { "type": "boolean", "default": true },
+            "team_workload":       { "type": "boolean", "default": true },
+            "sprint_progress":     { "type": "boolean", "default": true },
+            "workload_per_person": { "type": "boolean", "default": true }
+          },
+          "additionalProperties": false
+        },
+        "tables": {
+          "type": "object",
+          "properties": {
+            "issues_columns": {
+              "type": "array",
+              "items": { "type": "string" },
+              "description": "Columns to show in the all-issues table."
+            },
+            "max_rows":       { "type": "integer", "minimum": 1, "maximum": 5000, "default": 200 },
+            "default_sort":   { "type": "string", "default": "key" },
+            "sort_direction":  { "type": "string", "enum": ["asc", "desc"], "default": "asc" }
+          },
+          "additionalProperties": false
+        },
+        "filters": {
+          "type": "object",
+          "description": "Default filter values applied on dashboard load.",
+          "properties": {
+            "default_teams":      { "type": "array", "items": { "type": "string" } },
+            "default_sprints":    { "type": "array", "items": { "type": "string" } },
+            "default_statuses":   { "type": "array", "items": { "type": "string" } },
+            "default_types":      { "type": "array", "items": { "type": "string" } },
+            "default_priorities": { "type": "array", "items": { "type": "string" } }
+          },
+          "additionalProperties": false
+        },
+        "risk_display": {
+          "type": "object",
+          "properties": {
+            "show_severity_badges": { "type": "boolean", "default": true },
+            "show_recommendations": { "type": "boolean", "default": true },
+            "highlight_blocked":    { "type": "boolean", "default": true }
+          },
+          "additionalProperties": false
+        },
+        "roadmap": {
+          "type": "object",
+          "description": "Roadmap / timeline view settings.",
+          "properties": {
+            "time_window_months": { "type": "integer", "minimum": 1, "maximum": 24, "default": 3 },
+            "default_zoom":       { "type": "integer", "minimum": 25, "maximum": 400, "default": 100 },
+            "show_dependencies":  { "type": "boolean", "default": true },
+            "show_risk_badges":   { "type": "boolean", "default": true }
+          },
+          "additionalProperties": false
+        },
+        "timeline": {
+          "type": "object",
+          "description": "Interactive Gantt-style timeline view settings.",
+          "properties": {
+            "default_mode": {
+              "type": "string",
+              "enum": ["assignee", "team", "epic", "conflict", "executive"],
+              "default": "assignee",
+              "description": "Default timeline grouping mode."
+            },
+            "default_zoom":       { "type": "integer", "minimum": 25, "maximum": 400, "default": 100 },
+            "max_swimlanes":      { "type": "integer", "minimum": 1, "maximum": 100, "default": 30 },
+            "show_overlaps":      { "type": "boolean", "default": true },
+            "show_sprint_boundaries": { "type": "boolean", "default": true },
+            "show_today_marker":  { "type": "boolean", "default": true },
+            "compact_bar_height": { "type": "boolean", "default": false }
+          },
+          "additionalProperties": false
+        },
+        "sections_collapsed": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Section IDs that should be collapsed by default."
+        },
+        "refresh_metadata": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show generation timestamp in the dashboard header."
+        }
+      },
+      "additionalProperties": false
+    },
+
+    "pi": {
+      "type": "object",
+      "description": "Program Increment (PI) configuration. 1 PI = N sprints × M working days.",
+      "properties": {
+        "enabled":             { "type": "boolean", "default": false, "description": "Enable the PI view tab." },
+        "name":                { "type": "string", "description": "PI name/label (e.g. PI 2026.1)." },
+        "start_date":          { "type": "string", "pattern": "^(\\d{4}-\\d{2}-\\d{2})?$", "description": "PI start date in ISO format (YYYY-MM-DD). Empty string when PI is disabled." },
+        "sprints_per_pi":      { "type": "integer", "minimum": 1, "maximum": 20, "default": 5 },
+        "sprint_length_days":  { "type": "integer", "minimum": 1, "maximum": 40, "default": 10, "description": "Working days per sprint." },
+        "working_days":        { "type": "array", "items": { "type": "integer", "minimum": 1, "maximum": 7 }, "default": [1,2,3,4,5], "description": "ISO weekday numbers (1=Mon … 7=Sun) that count as working days." },
+        "show_weekends":       { "type": "boolean", "default": false },
+        "date_format":         { "type": "string", "default": "%b %d" },
+        "show_today_marker":   { "type": "boolean", "default": true },
+        "show_sprint_boundaries": { "type": "boolean", "default": true },
+        "show_progress_indicator": { "type": "boolean", "default": true },
+        "show_remaining_days": { "type": "boolean", "default": true }
+      },
+      "additionalProperties": false
+    },
+    "locale": {
+      "type": "string",
+      "description": "UI language / locale code. Supported: 'en' (English), 'pl' (Polish).",
+      "enum": ["en", "pl"],
+      "default": "en"
+    },
+    "simulation": {
+      "type": "object",
+      "description": "Capacity simulation / what-if planning configuration.",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable the capacity simulation tab."
+        }
+      },
+      "additionalProperties": false
+    },
+    "methodology": {
+      "type": "string",
+      "description": "Project methodology. Controls which tabs, analytics, and terminology are active. Supported: scrum, kanban, waterfall, hybrid, custom.",
+      "enum": ["scrum", "kanban", "waterfall", "hybrid", "custom"],
+      "default": "scrum"
+    }
+  },
+  "additionalProperties": false
+}

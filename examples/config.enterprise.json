@@ -1,0 +1,99 @@
+{
+  "jira": {
+    "base_url": "https://jira.enterprise.com",
+    "server_type": "datacenter",
+    "auth_method": "pat",
+    "projects": ["PLATFORM", "MOBILE", "INFRA"],
+    "boards": [42, 87, 103],
+    "max_results": 100,
+    "jql_filter": "labels = 'Q1-2026' AND status != Cancelled"
+  },
+  "field_mappings": {
+    "story_points": "customfield_10028",
+    "epic_link": "customfield_10014",
+    "sprint": "customfield_10020",
+    "team_field": "customfield_10501",
+    "release_field": "customfield_11200"
+  },
+  "status_mapping": {
+    "Open": "To Do",
+    "Backlog": "To Do",
+    "Selected for Development": "To Do",
+    "In Development": "In Progress",
+    "Code Review": "In Progress",
+    "In QA": "In Progress",
+    "Ready for Deploy": "In Progress",
+    "Deployed": "Done",
+    "Closed": "Done",
+    "Won't Fix": "Done"
+  },
+  "teams": [
+    {
+      "key": "platform",
+      "name": "Platform",
+      "members": ["jsmith", "mjones", "klee", "rpatel"]
+    },
+    {
+      "key": "mobile",
+      "name": "Mobile",
+      "members": ["agarcia", "bwilson", "cchen"]
+    },
+    {
+      "key": "infra",
+      "name": "Infrastructure",
+      "members": ["dkim", "etaylor"]
+    }
+  ],
+  "thresholds": {
+    "overload_points": 25,
+    "overload_issues": 10,
+    "wip_limit": 4,
+    "aging_days": 21,
+    "capacity_per_person": 15
+  },
+  "blocked_link_types": ["Blocks", "is blocked by", "Dependency"],
+  "output": {
+    "path": "output/enterprise-dashboard.html",
+    "title": "Engineering Delivery Dashboard",
+    "primary_color": "#1E40AF",
+    "company_name": "Acme Corp"
+  },
+  "dashboard": {
+    "theme": "dark",
+    "branding": {
+      "title": "Engineering Delivery Dashboard",
+      "subtitle": "Platform · Mobile · Infrastructure",
+      "primary_color": "#1E40AF",
+      "secondary_color": "#1E293B",
+      "tertiary_color": "#64748B",
+      "company_name": "Acme Corp"
+    },
+    "layout": {
+      "density": "comfortable",
+      "max_width": "1600px"
+    },
+    "tabs": {
+      "visible": ["overview", "workload", "sprints", "timeline", "insights", "dependencies", "issues"],
+      "default_tab": "overview"
+    },
+    "timeline": {
+      "default_mode": "team",
+      "default_zoom": 100,
+      "show_overlaps": true,
+      "show_sprint_boundaries": true,
+      "show_today_marker": true
+    }
+  },
+  "pi": {
+    "enabled": true,
+    "name": "PI 2026.1",
+    "start_date": "2026-01-05",
+    "sprints_per_pi": 5,
+    "sprint_length_days": 10,
+    "working_days": [1, 2, 3, 4, 5]
+  },
+  "simulation": {
+    "enabled": true
+  },
+  "locale": "en"
+}

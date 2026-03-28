@@ -1,0 +1,1595 @@
+<!DOCTYPE html>
+<html lang="{{ locale }}" data-theme="system">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FlowBoard — {{ t("wizard.title") }}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<noscript><style>body::after{content:"JavaScript is required to run FlowBoard.";display:block;text-align:center;padding:40px;font-size:1.2rem;}</style></noscript>
+<style>
+:root, [data-theme="light"] {
+  --primary: #fb6400;
+  --primary-light: color-mix(in srgb, var(--primary) 12%, white);
+  --bg: #FAFBFC; --surface: #FFFFFF; --border: #E8ECF1; --border-subtle: #F0F3F6;
+  --text: #111827; --text-secondary: #6B7280;
+  --success: #22C55E; --error: #EF4444;
+  --radius: 14px; --radius-sm: 8px;
+  --shadow: 0 1px 2px rgba(0,0,0,.04), 0 1px 4px rgba(0,0,0,.03);
+  --shadow-md: 0 2px 8px rgba(0,0,0,.06), 0 1px 3px rgba(0,0,0,.04);
+  --shadow-lg: 0 8px 24px rgba(0,0,0,.08), 0 2px 8px rgba(0,0,0,.04);
+}
+[data-theme="dark"] {
+  --bg: #09090B; --surface: #18181B; --border: #27272A; --border-subtle: #1F1F23;
+  --text: #FAFAFA; --text-secondary: #A1A1AA;
+  --shadow: 0 1px 2px rgba(0,0,0,.3); --shadow-md: 0 2px 8px rgba(0,0,0,.4); --shadow-lg: 0 8px 24px rgba(0,0,0,.5);
+}
+@media (prefers-color-scheme: dark) {
+  [data-theme="system"] {
+    --bg: #09090B; --surface: #18181B; --border: #27272A; --border-subtle: #1F1F23;
+    --text: #FAFAFA; --text-secondary: #A1A1AA;
+    --shadow: 0 1px 2px rgba(0,0,0,.3); --shadow-md: 0 2px 8px rgba(0,0,0,.4); --shadow-lg: 0 8px 24px rgba(0,0,0,.5);
+  }
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg); color: var(--text); line-height: 1.55; letter-spacing: -0.003em;
+  -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh; display: flex; flex-direction: column; align-items: center;
+  padding: 32px 24px 80px;
+}
+.wz-container { max-width: 720px; width: 100%; margin-top: 32px; }
+.wz-hero { text-align: center; margin-bottom: 36px; }
+.wz-hero h1 { font-size: 1.75rem; font-weight: 700; margin-bottom: 8px; letter-spacing: -0.02em; }
+.wz-hero h1 span { color: var(--primary); }
+.wz-hero p { color: var(--text-secondary); font-size: 0.875rem; line-height: 1.5; }
+
+/* Stepper */
+.wz-stepper { display: flex; justify-content: center; gap: 8px; margin-bottom: 32px; }
+.wz-step-dot {
+  width: 10px; height: 10px; border-radius: 50%; background: var(--border);
+  transition: all .3s; cursor: pointer;
+}
+.wz-step-dot.active { background: var(--primary); transform: scale(1.3); }
+.wz-step-dot.done { background: var(--success); }
+.wz-step-label { display: flex; justify-content: center; gap: 24px; margin-bottom: 24px; }
+.wz-step-label span { font-size: 0.75rem; color: var(--text-secondary); font-weight: 500; }
+.wz-step-label span.active { color: var(--primary); font-weight: 700; }
+
+/* Cards grid */
+.wz-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%,200px),1fr)); gap: 14px; margin-bottom: 24px; }
+.wz-card {
+  background: var(--surface); border: 1px solid var(--border-subtle, var(--border)); border-radius: var(--radius);
+  padding: 20px; cursor: pointer; transition: all .15s; text-align: center;
+}
+.wz-card:hover { border-color: var(--primary); box-shadow: var(--shadow-md); }
+.wz-card.active { border-color: var(--primary); box-shadow: 0 0 0 2px var(--primary); }
+.wz-card-icon { font-size: 1.8rem; margin-bottom: 8px; }
+.wz-card h3 { font-size: 0.9rem; font-weight: 600; margin-bottom: 3px; }
+.wz-card p { font-size: 0.78rem; color: var(--text-secondary); }
+.wz-badge { position: absolute; top: -8px; right: 12px; background: var(--primary); color: #fff;
+  font-size: 0.68rem; font-weight: 600; padding: 2px 8px; border-radius: 999px; }
+
+/* Panel */
+.wz-panel {
+  background: var(--surface); border: 1px solid var(--border-subtle, var(--border)); border-radius: var(--radius);
+  padding: 28px; margin-bottom: 20px;
+  animation: fadeIn .2s ease;
+}
+.wz-panel h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: 18px; }
+.wz-field { margin-bottom: 14px; }
+.wz-field label { display: block; font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 4px; }
+.wz-field input, .wz-field select, .wz-field textarea {
+  width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px;
+  font-size: 0.88rem; font-family: inherit; background: var(--bg); color: var(--text);
+  transition: border-color .2s;
+}
+.wz-field input:focus, .wz-field select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 20%, transparent); }
+.wz-field textarea { min-height: 120px; font-family: monospace; font-size: 0.82rem; }
+.wz-field .wz-hint { font-size: 0.75rem; color: var(--text-secondary); margin-top: 3px; }
+.wz-hint { font-size: 0.75rem; color: var(--text-secondary); margin-top: 6px; line-height: 1.4; }
+.wz-field .wz-error { font-size: 0.75rem; color: var(--error); margin-top: 3px; min-height: 0; }
+.wz-field.has-error .wz-error { display: block; }
+.wz-field.has-error input, .wz-field.has-error select { border-color: var(--error); }
+.wz-field label .wz-required { color: var(--error); }
+
+/* Utility classes replacing inline styles */
+.wz-divider { border: none; border-top: 1px solid var(--border); margin: 18px 0; }
+.wz-divider-lg { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
+.wz-section-title { font-size: 0.9rem; font-weight: 600; margin-bottom: 8px; }
+.wz-section-title-sm { font-size: 0.9rem; font-weight: 600; margin-bottom: 4px; }
+.wz-section-desc { color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 16px; }
+.wz-section-desc-sm { color: var(--text-secondary); font-size: 0.82rem; margin-bottom: 12px; }
+.wz-hint-text { color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 14px; }
+.wz-cred-hint { font-size: 0.78rem; color: var(--text-secondary); margin-top: 12px; }
+.wz-project-warn { font-size: 0.82rem; color: var(--error); margin-top: 4px; }
+
+.wz-fields-status { margin-top: 8px; }
+.wz-row-mt { display: flex; gap: 12px; margin-top: 12px; }
+.wz-row-mt > * { flex: 1; }
+.wz-retry-btn { margin-left: 8px; }
+.wz-add-team-btn { margin-top: 10px; }
+.wz-import-panel { max-width: 600px; }
+.wz-example-toggle { font-size: 0.75rem; margin-bottom: 8px; }
+.wz-example-pre {
+  display: none; background: var(--bg); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 12px; font-size: 0.72rem;
+  max-height: 200px; overflow: auto; white-space: pre-wrap;
+  color: var(--text-secondary); cursor: pointer;
+}
+.wz-example-wrap { margin-bottom: 12px; }
+.wz-import-textarea { min-height: 160px; }
+.wz-color-inp { width: 60px; height: 36px; border: none; cursor: pointer; }
+.wz-option-group { max-width: 320px; }
+.wz-estimation-legend {
+  background: color-mix(in srgb, var(--primary) 5%, var(--surface));
+  border: 1px solid color-mix(in srgb, var(--primary) 15%, var(--border));
+  border-radius: 8px; padding: 12px 16px; margin: 12px 0;
+}
+.wz-estimation-legend h5 { font-size: 0.82rem; font-weight: 600; margin: 0 0 6px; color: var(--text); }
+.wz-estimation-legend p { font-size: 0.75rem; color: var(--text-secondary); margin: 0 0 4px; line-height: 1.5; }
+.wz-estimation-scale {
+  display: flex; flex-wrap: wrap; gap: 6px 12px; margin: 8px 0;
+  font-size: 0.75rem; font-weight: 500; color: var(--text);
+}
+.wz-estimation-scale span { white-space: nowrap; }
+.wz-pi-toggle { display: flex; align-items: center; gap: 10px; }
+.wz-pi-toggle label, .wz-pi-toggle-label { margin: 0; font-size: 0.85rem; }
+.wz-pi-toggle input[type="checkbox"] {
+  width: 18px; height: 18px; accent-color: var(--primary); cursor: pointer;
+  border-radius: 4px; flex-shrink: 0;
+}
+.wz-card-relative { position: relative; }
+.wz-hero-logo { width: 36px; height: 36px; vertical-align: middle; margin-right: 8px; }
+.wz-team-input-key { flex: 0.5; min-width: 80px; font-weight: 600; font-family: monospace; font-size: 0.82rem; text-transform: uppercase; }
+.wz-team-input-members { flex: 2; }
+.wz-row { display: flex; gap: 12px; }
+.wz-row > * { flex: 1; }
+
+/* Buttons */
+.wz-btn {
+  display: inline-flex; align-items: center; gap: 6px; padding: 10px 22px;
+  background: var(--primary); color: #fff; border: none; border-radius: var(--radius-sm, 8px);
+  font-size: 0.8125rem; font-weight: 600; cursor: pointer; transition: opacity .15s;
+}
+.wz-btn:hover { opacity: .9; }
+.wz-btn:disabled { opacity: .4; cursor: not-allowed; }
+.wz-btn.secondary { background: transparent; color: var(--text); border: 1px solid var(--border); }
+.wz-btn.secondary:hover { background: var(--bg); }
+.wz-btn.success { background: var(--success); }
+.wz-btn.small { padding: 6px 14px; font-size: 0.75rem; }
+.wz-btn.danger { background: var(--error); }
+.wz-actions { display: flex; justify-content: space-between; margin-top: 20px; }
+
+/* Status badge */
+.wz-status { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px;
+  border-radius: 8px; font-size: 0.82rem; font-weight: 500; margin: 8px 0; }
+.wz-status.ok { background: color-mix(in srgb, var(--success) 15%, transparent); color: var(--success); }
+.wz-status.fail { background: color-mix(in srgb, var(--error) 15%, transparent); color: var(--error); }
+.wz-status.loading { background: color-mix(in srgb, var(--primary) 15%, transparent); color: var(--primary); }
+
+/* Project chips */
+.wz-chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+.wz-chip {
+  display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px;
+  border: 1px solid var(--border); border-radius: 20px; font-size: 0.82rem;
+  cursor: pointer; transition: all .2s; background: var(--surface);
+}
+.wz-chip-key {
+  font-weight: 600; font-size: 0.78rem; background: var(--bg); padding: 1px 6px;
+  border-radius: 4px; letter-spacing: .02em;
+}
+.wz-chip.selected .wz-chip-key { background: rgba(255,255,255,.2); color: #fff; }
+.wz-chip-name { color: var(--text-secondary); }
+.wz-chip.selected .wz-chip-name { color: #fff; }
+.wz-chip-count {
+  font-size: 0.7rem; background: var(--bg); color: var(--text-secondary);
+  padding: 1px 6px; border-radius: 10px; font-weight: 500;
+}
+.wz-chip.selected .wz-chip-count { background: rgba(255,255,255,.2); color: #fff; }
+.wz-chip:hover, .wz-chip:focus-visible { border-color: var(--primary); outline: none; }
+.wz-chip:focus-visible { box-shadow: 0 0 0 2px var(--primary); }
+.wz-chip.selected { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+/* Team list */
+.wz-team-item {
+  display: flex; align-items: center; gap: 10px; padding: 10px;
+  border: 1px solid var(--border); border-radius: 8px; margin-bottom: 8px;
+  background: var(--surface);
+}
+.wz-team-item input { flex: 1; padding: 8px 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.85rem; background: var(--bg); color: var(--text); }
+.wz-team-item input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary) 15%, transparent); }
+.wz-team-header {
+  display: flex; gap: 10px; padding: 0 10px; margin-bottom: 6px;
+  font-size: 0.72rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: .04em;
+}
+.wz-team-header span { flex: 1; }
+.wz-team-header .wz-th-key { flex: 0.5; min-width: 80px; }
+.wz-team-header .wz-th-members { flex: 2; }
+.wz-team-header .wz-th-action { width: 36px; }
+
+/* Review table */
+.wz-review-section { margin-bottom: 16px; padding: 14px; border: 1px solid var(--border); border-radius: 8px; }
+.wz-review-section h4 { font-size: 0.85rem; font-weight: 600; margin-bottom: 8px;
+  display: flex; justify-content: space-between; align-items: center; }
+.wz-review-section h4 button { background: none; border: none; color: var(--primary);
+  cursor: pointer; font-size: 0.78rem; font-weight: 600; }
+.wz-review-row { display: flex; justify-content: space-between; font-size: 0.82rem; padding: 3px 0; }
+.wz-review-row .label { color: var(--text-secondary); }
+
+/* Slider */
+.wz-slider { width: 100%; accent-color: var(--primary); }
+.wz-slider-val { font-size: 0.82rem; color: var(--primary); font-weight: 600; }
+
+/* Toast */
+.wz-toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+  padding: 12px 24px; border-radius: 8px; font-size: 0.85rem; font-weight: 500;
+  opacity: 0; transition: opacity .3s; pointer-events: none; z-index: 999; }
+.wz-toast.success { background: #065F46; color: #D1FAE5; opacity: 1; }
+.wz-toast.error { background: #991B1B; color: #FEE2E2; opacity: 1; }
+
+/* Hide */
+.hidden { display: none !important; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes spin { to { transform: rotate(360deg); } }
+.spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid #fff;
+  border-top-color: transparent; border-radius: 50%; animation: spin .6s linear infinite; }
+
+/* Focus-visible for cards (Fix #6: keyboard nav) */
+.wz-card:focus-visible { border-color: var(--primary); box-shadow: 0 0 0 2px var(--primary); outline: none; }
+
+/* Modal overlay (Fix #8: focus trap) */
+.wz-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.4); z-index: 50;
+  display: flex; align-items: center; justify-content: center; }
+.wz-overlay .wz-panel { max-width: 560px; width: 90%; margin: 0; position: relative; z-index: 51; }
+.wz-overlay .wz-demo-picker { max-width: 640px; }
+
+/* Methodology Demo Picker */
+.wz-demo-picker-desc { font-size: 0.82rem; color: var(--text-secondary); margin: -10px 0 20px; }
+.wz-demo-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px; }
+.wz-demo-method-card {
+  position: relative; overflow: hidden;
+  background: var(--surface); border: 1px solid var(--border-subtle, var(--border)); border-radius: var(--radius);
+  padding: 20px; cursor: pointer; transition: all .15s ease; text-align: left;
+}
+.wz-demo-method-card:hover { border-color: var(--method-color, var(--primary)); box-shadow: var(--shadow-md); }
+.wz-demo-method-card:focus-visible { border-color: var(--method-color, var(--primary)); box-shadow: 0 0 0 2px var(--method-color, var(--primary)); outline: none; }
+.wz-demo-method-icon { font-size: 1.6rem; margin-bottom: 8px; }
+.wz-demo-method-label { font-size: 0.92rem; font-weight: 700; margin-bottom: 4px; color: var(--text); }
+.wz-demo-method-desc { font-size: 0.76rem; color: var(--text-secondary); line-height: 1.45; }
+.wz-demo-method-accent { position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: var(--method-color, var(--primary)); opacity: 0; transition: opacity .2s; }
+.wz-demo-method-card:hover .wz-demo-method-accent,
+.wz-demo-method-card:focus-visible .wz-demo-method-accent { opacity: 1; }
+.wz-demo-method-card.active { border-color: var(--method-color, var(--primary)); box-shadow: 0 0 0 2px var(--method-color, var(--primary)); }
+.wz-demo-method-card.active .wz-demo-method-accent { opacity: 1; }
+@media (max-width: 480px) {
+  .wz-demo-grid { grid-template-columns: 1fr; }
+}
+
+/* Slider help text (Fix #17) */
+.wz-slider-help { font-size: 0.72rem; color: var(--text-secondary); margin-top: 2px; }
+
+/* Color hex input (Fix #18) */
+.wz-color-row { display: flex; align-items: center; gap: 10px; }
+.wz-color-hex { width: 100px; padding: 6px 10px; border: 1px solid var(--border); border-radius: 6px;
+  font-family: monospace; font-size: 0.82rem; background: var(--bg); color: var(--text); }
+
+/* Responsive stepper (small screens) */
+@media (max-width: 480px) {
+  .wz-stepper { gap: 4px; }
+  .wz-step-label { gap: 8px; flex-wrap: wrap; }
+  .wz-step-label span { font-size: 0.65rem; }
+  .wz-cards { grid-template-columns: 1fr; }
+}
+
+/* Top settings bar */
+.wz-topbar {
+  position: fixed; top: 16px; right: 16px; z-index: 100;
+}
+.wz-topbar-toggle {
+  width: 36px; height: 36px; border-radius: 50%;
+  border: 1px solid var(--border); background: var(--surface);
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  color: var(--text-secondary); transition: all .15s; box-shadow: var(--shadow);
+}
+.wz-topbar-toggle:hover { border-color: var(--primary); color: var(--text); box-shadow: var(--shadow-md); }
+.wz-topbar-toggle svg { width: 16px; height: 16px; }
+.wz-topbar-menu {
+  display: none; position: absolute; top: 42px; right: 0;
+  background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+  padding: 10px; box-shadow: var(--shadow-lg); min-width: 150px;
+}
+.wz-topbar-menu.open { display: block; }
+.wz-topbar-group { display: flex; gap: 4px; margin-bottom: 6px; }
+.wz-topbar-group:last-child { margin-bottom: 0; }
+.wz-topbar-label { font-size: 0.65rem; color: var(--text-secondary); font-weight: 600; text-transform: uppercase; letter-spacing: .04em; margin-bottom: 3px; }
+.wz-topbar-btn {
+  flex: 1; padding: 5px 10px; border: 1px solid var(--border); border-radius: 6px;
+  background: transparent; color: var(--text-secondary); font-size: 0.75rem; font-weight: 600;
+  cursor: pointer; transition: all .15s; font-family: inherit; text-align: center;
+}
+.wz-topbar-btn:hover { border-color: var(--primary); color: var(--text); }
+.wz-topbar-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+</style>
+</head>
+<body>
+
+<div class="wz-topbar" id="wzTopbar">
+  <button class="wz-topbar-toggle" onclick="document.getElementById('wzTopMenu').classList.toggle('open')" aria-label="Settings">
+    <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 0 1-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 0 1 .947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 0 1 2.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 0 1 2.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 0 1 .947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 0 1-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 0 1-2.287-.947zM10 13a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" clip-rule="evenodd"/></svg>
+  </button>
+  <div class="wz-topbar-menu" id="wzTopMenu">
+    <div class="wz-topbar-label">{{ t("ui.quick_settings.theme", fallback="Theme") }}</div>
+    <div class="wz-topbar-group">
+      <button class="wz-topbar-btn" onclick="wzSetTheme('light')" data-wz-theme="light">☀️</button>
+      <button class="wz-topbar-btn active" onclick="wzSetTheme('system')" data-wz-theme="system">🖥️</button>
+      <button class="wz-topbar-btn" onclick="wzSetTheme('dark')" data-wz-theme="dark">🌙</button>
+    </div>
+    <div class="wz-topbar-label">{{ t("ui.quick_settings.language", fallback="Language") }}</div>
+    <div class="wz-topbar-group">
+      <button class="wz-topbar-btn{% if locale == 'en' %} active{% endif %}" onclick="wzSetLang('en')" data-wz-lang="en">EN</button>
+      <button class="wz-topbar-btn{% if locale == 'pl' %} active{% endif %}" onclick="wzSetLang('pl')" data-wz-lang="pl">PL</button>
+    </div>
+  </div>
+</div>
+
+<div class="wz-container">
+  <div class="wz-hero">
+    <h1>
+      <svg class="wz-hero-logo" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <defs>
+          <linearGradient id="frLogoBg" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
+            <stop stop-color="#ff7b1a"/><stop offset="1" stop-color="#e05800"/>
+          </linearGradient>
+          <linearGradient id="frColGrad" x1="0" y1="8" x2="0" y2="34" gradientUnits="userSpaceOnUse">
+            <stop stop-color="#fff"/><stop offset="1" stop-color="#fff" stop-opacity=".7"/>
+          </linearGradient>
+        </defs>
+        <rect width="40" height="40" rx="10" fill="url(#frLogoBg)"/>
+        <rect x="7" y="20" width="7" height="13" rx="2.5" fill="url(#frColGrad)" opacity=".65"/>
+        <rect x="16.5" y="14" width="7" height="19" rx="2.5" fill="url(#frColGrad)" opacity=".82"/>
+        <rect x="26" y="8" width="7" height="25" rx="2.5" fill="url(#frColGrad)"/>
+        <path d="M8 11 C14 11, 16 7, 28 7" stroke="#fff" stroke-width="2" stroke-linecap="round" fill="none" opacity=".55"/>
+        <path d="M25 4.5 L28.5 7 L25 9.5" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity=".55"/>
+      </svg>
+      <span>FlowBoard</span>
+    </h1>
+    <p>{{ t("wizard.subtitle") }}</p>
+  </div>
+
+  <!-- Step indicator -->
+  <div class="wz-stepper" id="stepper"></div>
+  <div class="wz-step-label" id="stepLabels"></div>
+
+  <!-- Content rendered by JS -->
+  <div id="wizardContent"></div>
+</div>
+
+<div class="wz-toast" id="toast" role="alert" aria-live="assertive"></div>
+
+<script>
+/* ===================================================================
+   FlowBoard Configuration Wizard — Client-side State Machine
+   =================================================================== */
+
+const T = {
+  title: {{ t("wizard.title")|tojson }},
+  step_connection: {{ t("wizard.step_connection")|tojson }},
+  step_projects: {{ t("wizard.step_projects")|tojson }},
+  step_methodology: {{ t("wizard.step_methodology")|tojson }},
+  step_teams: {{ t("wizard.step_teams")|tojson }},
+  step_customize: {{ t("wizard.step_customize")|tojson }},
+  step_review: {{ t("wizard.step_review")|tojson }},
+  back: {{ t("wizard.back")|tojson }},
+  next: {{ t("wizard.next")|tojson }},
+  skip: {{ t("wizard.skip")|tojson }},
+  save_and_launch: {{ t("wizard.save_and_launch")|tojson }},
+  testing_connection: {{ t("wizard.testing_connection")|tojson }},
+  connection_success: {{ t("wizard.connection_success")|tojson }},
+  connection_failed: {{ t("wizard.connection_failed")|tojson }},
+  test_connection: {{ t("wizard.test_connection")|tojson }},
+  loading_projects: {{ t("wizard.loading_projects")|tojson }},
+  no_projects_found: {{ t("wizard.no_projects_found")|tojson }},
+  select_projects: {{ t("wizard.select_projects")|tojson }},
+  auto_detect_fields: {{ t("wizard.auto_detect_fields")|tojson }},
+  auto_detect_hint: {{ t("wizard.auto_detect_hint")|tojson }},
+  detecting_fields: {{ t("wizard.detecting_fields")|tojson }},
+  fields_detected: {{ t("wizard.fields_detected")|tojson }},
+  add_team: {{ t("wizard.add_team")|tojson }},
+  team_key: {{ t("wizard.team_key")|tojson }},
+  team_name: {{ t("wizard.team_name")|tojson }},
+  team_members: {{ t("wizard.team_members")|tojson }},
+  remove_team: {{ t("wizard.remove_team")|tojson }},
+  no_teams_note: {{ t("wizard.no_teams_note")|tojson }},
+  overload_points: {{ t("wizard.overload_points")|tojson }},
+  wip_limit: {{ t("wizard.wip_limit")|tojson }},
+  aging_days: {{ t("wizard.aging_days")|tojson }},
+  company_name: {{ t("wizard.company_name")|tojson }},
+  dashboard_title: {{ t("wizard.dashboard_title")|tojson }},
+  accent_color: {{ t("wizard.accent_color")|tojson }},
+  review_connection: {{ t("wizard.review_connection")|tojson }},
+  review_projects: {{ t("wizard.review_projects")|tojson }},
+  review_teams: {{ t("wizard.review_teams")|tojson }},
+  review_settings: {{ t("wizard.review_settings")|tojson }},
+  review_fields: {{ t("wizard.review_fields")|tojson }},
+  review_methodology: {{ t("wizard.review_methodology")|tojson }},
+  review_dashboard: {{ t("wizard.review_dashboard")|tojson }},
+  review_pi: {{ t("wizard.review_pi")|tojson }},
+  review_status_mapping: {{ t("wizard.review_status_mapping")|tojson }},
+  edit: {{ t("wizard.edit")|tojson }},
+  saving: {{ t("wizard.saving")|tojson }},
+  save_success: {{ t("wizard.save_success")|tojson }},
+  save_failed: {{ t("wizard.save_failed")|tojson }},
+  cred_warning: {{ t("wizard.cred_warning")|tojson }},
+  try_demo: {{ t("wizard.try_demo")|tojson }},
+  try_demo_desc: {{ t("wizard.try_demo_desc")|tojson }},
+  connect_jira: {{ t("wizard.connect_jira")|tojson }},
+  connect_jira_desc: {{ t("wizard.connect_jira_desc")|tojson }},
+  import_json: {{ t("wizard.import_json")|tojson }},
+  import_json_desc: {{ t("wizard.import_json_desc")|tojson }},
+  import_save: {{ t("wizard.import_save")|tojson }},
+  import_desc: {{ t("wizard.import_desc")|tojson }},
+  jira_url: {{ t("first_run.jira_url")|tojson }},
+  auth_email: {{ t("first_run.auth_email")|tojson }},
+  auth_token: {{ t("first_run.auth_token")|tojson }},
+  auth_method: {{ t("wizard.auth_method")|tojson }},
+  auth_basic: {{ t("wizard.auth_basic")|tojson }},
+  auth_pat: {{ t("wizard.auth_pat")|tojson }},
+  auth_basic_hint: {{ t("wizard.auth_basic_hint")|tojson }},
+  auth_pat_hint: {{ t("wizard.auth_pat_hint")|tojson }},
+  url_placeholder: {{ t("first_run.jira_url_placeholder")|tojson }},
+  email_placeholder: {{ t("first_run.email_placeholder")|tojson }},
+  token_placeholder: {{ t("first_run.token_placeholder")|tojson }},
+  env_hint: {{ t("wizard.env_hint")|tojson }},
+  loading_demo: {{ t("wizard.loading_demo")|tojson }},
+  choose_methodology: {{ t("wizard.choose_methodology")|tojson }},
+  choose_methodology_desc: {{ t("wizard.choose_methodology_desc")|tojson }},
+  demo_scrum: {{ t("wizard.demo_scrum")|tojson }},
+  demo_scrum_desc: {{ t("wizard.demo_scrum_desc")|tojson }},
+  demo_kanban: {{ t("wizard.demo_kanban")|tojson }},
+  demo_kanban_desc: {{ t("wizard.demo_kanban_desc")|tojson }},
+  demo_waterfall: {{ t("wizard.demo_waterfall")|tojson }},
+  demo_waterfall_desc: {{ t("wizard.demo_waterfall_desc")|tojson }},
+  demo_hybrid: {{ t("wizard.demo_hybrid")|tojson }},
+  demo_hybrid_desc: {{ t("wizard.demo_hybrid_desc")|tojson }},
+  generating_demo: {{ t("wizard.generating_demo")|tojson }},
+  recommended: {{ t("first_run.recommended")|tojson }},
+  invalid_json: {{ t("first_run.invalid_json")|tojson }},
+  config_must_have_jira: {{ t("first_run.config_must_have_jira")|tojson }},
+  field_story_points: {{ t("wizard.field_story_points")|tojson }},
+  field_epic_link: {{ t("wizard.field_epic_link")|tojson }},
+  field_sprint: {{ t("wizard.field_sprint")|tojson }},
+  overload_hint: {{ t("wizard.overload_hint")|tojson }},
+  wip_hint: {{ t("wizard.wip_hint")|tojson }},
+  aging_hint: {{ t("wizard.aging_hint")|tojson }},
+  estimation_legend_title: {{ t("wizard.estimation_legend_title")|tojson }},
+  estimation_legend_desc: {{ t("wizard.estimation_legend_desc")|tojson }},
+  estimation_legend_items: {{ t("wizard.estimation_legend_items")|tojson }},
+  estimation_legend_note: {{ t("wizard.estimation_legend_note")|tojson }},
+  select_at_least_one: {{ t("wizard.select_at_least_one")|tojson }},
+  retry: {{ t("wizard.retry")|tojson }},
+  url_invalid: {{ t("wizard.url_invalid")|tojson }},
+  email_invalid: {{ t("wizard.email_invalid")|tojson }},
+  token_too_short: {{ t("wizard.token_too_short")|tojson }},
+  // Methodology
+  methodology_title: {{ t("wizard.methodology_title")|tojson }},
+  methodology_desc: {{ t("wizard.methodology_desc")|tojson }},
+  methodology_scrum: {{ t("wizard.methodology_scrum")|tojson }},
+  methodology_scrum_desc: {{ t("wizard.methodology_scrum_desc")|tojson }},
+  methodology_kanban: {{ t("wizard.methodology_kanban")|tojson }},
+  methodology_kanban_desc: {{ t("wizard.methodology_kanban_desc")|tojson }},
+  methodology_waterfall: {{ t("wizard.methodology_waterfall")|tojson }},
+  methodology_waterfall_desc: {{ t("wizard.methodology_waterfall_desc")|tojson }},
+  methodology_hybrid: {{ t("wizard.methodology_hybrid")|tojson }},
+  methodology_hybrid_desc: {{ t("wizard.methodology_hybrid_desc")|tojson }},
+  // JQL
+  jql_filter: {{ t("wizard.jql_filter")|tojson }},
+  jql_hint: {{ t("wizard.jql_hint")|tojson }},
+  // Dashboard prefs
+  dashboard_prefs_title: {{ t("wizard.dashboard_prefs_title")|tojson }},
+  dashboard_theme: {{ t("wizard.dashboard_theme")|tojson }},
+  dashboard_theme_light: {{ t("wizard.dashboard_theme_light")|tojson }},
+  dashboard_theme_dark: {{ t("wizard.dashboard_theme_dark")|tojson }},
+  dashboard_theme_system: {{ t("wizard.dashboard_theme_system")|tojson }},
+  layout_density: {{ t("wizard.layout_density")|tojson }},
+  density_compact: {{ t("wizard.density_compact")|tojson }},
+  density_comfortable: {{ t("wizard.density_comfortable")|tojson }},
+  density_spacious: {{ t("wizard.density_spacious")|tojson }},
+  tab_visibility: {{ t("wizard.tab_visibility")|tojson }},
+  tab_overview: {{ t("wizard.tab_overview")|tojson }},
+  tab_workload: {{ t("wizard.tab_workload")|tojson }},
+  tab_sprints: {{ t("wizard.tab_sprints")|tojson }},
+  tab_timeline: {{ t("wizard.tab_timeline")|tojson }},
+  tab_pi: {{ t("wizard.tab_pi")|tojson }},
+  tab_insights: {{ t("wizard.tab_insights")|tojson }},
+  tab_issues: {{ t("wizard.tab_issues")|tojson }},
+  tab_kanban: {{ t("wizard.tab_kanban")|tojson }},
+  // PI
+  pi_title: {{ t("wizard.pi_title")|tojson }},
+  pi_enabled: {{ t("wizard.pi_enabled")|tojson }},
+  pi_name: {{ t("wizard.pi_name")|tojson }},
+  pi_name_placeholder: {{ t("wizard.pi_name_placeholder")|tojson }},
+  pi_start_date: {{ t("wizard.pi_start_date")|tojson }},
+  pi_sprints: {{ t("wizard.pi_sprints")|tojson }},
+  pi_sprint_length: {{ t("wizard.pi_sprint_length")|tojson }},
+  pi_hint: {{ t("wizard.pi_hint")|tojson }},
+  // Status mapping
+  status_mapping_title: {{ t("wizard.status_mapping_title")|tojson }},
+  status_mapping_desc: {{ t("wizard.status_mapping_desc")|tojson }},
+  status_todo: {{ t("wizard.status_todo")|tojson }},
+  status_todo_placeholder: {{ t("wizard.status_todo_placeholder")|tojson }},
+  status_inprogress: {{ t("wizard.status_inprogress")|tojson }},
+  status_inprogress_placeholder: {{ t("wizard.status_inprogress_placeholder")|tojson }},
+  status_done: {{ t("wizard.status_done")|tojson }},
+  status_done_placeholder: {{ t("wizard.status_done_placeholder")|tojson }},
+  // Import example
+  import_show_example: {{ t("wizard.import_show_example")|tojson }},
+  import_hide_example: {{ t("wizard.import_hide_example")|tojson }},
+  // Sim exit
+  back_to_timeline: {{ t("sim.back_to_timeline")|tojson }},
+};
+
+const STEPS = [T.step_connection, T.step_projects, T.step_methodology, T.step_teams, T.step_customize, T.step_review];
+
+const STORAGE_KEY = 'flowboard_wizard_state';
+
+/* Wizard state */
+const W = {
+  step: -1,
+  jira: { base_url: '', auth_email: '', auth_token: '', auth_method: 'basic', jql_filter: '' },
+  verified: false,
+  serverInfo: null,
+  projects: [],
+  selectedProjects: [],
+  fields: { story_points: 'customfield_10016', epic_link: 'customfield_10014', sprint: 'customfield_10020' },
+  methodology: 'scrum',
+  statusMapping: { todo: 'To Do, Open, Backlog', inprogress: 'In Progress, In Review, In Development', done: 'Done, Closed, Released' },
+  teams: [],
+  thresholds: { overload_points: 20, wip_limit: 5, aging_days: 14 },
+  branding: { company_name: '', title: 'FlowBoard Dashboard', color: '#fb6400' },
+  dashboardPrefs: { theme: 'system', density: 'comfortable', visibleTabs: ['overview','workload','sprints','timeline','insights','issues'] },
+  pi: { enabled: false, name: '', start_date: '', sprints_per_pi: 5, sprint_length_days: 10 },
+
+};
+
+/* Fix #1: Restore state from localStorage */
+(function restoreState() {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      const s = JSON.parse(saved);
+      Object.assign(W.jira, s.jira || {});
+      W.step = typeof s.step === 'number' ? s.step : -1;
+      W.verified = !!s.verified;
+      W.serverInfo = s.serverInfo || null;
+      W.projects = Array.isArray(s.projects) ? s.projects : [];
+      W.selectedProjects = Array.isArray(s.selectedProjects) ? s.selectedProjects : [];
+      if (s.fields) Object.assign(W.fields, s.fields);
+      if (Array.isArray(s.teams)) W.teams = s.teams;
+      if (s.thresholds) Object.assign(W.thresholds, s.thresholds);
+      if (s.branding) Object.assign(W.branding, s.branding);
+      if (s.methodology) W.methodology = s.methodology;
+      if (s.statusMapping) Object.assign(W.statusMapping, s.statusMapping);
+      if (s.dashboardPrefs) Object.assign(W.dashboardPrefs, s.dashboardPrefs);
+      if (s.pi) Object.assign(W.pi, s.pi);
+
+    }
+  } catch (e) { /* ignore corrupt storage */ }
+})();
+
+function persistState() {
+  try {
+    const s = { ...W };
+    // Never persist credentials in localStorage
+    s.jira = { ...W.jira, auth_token: '' };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(s));
+  } catch (e) { /* quota exceeded or private mode */ }
+}
+
+const $ = id => document.getElementById(id);
+const el = (tag, attrs, ...children) => {
+  const e = document.createElement(tag);
+  if (attrs) Object.entries(attrs).forEach(([k,v]) => {
+    if (k === 'class') e.className = v;
+    else if (k.startsWith('on')) e.addEventListener(k.slice(2), v);
+    else if (v !== undefined && v !== null) e.setAttribute(k, v);
+  });
+  children.flat().forEach(c => { if (c != null) e.append(typeof c === 'string' ? document.createTextNode(c) : c); });
+  return e;
+};
+
+/* API helper */
+async function api(path, data) {
+  const resp = await fetch(path, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'FlowBoard' },
+    body: JSON.stringify(data),
+  });
+  return resp.json();
+}
+
+/* Fix #10: longer timeout for errors (5.5s vs 3.5s) */
+function toast(msg, type, duration) {
+  const t = $('toast');
+  t.textContent = msg; t.className = 'wz-toast ' + (type || 'success');
+  const delay = duration || (type === 'error' ? 5500 : 3500);
+  clearTimeout(toast._timer);
+  toast._timer = setTimeout(() => { t.className = 'wz-toast'; }, delay);
+}
+
+/* Fix #2: Debounce utility */
+function debounce(fn, ms) {
+  let timer;
+  return function(...args) { clearTimeout(timer); timer = setTimeout(() => fn.apply(this, args), ms); };
+}
+
+/* ---- Stepper rendering (Fix #7: ARIA) ---- */
+function renderStepper() {
+  const stepper = $('stepper');
+  const labels = $('stepLabels');
+  stepper.textContent = ''; labels.textContent = '';
+  if (W.step < 0) { stepper.classList.add('hidden'); labels.classList.add('hidden'); return; }
+  stepper.classList.remove('hidden'); labels.classList.remove('hidden');
+  stepper.setAttribute('role', 'navigation');
+  stepper.setAttribute('aria-label', 'Wizard steps');
+  STEPS.forEach((name, i) => {
+    const isActive = i === W.step;
+    const isDone = i < W.step;
+    const dot = el('div', {
+      class: 'wz-step-dot' + (isActive ? ' active' : isDone ? ' done' : ''),
+      role: 'tab',
+      'aria-selected': isActive ? 'true' : 'false',
+      'aria-label': name + (isDone ? ' (completed)' : isActive ? ' (current)' : ''),
+      tabindex: isDone ? '0' : '-1',
+      onclick: () => { if (isDone) goStep(i); },
+      onkeydown: (e) => { if (isDone && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); goStep(i); } },
+    });
+    stepper.appendChild(dot);
+    const lbl = el('span', { class: isActive ? 'active' : '', 'aria-hidden': 'true' }, name);
+    labels.appendChild(lbl);
+  });
+}
+
+/* ---- Navigation ---- */
+function goStep(n) { W.step = n; persistState(); render(); }
+function goNext() { if (W.step < STEPS.length - 1) goStep(W.step + 1); }
+function goBack() { if (W.step > 0) goStep(W.step - 1); else goStep(-1); }
+
+/* ---- Render dispatcher ---- */
+function render() {
+  renderStepper();
+  const c = $('wizardContent'); c.textContent = '';
+  if (W.step === -1) renderWelcome(c);
+  else if (W.step === 0) renderConnection(c);
+  else if (W.step === 1) renderProjects(c);
+  else if (W.step === 2) renderMethodology(c);
+  else if (W.step === 3) renderTeams(c);
+  else if (W.step === 4) renderCustomize(c);
+  else if (W.step === 5) renderReview(c);
+}
+
+/* ==== STEP -1: Welcome (Fix #6: tabindex, #7: aria) ==== */
+function renderWelcome(c) {
+  const cards = el('div', {class: 'wz-cards', role: 'group', 'aria-label': 'Setup options'});
+  const jiraCard = el('div', {class: 'wz-card wz-card-relative', tabindex: '0', role: 'button',
+    'aria-label': T.connect_jira + ' (' + T.recommended + ')',
+    onclick: () => goStep(0),
+    onkeydown: (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); goStep(0); } }
+  },
+    el('div', {class: 'wz-badge'}, T.recommended),
+    el('div', {class: 'wz-card-icon', 'aria-hidden': 'true'}, '🔗'),
+    el('h3', null, T.connect_jira),
+    el('p', null, T.connect_jira_desc)
+  );
+  const importCard = el('div', {class: 'wz-card', tabindex: '0', role: 'button',
+    'aria-label': T.import_json,
+    onclick: showImportModal,
+    onkeydown: (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); showImportModal(); } }
+  },
+    el('div', {class: 'wz-card-icon', 'aria-hidden': 'true'}, '📋'),
+    el('h3', null, T.import_json),
+    el('p', null, T.import_json_desc)
+  );
+  const demoCard = el('div', {class: 'wz-card', tabindex: '0', role: 'button',
+    'aria-label': T.try_demo,
+    onclick: showDemoMethodologyPicker,
+    onkeydown: (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); showDemoMethodologyPicker(); } }
+  },
+    el('div', {class: 'wz-card-icon', 'aria-hidden': 'true'}, '🎯'),
+    el('h3', null, T.try_demo),
+    el('p', null, T.try_demo_desc)
+  );
+  cards.append(jiraCard, importCard, demoCard);
+  c.appendChild(cards);
+}
+
+/* Import modal with focus trap and example config */
+function showImportModal() {
+  const existing = $('importOverlay');
+  if (existing) existing.remove();
+
+  const exampleCfg = JSON.stringify({
+    jira: {
+      base_url: "https://your-company.atlassian.net",
+      auth_email: "user@company.com",
+      auth_token: "your-api-token",
+      projects: ["PROJ1", "PROJ2"],
+      auth_method: "basic"
+    },
+    methodology: "scrum",
+    locale: "en",
+    status_mapping: { "To Do": "To Do", "Open": "To Do", "In Progress": "In Progress", "Done": "Done", "Closed": "Done" },
+    thresholds: { overload_points: 20, wip_limit: 5, aging_days: 14 },
+    field_mappings: { story_points: "customfield_10016", epic_link: "customfield_10014", sprint: "customfield_10020" },
+    teams: [{ key: "alpha", name: "Team Alpha", members: ["alice", "bob"] }],
+    dashboard: { theme: "system", branding: { title: "My Dashboard", primary_color: "#fb6400" }, layout: { density: "comfortable" } }
+  }, null, 2);
+
+  const overlay = el('div', {class: 'wz-overlay', id: 'importOverlay',
+    onclick: (e) => { if (e.target === overlay) closeImportModal(); },
+    onkeydown: (e) => { if (e.key === 'Escape') closeImportModal(); }
+  });
+  const panel = el('div', {class: 'wz-panel wz-import-panel', role: 'dialog', 'aria-modal': 'true', 'aria-label': T.import_json});
+
+  // Example toggle
+  const exampleWrap = el('div', {class: 'wz-import-example wz-example-wrap'});
+  const exampleToggle = el('button', {class: 'wz-btn small secondary wz-example-toggle'}, T.import_show_example || 'Show example');
+  const examplePre = el('pre', {class: 'wz-example-pre'}, exampleCfg);
+  exampleToggle.addEventListener('click', () => {
+    const visible = examplePre.style.display !== 'none';
+    examplePre.style.display = visible ? 'none' : 'block';
+    exampleToggle.textContent = visible ? (T.import_show_example || 'Show example') : (T.import_hide_example || 'Hide example');
+  });
+  examplePre.addEventListener('click', () => {
+    const ta = $('importJson');
+    if (ta && !ta.value.trim()) { ta.value = exampleCfg; }
+  });
+  exampleWrap.append(exampleToggle, examplePre);
+
+  panel.append(
+    el('h3', null, '📋 ' + T.import_json),
+    exampleWrap,
+    el('div', {class: 'wz-field'},
+      el('label', {for: 'importJson'}, T.import_desc),
+      el('textarea', {id: 'importJson', placeholder: '{"jira": {"base_url": "https://..."}, ...}', 'aria-label': T.import_desc, class: 'wz-import-textarea'})
+    ),
+    el('div', {class: 'wz-actions'},
+      el('button', {class: 'wz-btn secondary', onclick: closeImportModal}, T.back),
+      el('button', {class: 'wz-btn', onclick: doImport}, T.import_save)
+    )
+  );
+  overlay.appendChild(panel);
+  document.body.appendChild(overlay);
+  setTimeout(() => { const ta = $('importJson'); if (ta) ta.focus(); }, 50);
+  overlay.addEventListener('keydown', trapFocus);
+}
+
+function closeImportModal() {
+  const o = $('importOverlay');
+  if (o) o.remove();
+}
+
+function trapFocus(e) {
+  if (e.key !== 'Tab') return;
+  const modal = $('importOverlay');
+  if (!modal) return;
+  const focusable = modal.querySelectorAll('textarea, button, [tabindex]:not([tabindex="-1"])');
+  if (focusable.length === 0) return;
+  const first = focusable[0];
+  const last = focusable[focusable.length - 1];
+  if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+  else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+}
+
+async function doImport() {
+  const raw = ($('importJson') || {}).value || '';
+  if (!raw.trim()) { toast(T.invalid_json, 'error'); return; }
+  try {
+    const cfg = JSON.parse(raw);
+    if (typeof cfg !== 'object' || Array.isArray(cfg)) { toast(T.invalid_json + ': ' + (T.config_must_be_object || 'Must be a JSON object'), 'error'); return; }
+    if (!cfg.jira) { toast(T.config_must_have_jira, 'error'); return; }
+    const resp = await api('/api/wizard/import', { json_str: raw });
+    if (resp.ok) { toast(T.save_success); localStorage.removeItem(STORAGE_KEY); setTimeout(() => location.reload(), 1500); }
+    else {
+      const msg = resp.error || T.save_failed;
+      toast(msg, 'error', 8000);
+    }
+  } catch (e) { toast(T.invalid_json + ': ' + e.message, 'error'); }
+}
+
+/* ==== Methodology Demo Picker ==== */
+const DEMO_METHODOLOGIES = [
+  { key: 'scrum',     icon: '🏃', label: () => T.demo_scrum,     desc: () => T.demo_scrum_desc,     color: '#fb6400' },
+  { key: 'kanban',    icon: '📊', label: () => T.demo_kanban,    desc: () => T.demo_kanban_desc,    color: '#3b82f6' },
+  { key: 'waterfall', icon: '📐', label: () => T.demo_waterfall, desc: () => T.demo_waterfall_desc, color: '#8b5cf6' },
+  { key: 'hybrid',    icon: '🔀', label: () => T.demo_hybrid,    desc: () => T.demo_hybrid_desc,    color: '#10b981' },
+];
+
+function showDemoMethodologyPicker() {
+  const existing = $('demoPickerOverlay');
+  if (existing) existing.remove();
+
+  const overlay = el('div', {class: 'wz-overlay', id: 'demoPickerOverlay',
+    onclick: (e) => { if (e.target === overlay) closeDemoPicker(); },
+    onkeydown: (e) => { if (e.key === 'Escape') closeDemoPicker(); }
+  });
+  const panel = el('div', {class: 'wz-panel wz-demo-picker', role: 'dialog', 'aria-modal': 'true', 'aria-label': T.choose_methodology});
+
+  panel.append(
+    el('h3', null, '🎯 ' + T.choose_methodology),
+    el('p', {class: 'wz-demo-picker-desc'}, T.choose_methodology_desc)
+  );
+
+  const grid = el('div', {class: 'wz-demo-grid'});
+  DEMO_METHODOLOGIES.forEach(m => {
+    const card = el('div', {
+      class: 'wz-demo-method-card', tabindex: '0', role: 'button',
+      'aria-label': m.label(),
+      style: '--method-color: ' + m.color,
+      onclick: () => launchDemo(m.key),
+      onkeydown: (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); launchDemo(m.key); } }
+    },
+      el('div', {class: 'wz-demo-method-icon', 'aria-hidden': 'true'}, m.icon),
+      el('div', {class: 'wz-demo-method-label'}, m.label()),
+      el('div', {class: 'wz-demo-method-desc'}, m.desc()),
+      el('div', {class: 'wz-demo-method-accent'})
+    );
+    grid.appendChild(card);
+  });
+
+  panel.append(grid);
+  panel.append(
+    el('div', {class: 'wz-actions'},
+      el('button', {class: 'wz-btn secondary', onclick: closeDemoPicker}, T.back)
+    )
+  );
+  overlay.appendChild(panel);
+  document.body.appendChild(overlay);
+  setTimeout(() => { const first = grid.querySelector('.wz-demo-method-card'); if (first) first.focus(); }, 50);
+  overlay.addEventListener('keydown', trapDemoPickerFocus);
+}
+
+function closeDemoPicker() {
+  const o = $('demoPickerOverlay');
+  if (o) o.remove();
+}
+
+function trapDemoPickerFocus(e) {
+  if (e.key !== 'Tab') return;
+  const modal = $('demoPickerOverlay');
+  if (!modal) return;
+  const focusable = modal.querySelectorAll('button, [tabindex]:not([tabindex="-1"])');
+  if (focusable.length === 0) return;
+  const first = focusable[0];
+  const last = focusable[focusable.length - 1];
+  if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+  else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+}
+
+async function launchDemo(methodology) {
+  closeDemoPicker();
+  const label = (methodology || 'scrum').charAt(0).toUpperCase() + (methodology || 'scrum').slice(1);
+  toast(T.generating_demo.replace('{methodology}', label), 'success');
+  const lang = localStorage.getItem('fb-language') || 'en';
+  const resp = await api('/api/demo', { methodology: methodology || 'scrum', locale: lang });
+  if (resp.ok) { localStorage.removeItem(STORAGE_KEY); location.href = '/'; }
+  else toast(resp.error || 'Demo failed', 'error');
+}
+
+/* ==== STEP 0: Jira Connection (Fix #9: inline validation, #11: retry, #20: auth hints) ==== */
+function renderConnection(c) {
+  const panel = el('div', {class: 'wz-panel'});
+  panel.append(el('h3', null, '🔗 ' + T.step_connection));
+  // URL with inline validation
+  panel.append(fieldEl(T.jira_url, 'wz-url', 'url', W.jira.base_url, T.url_placeholder, true, validateUrl));
+  // Auth method with inline help (Fix #20)
+  const authHint = el('div', {class: 'wz-hint', id: 'authHint'}, W.jira.auth_method === 'basic' ? T.auth_basic_hint : T.auth_pat_hint);
+  panel.append(el('div', {class: 'wz-field'},
+    el('label', null, T.auth_method),
+    el('select', {id: 'wz-auth-method', 'aria-label': T.auth_method,
+      onchange: (e) => { W.jira.auth_method = e.target.value; persistState(); render(); }},
+      el('option', {value: 'basic', ...(W.jira.auth_method === 'basic' ? {selected: ''} : {})}, T.auth_basic),
+      el('option', {value: 'pat', ...(W.jira.auth_method === 'pat' ? {selected: ''} : {})}, T.auth_pat)
+    ),
+    authHint
+  ));
+  // Email (only for basic) with validation
+  if (W.jira.auth_method === 'basic') {
+    panel.append(fieldEl(T.auth_email, 'wz-email', 'email', W.jira.auth_email, T.email_placeholder, true, validateEmail));
+  }
+  // Token with validation
+  panel.append(fieldEl(T.auth_token, 'wz-token', 'password', W.jira.auth_token, T.token_placeholder, true, validateToken));
+  panel.append(el('div', {class: 'wz-field'}, el('span', {class: 'wz-hint'}, T.env_hint)));
+  // JQL filter (optional)
+  const jqlField = el('div', {class: 'wz-field'});
+  jqlField.append(el('label', {for: 'wz-jql'}, T.jql_filter));
+  const jqlInp = el('input', {type: 'text', id: 'wz-jql', value: W.jira.jql_filter || '', placeholder: "labels = 'team-alpha'", 'aria-label': T.jql_filter});
+  jqlInp.addEventListener('input', () => { W.jira.jql_filter = jqlInp.value.trim(); persistState(); });
+  jqlField.append(jqlInp, el('div', {class: 'wz-hint'}, T.jql_hint));
+  panel.append(jqlField);
+  // Test button
+  const testBtn = el('button', {class: 'wz-btn', id: 'testBtn', onclick: testConnection, 'aria-label': T.test_connection}, '🔍 ' + T.test_connection);
+  panel.appendChild(testBtn);
+  // Status
+  panel.appendChild(el('div', {id: 'connStatus', role: 'status', 'aria-live': 'polite'}));
+  if (W.verified && W.serverInfo) {
+    showConnStatus(true, W.serverInfo);
+  }
+  // Nav
+  panel.append(navActions(true, W.verified));
+  c.appendChild(panel);
+}
+
+/* Fix #9: Inline validators */
+function validateUrl() {
+  const v = ($('wz-url') || {}).value || '';
+  if (!v) return '';
+  try { const u = new URL(v); if (!['http:', 'https:'].includes(u.protocol)) return T.url_invalid; } catch { return T.url_invalid; }
+  return '';
+}
+function validateEmail() {
+  const v = ($('wz-email') || {}).value || '';
+  if (!v) return '';
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) return T.email_invalid;
+  return '';
+}
+function validateToken() {
+  const v = ($('wz-token') || {}).value || '';
+  if (v && v.length < 10) return T.token_too_short;
+  return '';
+}
+
+function fieldEl(label, id, type, value, placeholder, required, validator) {
+  const f = el('div', {class: 'wz-field'});
+  const lbl = el('label', {for: id}, label);
+  if (required) lbl.appendChild(el('span', {class: 'wz-required'}, ' *'));
+  f.appendChild(lbl);
+  const inp = el('input', {type, id, value: value || '', placeholder: placeholder || '', 'aria-label': label, 'aria-required': required ? 'true' : undefined});
+  const errDiv = el('div', {class: 'wz-error', id: id + '-error', 'aria-live': 'polite'});
+  inp.addEventListener('input', () => { syncField(id); if (validator) showFieldError(id, validator()); });
+  inp.addEventListener('blur', () => { if (validator) showFieldError(id, validator()); });
+  f.appendChild(inp);
+  f.appendChild(errDiv);
+  return f;
+}
+
+function showFieldError(id, msg) {
+  const errDiv = $(id + '-error');
+  const field = errDiv ? errDiv.parentElement : null;
+  if (errDiv) errDiv.textContent = msg || '';
+  if (field) { if (msg) field.classList.add('has-error'); else field.classList.remove('has-error'); }
+}
+
+function syncField(id) {
+  const v = ($(id) || {}).value || '';
+  if (id === 'wz-url') W.jira.base_url = v.trim().replace(/\/+$/, '');
+  else if (id === 'wz-email') W.jira.auth_email = v.trim();
+  else if (id === 'wz-token') W.jira.auth_token = v.trim();
+  else if (id === 'wz-jql') W.jira.jql_filter = v.trim();
+  W.verified = false;
+  persistState();
+}
+
+async function testConnection() {
+  if (!W.jira.base_url) { toast(T.connection_failed, 'error'); return; }
+  syncField('wz-url'); syncField('wz-email'); syncField('wz-token');
+  const btn = $('testBtn');
+  btn.disabled = true; btn.textContent = ''; btn.appendChild(el('span',{class:'spinner'})); btn.append(' ' + T.testing_connection);
+  showConnStatus('loading');
+  try {
+    const resp = await api('/api/wizard/verify', W.jira);
+    if (resp.ok) {
+      W.verified = true; W.serverInfo = resp.info;
+      showConnStatus(true, resp.info);
+      toast(T.connection_success);
+      persistState();
+    } else {
+      W.verified = false;
+      showConnStatus(false, resp.error);
+      toast(T.connection_failed, 'error');
+    }
+  } catch (e) { showConnStatus(false, e.message); }
+  btn.disabled = false; btn.textContent = '🔍 ' + T.test_connection;
+  const nb = document.querySelector('.wz-actions .wz-btn:last-child');
+  if (nb) nb.disabled = !W.verified;
+}
+
+/* Fix #11: Retry button in error status */
+function showConnStatus(ok, info) {
+  const s = $('connStatus'); if (!s) return; s.textContent = '';
+  if (ok === 'loading') {
+    s.appendChild(el('div', {class: 'wz-status loading', role: 'status'}, '⏳ ' + T.testing_connection));
+  } else if (ok === true) {
+    const text = '✅ ' + T.connection_success + (info ? ` — ${info.server_title || ''} v${info.version || ''} (${info.deployment_type || ''})` : '');
+    s.appendChild(el('div', {class: 'wz-status ok'}, text));
+  } else if (ok === false) {
+    const row = el('div', {class: 'wz-status fail'});
+    row.append('❌ ' + (typeof info === 'string' ? info : T.connection_failed) + ' ');
+    row.appendChild(el('button', {class: 'wz-btn small wz-retry-btn', onclick: testConnection}, '🔄 ' + T.retry));
+    s.appendChild(row);
+  }
+}
+
+/* ==== STEP 1: Projects (Fix #2: debounce, Fix #3: ≥1 project validation) ==== */
+function renderProjects(c) {
+  const panel = el('div', {class: 'wz-panel'});
+  panel.append(el('h3', null, '📂 ' + T.select_projects));
+  const chipsArea = el('div', {class: 'wz-chips', id: 'projectChips', role: 'group', 'aria-label': T.select_projects});
+  panel.appendChild(chipsArea);
+  panel.appendChild(el('div', {id: 'projectStatus', role: 'status', 'aria-live': 'polite'}));
+  // Fix #3: warning when no projects selected
+  panel.appendChild(el('div', {id: 'projectWarn', class: 'wz-project-warn', 'aria-live': 'polite'}));
+  // Field detection
+  panel.append(el('hr', {class: 'wz-divider'}));
+  panel.append(el('button', {class: 'wz-btn small secondary', onclick: autoDetectFields, id: 'detectBtn'}, '🔍 ' + T.auto_detect_fields));
+  panel.append(el('div', {class: 'wz-hint'}, T.auto_detect_hint));
+  panel.append(el('div', {id: 'fieldsStatus', class: 'wz-fields-status', role: 'status', 'aria-live': 'polite'}));
+  // Field inputs
+  const row = el('div', {class: 'wz-row-mt'});
+  row.append(fieldEl(T.field_story_points, 'wz-fsp', 'text', W.fields.story_points));
+  row.append(fieldEl(T.field_epic_link, 'wz-fep', 'text', W.fields.epic_link));
+  row.append(fieldEl(T.field_sprint, 'wz-fspr', 'text', W.fields.sprint));
+  panel.appendChild(row);
+  // Fix #3: Next requires ≥1 project
+  const hasProjects = W.selectedProjects.length > 0;
+  panel.append(navActions(true, hasProjects));
+  c.appendChild(panel);
+  if (W.projects.length === 0) loadProjects();
+  else renderProjectChips();
+}
+
+async function loadProjects() {
+  const s = $('projectStatus');
+  if (s) { s.textContent = ''; s.appendChild(el('div', {class: 'wz-status loading'}, '⏳ ' + T.loading_projects)); }
+  try {
+    const resp = await api('/api/wizard/projects', W.jira);
+    if (resp.ok) {
+      W.projects = resp.projects;
+      persistState();
+      if (W.projects.length === 0 && s) { s.textContent = ''; s.appendChild(el('div', {class: 'wz-status fail'}, T.no_projects_found)); }
+      else { if (s) s.textContent = ''; renderProjectChips(); }
+    } else if (s) { s.textContent = ''; s.appendChild(el('div', {class: 'wz-status fail'}, resp.error || '')); }
+  } catch (e) { if (s) { s.textContent = ''; s.appendChild(el('div', {class: 'wz-status fail'}, e.message)); } }
+}
+
+/* Fix #6: keyboard-accessible chips */
+function renderProjectChips() {
+  const area = $('projectChips'); if (!area) return; area.textContent = '';
+  W.projects.forEach(p => {
+    const sel = W.selectedProjects.includes(p.key);
+    const chip = el('div', {
+      class: 'wz-chip' + (sel ? ' selected' : ''),
+      tabindex: '0',
+      role: 'checkbox',
+      'aria-checked': sel ? 'true' : 'false',
+      'aria-label': p.key + ' — ' + p.name,
+      onclick: () => { toggleProject(p.key); },
+      onkeydown: (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleProject(p.key); } },
+    });
+    chip.append(
+      el('span', {class: 'wz-chip-key'}, p.key),
+      el('span', {class: 'wz-chip-name'}, p.name)
+    );
+    if (p.issueCount) chip.append(el('span', {class: 'wz-chip-count'}, String(p.issueCount)));
+    area.appendChild(chip);
+  });
+  updateProjectWarning();
+}
+
+function toggleProject(key) {
+  const i = W.selectedProjects.indexOf(key);
+  if (i >= 0) W.selectedProjects.splice(i, 1);
+  else W.selectedProjects.push(key);
+  persistState();
+  renderProjectChips();
+  // Update Next button state
+  const nb = document.querySelector('.wz-actions .wz-btn:last-child');
+  if (nb) nb.disabled = W.selectedProjects.length === 0;
+}
+
+function updateProjectWarning() {
+  const warn = $('projectWarn');
+  if (warn) warn.textContent = (W.projects.length > 0 && W.selectedProjects.length === 0) ? T.select_at_least_one : '';
+}
+
+async function autoDetectFields() {
+  const btn = $('detectBtn'); const s = $('fieldsStatus');
+  if (btn) btn.disabled = true;
+  if (s) { s.textContent = ''; s.appendChild(el('div', {class: 'wz-status loading'}, '⏳ ' + T.detecting_fields)); }
+  try {
+    const resp = await api('/api/wizard/fields', W.jira);
+    if (resp.ok && resp.fields) {
+      if (resp.fields.story_points) { W.fields.story_points = resp.fields.story_points.id; const e = $('wz-fsp'); if (e) e.value = resp.fields.story_points.id; }
+      if (resp.fields.epic_link) { W.fields.epic_link = resp.fields.epic_link.id; const e = $('wz-fep'); if (e) e.value = resp.fields.epic_link.id; }
+      if (resp.fields.sprint) { W.fields.sprint = resp.fields.sprint.id; const e = $('wz-fspr'); if (e) e.value = resp.fields.sprint.id; }
+      persistState();
+      if (s) { s.textContent = ''; s.appendChild(el('div', {class: 'wz-status ok'}, '✅ ' + T.fields_detected)); }
+    } else if (s) { s.textContent = ''; }
+  } catch (e) { /* ignore */ }
+  if (btn) btn.disabled = false;
+}
+
+/* ==== STEP 2: Methodology ==== */
+const METHODOLOGIES = [
+  { key: 'scrum',     icon: '🏃', color: '#fb6400' },
+  { key: 'kanban',    icon: '📊', color: '#3b82f6' },
+  { key: 'waterfall', icon: '📐', color: '#8b5cf6' },
+  { key: 'hybrid',    icon: '🔀', color: '#10b981' },
+];
+
+function renderMethodology(c) {
+  const panel = el('div', {class: 'wz-panel'});
+  panel.append(el('h3', null, '🎯 ' + T.methodology_title));
+  panel.append(el('p', {class: 'wz-section-desc'}, T.methodology_desc));
+  const grid = el('div', {class: 'wz-demo-grid'});
+  METHODOLOGIES.forEach(m => {
+    const label = T['methodology_' + m.key];
+    const desc = T['methodology_' + m.key + '_desc'];
+    const isActive = W.methodology === m.key;
+    const card = el('div', {
+      class: 'wz-demo-method-card' + (isActive ? ' active' : ''), tabindex: '0', role: 'radio',
+      'aria-checked': isActive ? 'true' : 'false', 'aria-label': label,
+      style: '--method-color: ' + m.color,
+      onclick: () => selectMethodology(m.key),
+      onkeydown: (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectMethodology(m.key); } }
+    },
+      el('div', {class: 'wz-demo-method-icon', 'aria-hidden': 'true'}, m.icon),
+      el('div', {class: 'wz-demo-method-label'}, label),
+      el('div', {class: 'wz-demo-method-desc'}, desc),
+      el('div', {class: 'wz-demo-method-accent'})
+    );
+    grid.appendChild(card);
+  });
+  panel.appendChild(grid);
+  // Status mapping
+  panel.append(el('hr', {class: 'wz-divider-lg'}));
+  panel.append(el('h4', {class: 'wz-section-title-sm'}, T.status_mapping_title));
+  panel.append(el('p', {class: 'wz-section-desc-sm'}, T.status_mapping_desc));
+  const smFields = [
+    ['todo', T.status_todo, T.status_todo_placeholder],
+    ['inprogress', T.status_inprogress, T.status_inprogress_placeholder],
+    ['done', T.status_done, T.status_done_placeholder],
+  ];
+  smFields.forEach(([key, label, placeholder]) => {
+    const f = el('div', {class: 'wz-field'});
+    f.append(el('label', null, label));
+    const inp = el('input', {type: 'text', value: W.statusMapping[key] || '', placeholder, 'aria-label': label});
+    inp.addEventListener('input', () => { W.statusMapping[key] = inp.value; persistState(); });
+    f.appendChild(inp);
+    panel.appendChild(f);
+  });
+  panel.append(navActions(true, true));
+  c.appendChild(panel);
+}
+
+function selectMethodology(key) {
+  W.methodology = key;
+  // Auto-adjust visible tabs based on methodology
+  const baseTabs = ['overview', 'workload', 'insights', 'issues'];
+  const methodTabs = {
+    scrum: [...baseTabs, 'sprints', 'timeline'],
+    kanban: [...baseTabs, 'kanban'],
+    waterfall: [...baseTabs, 'timeline'],
+    hybrid: [...baseTabs, 'sprints', 'timeline', 'kanban'],
+  };
+  W.dashboardPrefs.visibleTabs = methodTabs[key] || baseTabs;
+  persistState();
+  render();
+}
+
+/* ==== STEP 3: Teams ==== */
+function renderTeams(c) {
+  const panel = el('div', {class: 'wz-panel'});
+  panel.append(el('h3', null, '👥 ' + T.step_teams));
+  panel.append(el('p', {class: 'wz-hint-text'}, T.no_teams_note));
+  const list = el('div', {id: 'teamList'});
+  panel.appendChild(list);
+  panel.append(el('button', {class: 'wz-btn small secondary wz-add-team-btn', onclick: addTeam}, '+ ' + T.add_team));
+  panel.append(navActions(true, true));
+  c.appendChild(panel);
+  renderTeamList();
+}
+
+function renderTeamList() {
+  const list = $('teamList'); if (!list) return; list.textContent = '';
+  if (W.teams.length > 0) {
+    const header = el('div', {class: 'wz-team-header'});
+    header.append(
+      el('span', {class: 'wz-th-key'}, T.team_key),
+      el('span', null, T.team_name),
+      el('span', {class: 'wz-th-members'}, T.team_members),
+      el('span', {class: 'wz-th-action'})
+    );
+    list.appendChild(header);
+  }
+  W.teams.forEach((t, i) => {
+    const row = el('div', {class: 'wz-team-item'});
+    const keyInp = el('input', {type: 'text', value: t.key, placeholder: T.team_key, class: 'wz-team-input-key', 'aria-label': T.team_key});
+    keyInp.addEventListener('input', () => { W.teams[i].key = keyInp.value; persistState(); });
+    const nameInp = el('input', {type: 'text', value: t.name, placeholder: T.team_name, 'aria-label': T.team_name});
+    nameInp.addEventListener('input', () => { W.teams[i].name = nameInp.value; persistState(); });
+    const membersInp = el('input', {type: 'text', value: t.members.join(', '), placeholder: T.team_members, class: 'wz-team-input-members', 'aria-label': T.team_members});
+    membersInp.addEventListener('input', () => { W.teams[i].members = membersInp.value.split(',').map(s => s.trim()).filter(Boolean); persistState(); });
+    const delBtn = el('button', {class: 'wz-btn small danger', 'aria-label': T.remove_team + ' ' + (t.name || t.key || i+1), onclick: () => { W.teams.splice(i, 1); persistState(); renderTeamList(); }}, '✕');
+    row.append(keyInp, nameInp, membersInp, delBtn);
+    list.appendChild(row);
+  });
+}
+
+function addTeam() {
+  W.teams.push({ key: '', name: '', members: [] });
+  persistState();
+  renderTeamList();
+}
+
+/* ==== STEP 4: Customize ==== */
+function renderCustomize(c) {
+  const panel = el('div', {class: 'wz-panel'});
+  panel.append(el('h3', null, '⚙️ ' + T.step_customize));
+  // Thresholds
+  panel.append(sliderEl(T.overload_points, 'wz-thr-op', W.thresholds.overload_points, 5, 50, v => { W.thresholds.overload_points = v; persistState(); }, T.overload_hint));
+  panel.append(sliderEl(T.wip_limit, 'wz-thr-wip', W.thresholds.wip_limit, 1, 20, v => { W.thresholds.wip_limit = v; persistState(); }, T.wip_hint));
+  panel.append(sliderEl(T.aging_days, 'wz-thr-age', W.thresholds.aging_days, 3, 60, v => { W.thresholds.aging_days = v; persistState(); }, T.aging_hint));
+  // Estimation legend
+  const legend = el('div', {class: 'wz-estimation-legend'});
+  legend.append(el('h5', null, '📐 ' + T.estimation_legend_title));
+  legend.append(el('p', null, T.estimation_legend_desc));
+  const scaleItems = T.estimation_legend_items.split('•').map(s => s.trim()).filter(Boolean);
+  const scaleRow = el('div', {class: 'wz-estimation-scale'});
+  scaleItems.forEach(item => scaleRow.append(el('span', null, item)));
+  legend.appendChild(scaleRow);
+  legend.append(el('p', null, T.estimation_legend_note));
+  panel.appendChild(legend);
+  panel.append(el('hr', {class: 'wz-divider'}));
+  // Branding
+  const row = el('div', {class: 'wz-row'});
+  row.append(fieldEl(T.company_name, 'wz-company', 'text', W.branding.company_name));
+  row.append(fieldEl(T.dashboard_title, 'wz-title', 'text', W.branding.title));
+  panel.appendChild(row);
+  // Color picker
+  const colorRow = el('div', {class: 'wz-field'});
+  colorRow.append(el('label', null, T.accent_color));
+  const colorWrap = el('div', {class: 'wz-color-row'});
+  const colorInp = el('input', {type: 'color', id: 'wz-color', value: W.branding.color.toLowerCase(), class: 'wz-color-inp', 'aria-label': T.accent_color});
+  const hexInp = el('input', {type: 'text', id: 'wz-color-hex', class: 'wz-color-hex', value: W.branding.color.toLowerCase(), placeholder: '#fb6400', 'aria-label': 'Hex color code'});
+  colorInp.addEventListener('input', () => { const v = colorInp.value.toLowerCase(); W.branding.color = v; hexInp.value = v; persistState(); });
+  hexInp.addEventListener('input', () => { const v = hexInp.value.trim().toLowerCase(); if (/^#[0-9a-f]{6}$/.test(v)) { W.branding.color = v; colorInp.value = v; persistState(); } });
+  colorWrap.append(colorInp, hexInp);
+  colorRow.appendChild(colorWrap);
+  panel.appendChild(colorRow);
+
+  panel.append(el('hr', {class: 'wz-divider'}));
+
+  // Dashboard preferences — theme
+  panel.append(el('h4', {class: 'wz-section-title'}, T.dashboard_prefs_title));
+  const themeGroup = el('div', {class: 'wz-field'});
+  themeGroup.append(el('label', null, T.dashboard_theme));
+  const themeRow = el('div', {class: 'wz-topbar-group wz-option-group'});
+  ['light', 'dark', 'system'].forEach(t => {
+    const label = T['dashboard_theme_' + t];
+    const btn = el('button', {
+      class: 'wz-topbar-btn' + (W.dashboardPrefs.theme === t ? ' active' : ''),
+      onclick: () => { W.dashboardPrefs.theme = t; persistState(); render(); }
+    }, label);
+    themeRow.appendChild(btn);
+  });
+  themeGroup.appendChild(themeRow);
+  panel.appendChild(themeGroup);
+
+  // Layout density
+  const densityGroup = el('div', {class: 'wz-field'});
+  densityGroup.append(el('label', null, T.layout_density));
+  const densityRow = el('div', {class: 'wz-topbar-group wz-option-group'});
+  ['compact', 'comfortable', 'spacious'].forEach(d => {
+    const label = T['density_' + d];
+    const btn = el('button', {
+      class: 'wz-topbar-btn' + (W.dashboardPrefs.density === d ? ' active' : ''),
+      onclick: () => { W.dashboardPrefs.density = d; persistState(); render(); }
+    }, label);
+    densityRow.appendChild(btn);
+  });
+  densityGroup.appendChild(densityRow);
+  panel.appendChild(densityGroup);
+
+  // Tab visibility
+  const tabGroup = el('div', {class: 'wz-field'});
+  tabGroup.append(el('label', null, T.tab_visibility));
+  const tabGrid = el('div', {class: 'wz-chips', role: 'group', 'aria-label': T.tab_visibility});
+  const allTabs = [
+    ['overview', T.tab_overview], ['workload', T.tab_workload], ['sprints', T.tab_sprints],
+    ['timeline', T.tab_timeline], ['pi', T.tab_pi], ['insights', T.tab_insights],
+    ['issues', T.tab_issues], ['kanban', T.tab_kanban]
+  ];
+  allTabs.forEach(([key, label]) => {
+    const checked = W.dashboardPrefs.visibleTabs.includes(key);
+    const chip = el('div', {
+      class: 'wz-chip' + (checked ? ' selected' : ''), tabindex: '0',
+      role: 'checkbox', 'aria-checked': checked ? 'true' : 'false', 'aria-label': label,
+      onclick: () => toggleTab(key),
+      onkeydown: (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleTab(key); } }
+    }, label);
+    tabGrid.appendChild(chip);
+  });
+  tabGroup.appendChild(tabGrid);
+  panel.appendChild(tabGroup);
+
+  // PI configuration (conditional)
+  if (W.methodology === 'scrum' || W.methodology === 'hybrid') {
+    panel.append(el('hr', {class: 'wz-divider'}));
+    panel.append(el('h4', {class: 'wz-section-title-sm'}, T.pi_title));
+    panel.append(el('p', {class: 'wz-section-desc-sm'}, T.pi_hint));
+    // PI enabled toggle
+    const piToggle = el('div', {class: 'wz-field wz-pi-toggle'});
+    const piCheck = el('input', {type: 'checkbox', id: 'wz-pi-enabled', ...(W.pi.enabled ? {checked: ''} : {}), 'aria-label': T.pi_enabled});
+    piCheck.addEventListener('change', () => { W.pi.enabled = piCheck.checked; persistState(); render(); });
+    piToggle.append(piCheck, el('label', {for: 'wz-pi-enabled', class: 'wz-pi-toggle-label'}, T.pi_enabled));
+    panel.appendChild(piToggle);
+
+    if (W.pi.enabled) {
+      const piRow = el('div', {class: 'wz-row'});
+      piRow.append(fieldEl(T.pi_name, 'wz-pi-name', 'text', W.pi.name, T.pi_name_placeholder));
+      piRow.append(fieldEl(T.pi_start_date, 'wz-pi-start', 'date', W.pi.start_date));
+      panel.appendChild(piRow);
+      panel.append(sliderEl(T.pi_sprints, 'wz-pi-sprints', W.pi.sprints_per_pi, 1, 20, v => { W.pi.sprints_per_pi = v; persistState(); }));
+      panel.append(sliderEl(T.pi_sprint_length, 'wz-pi-length', W.pi.sprint_length_days, 1, 40, v => { W.pi.sprint_length_days = v; persistState(); }));
+      // Bind PI text fields
+      setTimeout(() => {
+        const piName = $('wz-pi-name');
+        if (piName) piName.addEventListener('input', () => { W.pi.name = piName.value; persistState(); });
+        const piStart = $('wz-pi-start');
+        if (piStart) piStart.addEventListener('input', () => { W.pi.start_date = piStart.value; persistState(); });
+      }, 0);
+    }
+  }
+
+  panel.append(navActions(true, true));
+  c.appendChild(panel);
+  const compInp = $('wz-company'); if (compInp) compInp.addEventListener('input', () => { W.branding.company_name = compInp.value; persistState(); });
+  const titleInp = $('wz-title'); if (titleInp) titleInp.addEventListener('input', () => { W.branding.title = titleInp.value; persistState(); });
+}
+
+function toggleTab(key) {
+  const idx = W.dashboardPrefs.visibleTabs.indexOf(key);
+  if (idx >= 0) W.dashboardPrefs.visibleTabs.splice(idx, 1);
+  else W.dashboardPrefs.visibleTabs.push(key);
+  persistState();
+  render();
+}
+
+function sliderEl(label, id, value, min, max, onChange, helpText) {
+  const f = el('div', {class: 'wz-field'});
+  const lbl = el('label', {for: id}, label + ': ');
+  const valSpan = el('span', {class: 'wz-slider-val', id: id + '-val'}, String(value));
+  lbl.appendChild(valSpan);
+  f.appendChild(lbl);
+  const slider = el('input', {type: 'range', id, class: 'wz-slider', min: String(min), max: String(max), value: String(value), 'aria-label': label, 'aria-valuenow': String(value)});
+  slider.addEventListener('input', () => { const v = parseInt(slider.value); valSpan.textContent = v; slider.setAttribute('aria-valuenow', v); onChange(v); });
+  f.appendChild(slider);
+  if (helpText) f.appendChild(el('div', {class: 'wz-slider-help'}, helpText));
+  return f;
+}
+
+/* ==== STEP 5: Review ==== */
+function renderReview(c) {
+  syncFieldValues();
+  const panel = el('div', {class: 'wz-panel'});
+  panel.append(el('h3', null, '📋 ' + T.step_review));
+  // Connection
+  const connRows = [
+    ['URL', W.jira.base_url],
+    ['Auth', W.jira.auth_method === 'basic' ? W.jira.auth_email : 'PAT'],
+    ['Status', W.verified ? '✅' : '❌'],
+    ['Server', W.serverInfo ? (W.serverInfo.deployment_type || '') + ' v' + (W.serverInfo.version || '') : '—'],
+  ];
+  if (W.jira.jql_filter) connRows.push([T.jql_filter, W.jira.jql_filter]);
+  panel.appendChild(reviewSection(T.review_connection, 0, connRows));
+  // Projects + fields
+  panel.appendChild(reviewSection(T.review_projects, 1, [
+    ['Selected', W.selectedProjects.join(', ') || 'All'],
+
+    [T.field_story_points, W.fields.story_points || '—'],
+    [T.field_epic_link, W.fields.epic_link || '—'],
+    [T.field_sprint, W.fields.sprint || '—'],
+  ]));
+  // Methodology + status mapping
+  const methLabel = T['methodology_' + W.methodology] || W.methodology;
+  const methRows = [[T.review_methodology, methLabel]];
+  if (W.statusMapping.todo) methRows.push([T.status_todo, W.statusMapping.todo]);
+  if (W.statusMapping.inprogress) methRows.push([T.status_inprogress, W.statusMapping.inprogress]);
+  if (W.statusMapping.done) methRows.push([T.status_done, W.statusMapping.done]);
+  panel.appendChild(reviewSection(T.review_methodology, 2, methRows));
+  // Teams
+  const teamsData = W.teams.filter(t => t.key && t.name).map(t => [t.name, t.members.length + ' members']);
+  if (teamsData.length === 0) teamsData.push(['—', T.no_teams_note]);
+  panel.appendChild(reviewSection(T.review_teams, 3, teamsData));
+  // Settings + dashboard prefs
+  const setsRows = [
+    [T.overload_points, String(W.thresholds.overload_points)],
+    [T.wip_limit, String(W.thresholds.wip_limit)],
+    [T.aging_days, String(W.thresholds.aging_days)],
+    [T.company_name, W.branding.company_name || '—'],
+    [T.accent_color, W.branding.color],
+    [T.dashboard_theme, T['dashboard_theme_' + W.dashboardPrefs.theme] || W.dashboardPrefs.theme],
+    [T.layout_density, T['density_' + W.dashboardPrefs.density] || W.dashboardPrefs.density],
+    [T.tab_visibility, W.dashboardPrefs.visibleTabs.join(', ')],
+  ];
+  panel.appendChild(reviewSection(T.review_settings, 4, setsRows));
+  // PI (if enabled)
+  if (W.pi.enabled) {
+    panel.appendChild(reviewSection(T.review_pi, 4, [
+      [T.pi_name, W.pi.name || '—'],
+      [T.pi_start_date, W.pi.start_date || '—'],
+      [T.pi_sprints, String(W.pi.sprints_per_pi)],
+      [T.pi_sprint_length, String(W.pi.sprint_length_days) + ' days'],
+    ]));
+  }
+  // Hint
+  panel.append(el('p', {class: 'wz-cred-hint'}, T.cred_warning));
+  // Actions
+  const actions = el('div', {class: 'wz-actions'});
+  actions.append(el('button', {class: 'wz-btn secondary', onclick: goBack}, '← ' + T.back));
+  const saveBtn = el('button', {class: 'wz-btn success', id: 'saveBtn', onclick: saveAndLaunch}, '🚀 ' + T.save_and_launch);
+  actions.appendChild(saveBtn);
+  panel.appendChild(actions);
+  c.appendChild(panel);
+}
+
+function syncFieldValues() {
+  const fsp = $('wz-fsp'); if (fsp) W.fields.story_points = fsp.value;
+  const fep = $('wz-fep'); if (fep) W.fields.epic_link = fep.value;
+  const fspr = $('wz-fspr'); if (fspr) W.fields.sprint = fspr.value;
+}
+
+function reviewSection(title, stepIdx, rows) {
+  const s = el('div', {class: 'wz-review-section'});
+  const h = el('h4', null, title);
+  h.appendChild(el('button', {onclick: () => goStep(stepIdx), 'aria-label': T.edit + ' ' + title}, T.edit));
+  s.appendChild(h);
+  rows.forEach(([l, v]) => {
+    const r = el('div', {class: 'wz-review-row'});
+    r.append(el('span', {class: 'label'}, l), el('span', null, v));
+    s.appendChild(r);
+  });
+  return s;
+}
+
+async function saveAndLaunch() {
+  const btn = $('saveBtn');
+  btn.disabled = true; btn.textContent = ''; btn.appendChild(el('span',{class:'spinner'})); btn.append(' ' + T.saving);
+  const config = buildConfig();
+  try {
+    const resp = await api('/api/wizard/save', { config });
+    if (resp.ok) {
+      toast(T.save_success);
+      localStorage.removeItem(STORAGE_KEY);
+      try { await api('/api/analyze', {}); } catch (e) { /* will run async */ }
+      setTimeout(() => { location.href = '/'; }, 1500);
+    } else {
+      toast(resp.error || T.save_failed, 'error');
+      btn.disabled = false; btn.textContent = '🚀 ' + T.save_and_launch;
+    }
+  } catch (e) {
+    toast(T.save_failed, 'error');
+    btn.disabled = false; btn.textContent = '🚀 ' + T.save_and_launch;
+  }
+}
+
+function buildConfig() {
+  const jiraCfg = {
+    base_url: W.jira.base_url,
+    auth_email: W.jira.auth_email,
+    auth_token: W.jira.auth_token,
+    projects: W.selectedProjects,
+    auth_method: W.jira.auth_method,
+    server_type: (W.serverInfo && W.serverInfo.server_type) || 'cloud',
+  };
+  if (W.jira.jql_filter) jiraCfg.jql_filter = W.jira.jql_filter;
+
+  const cfg = {
+    jira: jiraCfg,
+    locale: localStorage.getItem('fb-language') || '{{ locale }}',
+    methodology: W.methodology,
+    output: {
+      path: 'output/dashboard.html',
+      title: W.branding.title || 'FlowBoard Dashboard',
+      company_name: W.branding.company_name || '',
+    },
+    thresholds: {
+      overload_points: W.thresholds.overload_points,
+      wip_limit: W.thresholds.wip_limit,
+      aging_days: W.thresholds.aging_days,
+    },
+    field_mappings: {
+      story_points: W.fields.story_points,
+      epic_link: W.fields.epic_link,
+      sprint: W.fields.sprint,
+    },
+    dashboard: {
+      theme: W.dashboardPrefs.theme,
+      branding: {
+        title: W.branding.title || 'FlowBoard Dashboard',
+        primary_color: W.branding.color.toLowerCase(),
+        company_name: W.branding.company_name || '',
+      },
+      layout: {
+        density: W.dashboardPrefs.density,
+      },
+      tabs: {
+        visible: W.dashboardPrefs.visibleTabs,
+      },
+    },
+  };
+  // Status mapping — schema expects { "JiraStatus": "Category", ... }
+  const sm = {};
+  const categories = [
+    ['todo', 'To Do'],
+    ['inprogress', 'In Progress'],
+    ['done', 'Done'],
+  ];
+  categories.forEach(([key, category]) => {
+    const raw = W.statusMapping[key];
+    if (!raw) return;
+    raw.split(',').map(s => s.trim()).filter(Boolean).forEach(status => { sm[status] = category; });
+  });
+  if (Object.keys(sm).length) cfg.status_mapping = sm;
+  // Teams
+  const validTeams = W.teams.filter(t => t.key && t.name);
+  if (validTeams.length) cfg.teams = validTeams;
+  // PI config
+  if (W.pi.enabled) {
+    cfg.pi = {
+      enabled: true,
+      name: W.pi.name || '',
+      start_date: W.pi.start_date || '',
+      sprints_per_pi: W.pi.sprints_per_pi,
+      sprint_length_days: W.pi.sprint_length_days,
+    };
+  }
+  return cfg;
+}
+
+/* ---- Shared nav ---- */
+function navActions(showBack, nextEnabled) {
+  const actions = el('div', {class: 'wz-actions'});
+  if (showBack) actions.append(el('button', {class: 'wz-btn secondary', onclick: goBack, 'aria-label': T.back}, '← ' + T.back));
+  else actions.append(el('div'));
+  actions.append(el('button', {class: 'wz-btn', onclick: goNext, disabled: nextEnabled ? undefined : 'true', 'aria-label': T.next}, T.next + ' →'));
+  return actions;
+}
+
+/* ---- Init ---- */
+render();
+</script>
+<script>
+// Theme/lang controls for wizard page
+function wzSetTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  document.querySelectorAll('[data-wz-theme]').forEach(b => {
+    b.classList.toggle('active', b.dataset.wzTheme === theme);
+  });
+  localStorage.setItem('fb-theme', theme);
+}
+function wzSetLang(lang) {
+  localStorage.setItem('fb-language', lang);
+  document.querySelectorAll('[data-wz-lang]').forEach(b => {
+    b.classList.toggle('active', b.dataset.wzLang === lang);
+  });
+  location.href = '/?lang=' + lang;
+}
+// Apply saved theme on load
+(function() {
+  var saved = localStorage.getItem('fb-theme');
+  if (saved) wzSetTheme(saved);
+  // Close menu when clicking outside
+  document.addEventListener('click', function(e) {
+    var tb = document.getElementById('wzTopbar');
+    if (tb && !tb.contains(e.target)) {
+      document.getElementById('wzTopMenu').classList.remove('open');
+    }
+  });
+})();
+</script>
+</body>
+</html>

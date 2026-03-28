@@ -1,0 +1,44 @@
+{% if is_demo %}
+<div class="demo-toolbar" role="banner" aria-label="{{ t('demo.toolbar_label') }}">
+  <div class="demo-toolbar-inner">
+    <div class="demo-toolbar-info">
+      <span class="demo-toolbar-badge">{{ t("demo.badge") }}</span>
+      <span class="demo-toolbar-methodology">{{ t("demo.current_methodology", methodology=methodology|capitalize) }}</span>
+    </div>
+    <div class="demo-toolbar-actions">
+      <button class="demo-toolbar-btn{% if methodology == 'scrum' %} active{% endif %}" onclick="switchDemo('scrum')" {% if methodology == 'scrum' %}disabled{% endif %} aria-pressed="{{ 'true' if methodology == 'scrum' else 'false' }}">🏃 Scrum</button>
+      <button class="demo-toolbar-btn{% if methodology == 'kanban' %} active{% endif %}" onclick="switchDemo('kanban')" {% if methodology == 'kanban' %}disabled{% endif %} aria-pressed="{{ 'true' if methodology == 'kanban' else 'false' }}">📊 Kanban</button>
+      <button class="demo-toolbar-btn{% if methodology == 'waterfall' %} active{% endif %}" onclick="switchDemo('waterfall')" {% if methodology == 'waterfall' %}disabled{% endif %} aria-pressed="{{ 'true' if methodology == 'waterfall' else 'false' }}">📐 Waterfall</button>
+      <button class="demo-toolbar-btn{% if methodology == 'hybrid' %} active{% endif %}" onclick="switchDemo('hybrid')" {% if methodology == 'hybrid' %}disabled{% endif %} aria-pressed="{{ 'true' if methodology == 'hybrid' else 'false' }}">🔀 Hybrid</button>
+      <span class="demo-toolbar-divider" aria-hidden="true"></span>
+      <button class="demo-toolbar-btn demo-toolbar-back" onclick="backToWizard()">← {{ t("demo.back_to_setup") }}</button>
+    </div>
+  </div>
+</div>
+<script>
+function switchDemo(m) {
+  var lang = localStorage.getItem('fb-language') || 'en';
+  var toolbar = document.querySelector('.demo-toolbar');
+  if (toolbar) toolbar.setAttribute('aria-busy', 'true');
+  document.querySelectorAll('.demo-toolbar-btn').forEach(function(b) { b.disabled = true; });
+  var info = document.querySelector('.demo-toolbar-methodology');
+  if (info) info.textContent = '⏳ {{ t("ui.loading", fallback="Loading…") }}';
+  fetch('/api/demo', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'FlowBoard' },
+    body: JSON.stringify({ methodology: m, locale: lang })
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(d) { if (d.ok) location.reload(); else alert(d.error || 'Failed'); })
+  .catch(function() { location.reload(); });
+}
+function backToWizard() {
+  fetch('/api/demo', {
+    method: 'DELETE',
+    headers: { 'X-Requested-With': 'FlowBoard' }
+  }).catch(function(){});
+  localStorage.setItem('flowboard_wizard_state', JSON.stringify({step: -1}));
+  location.href = '/?reset=1';
+}
+</script>
+{% endif %}

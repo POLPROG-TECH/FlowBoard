@@ -1,0 +1,9 @@
+{
+  "jira": {
+    "base_url": "https://yourcompany.atlassian.net",
+    "projects": ["PROJ"]
+  },
+  "output": {
+    "path": "output/dashboard.html"
+  }
+}
