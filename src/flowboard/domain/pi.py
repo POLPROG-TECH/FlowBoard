@@ -18,9 +18,11 @@ DEFAULT_WORKING_DAYS: frozenset[int] = frozenset({1, 2, 3, 4, 5})
 # Data structures
 # ---------------------------------------------------------------------------
 
+
 @dataclass(frozen=True, slots=True)
 class PISprintSlot:
     """One sprint slot inside a PI."""
+
     index: int  # 1-based (1 … sprints_per_pi)
     name: str
     start_date: date
@@ -34,6 +36,7 @@ class PISprintSlot:
 @dataclass(slots=True)
 class PISnapshot:
     """Complete PI-level snapshot for the presentation layer."""
+
     name: str
     start_date: date
     end_date: date
@@ -49,6 +52,7 @@ class PISnapshot:
 # ---------------------------------------------------------------------------
 # Business-day helpers
 # ---------------------------------------------------------------------------
+
 
 def _to_wd_set(working_days: list[int] | frozenset[int] | None) -> frozenset[int]:
     if working_days is None:
@@ -104,6 +108,7 @@ def count_working_days(start: date, end: date, working_days: list[int] | None = 
 # Sprint boundary computation
 # ---------------------------------------------------------------------------
 
+
 def compute_sprint_boundaries(
     pi_start: date,
     sprint_length: int = 10,
@@ -138,6 +143,7 @@ def compute_sprint_boundaries(
 # ---------------------------------------------------------------------------
 # PI snapshot computation
 # ---------------------------------------------------------------------------
+
 
 def compute_pi_snapshot(
     name: str,
@@ -192,19 +198,23 @@ def compute_pi_snapshot(
             elapsed = total_wd if today > s_end else 0
             remaining = 0 if today > s_end else total_wd
 
-        slots.append(PISprintSlot(
-            index=i,
-            name=f"{sprint_name_prefix} {i}",
-            start_date=s_start,
-            end_date=s_end,
-            is_current=is_current,
-            working_days_total=total_wd,
-            working_days_elapsed=elapsed,
-            working_days_remaining=remaining,
-        ))
+        slots.append(
+            PISprintSlot(
+                index=i,
+                name=f"{sprint_name_prefix} {i}",
+                start_date=s_start,
+                end_date=s_end,
+                is_current=is_current,
+                working_days_total=total_wd,
+                working_days_elapsed=elapsed,
+                working_days_remaining=remaining,
+            )
+        )
 
     total_wd = count_working_days(pi_start, pi_end, wd_list)
-    elapsed_wd = count_working_days(pi_start, min(today, pi_end), wd_list) if today >= pi_start else 0
+    elapsed_wd = (
+        count_working_days(pi_start, min(today, pi_end), wd_list) if today >= pi_start else 0
+    )
     remaining_wd = max(0, total_wd - elapsed_wd)
     progress = (elapsed_wd / total_wd * 100) if total_wd > 0 else 0.0
 

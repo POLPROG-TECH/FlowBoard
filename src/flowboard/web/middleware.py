@@ -32,13 +32,17 @@ class ErrorHandlerMiddleware:
         try:
             await self.app(scope, receive, send)
         except Exception:
-            _log.exception("Unhandled error in request %s %s", scope.get("method", "?"), scope.get("path", "/"))
+            _log.exception(
+                "Unhandled error in request %s %s", scope.get("method", "?"), scope.get("path", "/")
+            )
             body = b'{"ok":false,"error":"Internal server error"}'
-            await send({
-                "type": "http.response.start",
-                "status": 500,
-                "headers": [(b"content-type", b"application/json")],
-            })
+            await send(
+                {
+                    "type": "http.response.start",
+                    "status": 500,
+                    "headers": [(b"content-type", b"application/json")],
+                }
+            )
             await send({"type": "http.response.body", "body": body})
 
 
@@ -75,6 +79,13 @@ class SecurityHeadersMiddleware:
             "true",
             "yes",
         )
+        # Build frame-ancestors directive based on framing configuration.
+        if self._allow_framing:
+            cors_raw = os.getenv("FLOWBOARD_CORS_ORIGINS", "")
+            origins = [o.strip() for o in cors_raw.split(",") if o.strip()]
+            frame_ancestors = "'self' " + " ".join(origins) if origins else "'self'"
+        else:
+            frame_ancestors = "'none'"
         # NOTE: 'unsafe-inline' is retained for script-src and style-src because
         # the app generates self-contained HTML with inline CSS/JS and adding
         # nonces to every tag is impractical.  XSS is mitigated via Jinja2
@@ -87,7 +98,7 @@ class SecurityHeadersMiddleware:
             "img-src 'self' data:; "
             "font-src 'self' data: https://fonts.gstatic.com; "
             "connect-src 'self'; "
-            "frame-ancestors 'none'; "
+            f"frame-ancestors {frame_ancestors}; "
             "base-uri 'self'; "
             "form-action 'self'"
         )
@@ -333,11 +344,13 @@ class BodySizeLimitMiddleware:
 
         if content_length > _MAX_BODY_SIZE:
             body = b'{"ok":false,"error":"Request body too large"}'
-            await send({
-                "type": "http.response.start",
-                "status": 413,
-                "headers": [(b"content-type", b"application/json")],
-            })
+            await send(
+                {
+                    "type": "http.response.start",
+                    "status": 413,
+                    "headers": [(b"content-type", b"application/json")],
+                }
+            )
             await send({"type": "http.response.body", "body": body})
             return
 

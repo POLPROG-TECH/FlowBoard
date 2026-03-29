@@ -38,6 +38,7 @@ from flowboard.shared.types import (
 # Fixtures
 # ---------------------------------------------------------------------------
 
+
 @pytest.fixture()
 def people() -> list[Person]:
     return [
@@ -171,6 +172,7 @@ def snapshot(
 # _issue_date_range
 # ---------------------------------------------------------------------------
 
+
 class TestIssueDateRange:
     def test_created_and_due(self, issues: list[Issue]) -> None:
         rng = _issue_date_range(issues[0])
@@ -208,18 +210,47 @@ class TestIssueDateRange:
 # _detect_overlaps
 # ---------------------------------------------------------------------------
 
+
 class TestDetectOverlaps:
     def test_no_overlap(self) -> None:
         bars = [
-            TimelineBar(key="A", label="A", assignee="X", team="", start=date(2026, 1, 1), end=date(2026, 1, 10)),
-            TimelineBar(key="B", label="B", assignee="X", team="", start=date(2026, 1, 15), end=date(2026, 1, 25)),
+            TimelineBar(
+                key="A",
+                label="A",
+                assignee="X",
+                team="",
+                start=date(2026, 1, 1),
+                end=date(2026, 1, 10),
+            ),
+            TimelineBar(
+                key="B",
+                label="B",
+                assignee="X",
+                team="",
+                start=date(2026, 1, 15),
+                end=date(2026, 1, 25),
+            ),
         ]
         assert _detect_overlaps(bars, "X") == []
 
     def test_overlap_detected(self) -> None:
         bars = [
-            TimelineBar(key="A", label="A", assignee="X", team="", start=date(2026, 1, 1), end=date(2026, 1, 15)),
-            TimelineBar(key="B", label="B", assignee="X", team="", start=date(2026, 1, 10), end=date(2026, 1, 25)),
+            TimelineBar(
+                key="A",
+                label="A",
+                assignee="X",
+                team="",
+                start=date(2026, 1, 1),
+                end=date(2026, 1, 15),
+            ),
+            TimelineBar(
+                key="B",
+                label="B",
+                assignee="X",
+                team="",
+                start=date(2026, 1, 10),
+                end=date(2026, 1, 25),
+            ),
         ]
         overlaps = _detect_overlaps(bars, "X")
         assert len(overlaps) >= 1
@@ -229,9 +260,30 @@ class TestDetectOverlaps:
 
     def test_high_severity_for_triple_overlap(self) -> None:
         bars = [
-            TimelineBar(key="A", label="A", assignee="X", team="", start=date(2026, 1, 1), end=date(2026, 1, 20)),
-            TimelineBar(key="B", label="B", assignee="X", team="", start=date(2026, 1, 5), end=date(2026, 1, 25)),
-            TimelineBar(key="C", label="C", assignee="X", team="", start=date(2026, 1, 10), end=date(2026, 1, 30)),
+            TimelineBar(
+                key="A",
+                label="A",
+                assignee="X",
+                team="",
+                start=date(2026, 1, 1),
+                end=date(2026, 1, 20),
+            ),
+            TimelineBar(
+                key="B",
+                label="B",
+                assignee="X",
+                team="",
+                start=date(2026, 1, 5),
+                end=date(2026, 1, 25),
+            ),
+            TimelineBar(
+                key="C",
+                label="C",
+                assignee="X",
+                team="",
+                start=date(2026, 1, 10),
+                end=date(2026, 1, 30),
+            ),
         ]
         overlaps = _detect_overlaps(bars, "X")
         high_or_critical = [o for o in overlaps if o.severity in ("high", "critical")]
@@ -239,7 +291,14 @@ class TestDetectOverlaps:
 
     def test_single_bar_no_overlap(self) -> None:
         bars = [
-            TimelineBar(key="A", label="A", assignee="X", team="", start=date(2026, 1, 1), end=date(2026, 1, 10)),
+            TimelineBar(
+                key="A",
+                label="A",
+                assignee="X",
+                team="",
+                start=date(2026, 1, 1),
+                end=date(2026, 1, 10),
+            ),
         ]
         assert _detect_overlaps(bars, "X") == []
 
@@ -247,6 +306,7 @@ class TestDetectOverlaps:
 # ---------------------------------------------------------------------------
 # build_assignee_timeline
 # ---------------------------------------------------------------------------
+
 
 class TestAssigneeTimeline:
     def test_groups_by_assignee(self, snapshot: BoardSnapshot) -> None:
@@ -278,6 +338,7 @@ class TestAssigneeTimeline:
 # build_team_timeline
 # ---------------------------------------------------------------------------
 
+
 class TestTeamTimeline:
     def test_groups_by_team(self, snapshot: BoardSnapshot) -> None:
         data = build_team_timeline(snapshot)
@@ -290,6 +351,7 @@ class TestTeamTimeline:
 # ---------------------------------------------------------------------------
 # build_epic_timeline
 # ---------------------------------------------------------------------------
+
 
 class TestEpicTimeline:
     def test_uses_roadmap_items(self, snapshot: BoardSnapshot) -> None:
@@ -308,6 +370,7 @@ class TestEpicTimeline:
 # ---------------------------------------------------------------------------
 # build_conflict_timeline
 # ---------------------------------------------------------------------------
+
 
 class TestConflictTimeline:
     def test_only_conflicting_lanes(self, snapshot: BoardSnapshot) -> None:
@@ -333,6 +396,7 @@ class TestConflictTimeline:
 # build_executive_timeline
 # ---------------------------------------------------------------------------
 
+
 class TestExecutiveTimeline:
     def test_caps_swimlanes(self, snapshot: BoardSnapshot) -> None:
         data = build_executive_timeline(snapshot)
@@ -348,6 +412,7 @@ class TestExecutiveTimeline:
 # ---------------------------------------------------------------------------
 # build_timeline dispatcher
 # ---------------------------------------------------------------------------
+
 
 class TestBuildTimelineDispatcher:
     def test_all_modes(self, snapshot: BoardSnapshot) -> None:

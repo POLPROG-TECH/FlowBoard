@@ -43,6 +43,7 @@ def detect_all_risks(
     today = today or date.today()
     if t is None:
         from flowboard.i18n.translator import get_translator
+
         t = get_translator()
     signals: list[RiskSignal] = []
     signals.extend(_detect_overload_risks(workload_records, thresholds, t=t))
@@ -66,6 +67,7 @@ def detect_all_risks(
 # ------------------------------------------------------------------
 # Individual detectors
 # ------------------------------------------------------------------
+
 
 def _detect_overload_risks(
     records: list[WorkloadRecord],
@@ -121,7 +123,9 @@ def _detect_aging_risks(
             continue
         if issue.created:
             # Compare at date level to avoid timezone mismatch issues
-            created_date = issue.created.date() if isinstance(issue.created, datetime) else issue.created
+            created_date = (
+                issue.created.date() if isinstance(issue.created, datetime) else issue.created
+            )
             age = (today - created_date).days
             if age < 0:
                 continue  # future-dated issue, skip
@@ -162,7 +166,8 @@ def _detect_blocked_risks(issues: list[Issue], *, t: Translator | None = None) -
         )
     for issue in blocked:
         blockers = [
-            lnk.target_key for lnk in issue.links
+            lnk.target_key
+            for lnk in issue.links
             if lnk.link_type in (LinkType.IS_BLOCKED_BY, LinkType.DEPENDS_ON)
             and not lnk.is_resolved
         ]

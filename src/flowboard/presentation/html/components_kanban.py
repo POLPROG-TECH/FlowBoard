@@ -38,6 +38,7 @@ def flow_metrics_cards(insights: KanbanInsights | None, *, t: Translator) -> str
         )
 
     fm = insights.flow_metrics
+
     def _safe_fmt(template: str, **kwargs: object) -> str:
         try:
             return template.format(**kwargs)

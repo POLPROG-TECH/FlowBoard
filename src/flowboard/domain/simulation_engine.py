@@ -41,6 +41,7 @@ if TYPE_CHECKING:
 # Baseline metrics computation
 # ---------------------------------------------------------------------------
 
+
 def compute_baseline_metrics(
     snapshot: BoardSnapshot,
     thresholds: Thresholds,
@@ -49,14 +50,8 @@ def compute_baseline_metrics(
     wrs = snapshot.workload_records
     conflicts = snapshot.overlap_conflicts
 
-    overloaded = sum(
-        1 for wr in wrs
-        if wr.story_points > thresholds.overload_points
-    )
-    wip_violations = sum(
-        1 for wr in wrs
-        if wr.in_progress_count > thresholds.wip_limit
-    )
+    overloaded = sum(1 for wr in wrs if wr.story_points > thresholds.overload_points)
+    wip_violations = sum(1 for wr in wrs if wr.in_progress_count > thresholds.wip_limit)
     total_sp = sum(wr.story_points for wr in wrs)
     avg_load = total_sp / len(wrs) if wrs else 0.0
     max_load = max((wr.story_points for wr in wrs), default=0.0)
@@ -70,8 +65,7 @@ def compute_baseline_metrics(
                 tl_overlaps += 1  # count only as contribution basis
     # Use actual conflict count for timeline overlaps
     tl_overlap_count = sum(
-        1 for c in conflicts
-        if c.category in ("resource_contention", "timeline_overlap")
+        1 for c in conflicts if c.category in ("resource_contention", "timeline_overlap")
     )
 
     blocked_count = sum(1 for i in snapshot.issues if i.is_blocked and not i.is_done)
@@ -80,8 +74,7 @@ def compute_baseline_metrics(
     # Utilization
     cap_records = snapshot.capacity_records
     avg_util = (
-        sum(cr.utilization_pct for cr in cap_records) / len(cap_records)
-        if cap_records else 0.0
+        sum(cr.utilization_pct for cr in cap_records) / len(cap_records) if cap_records else 0.0
     )
 
     # Team risk: teams where average load > overload threshold
@@ -89,7 +82,8 @@ def compute_baseline_metrics(
     for wr in wrs:
         team_loads[wr.team or "unassigned"].append(wr.story_points)
     at_risk = sum(
-        1 for loads in team_loads.values()
+        1
+        for loads in team_loads.values()
         if loads and (sum(loads) / len(loads)) > thresholds.overload_points
     )
 
@@ -123,6 +117,7 @@ def compute_baseline_metrics(
 # ---------------------------------------------------------------------------
 # Simulate workload redistribution
 # ---------------------------------------------------------------------------
+
 
 def _simulate_workloads(
     wrs: list[WorkloadRecord],
@@ -179,16 +174,18 @@ def _simulate_workloads(
             if sim_wip > 1:
                 collision_estimate += sim_wip - 1
 
-            sim_workloads.append({
-                "person": m.person.display_name,
-                "team": team_key,
-                "story_points": round(sim_sp, 1),
-                "issue_count": sim_issues,
-                "in_progress": sim_wip,
-                "blocked": sim_blocked,
-                "original_sp": m.story_points,
-                "reduction_pct": round((1 - redistribution_factor) * 100, 1),
-            })
+            sim_workloads.append(
+                {
+                    "person": m.person.display_name,
+                    "team": team_key,
+                    "story_points": round(sim_sp, 1),
+                    "issue_count": sim_issues,
+                    "in_progress": sim_wip,
+                    "blocked": sim_blocked,
+                    "original_sp": m.story_points,
+                    "reduction_pct": round((1 - redistribution_factor) * 100, 1),
+                }
+            )
 
         # New team members (simulated placeholders)
         if delta > 0:
@@ -197,17 +194,19 @@ def _simulate_workloads(
             for i in range(delta):
                 all_loads.append(new_person_sp)
                 total_sp += new_person_sp
-                sim_workloads.append({
-                    "person": f"New {team_key.upper()} #{i + 1}",
-                    "team": team_key,
-                    "story_points": round(new_person_sp, 1),
-                    "issue_count": new_person_issues,
-                    "in_progress": 0,
-                    "blocked": 0,
-                    "original_sp": 0.0,
-                    "reduction_pct": 0.0,
-                    "is_new": True,
-                })
+                sim_workloads.append(
+                    {
+                        "person": f"New {team_key.upper()} #{i + 1}",
+                        "team": team_key,
+                        "story_points": round(new_person_sp, 1),
+                        "issue_count": new_person_issues,
+                        "in_progress": 0,
+                        "blocked": 0,
+                        "original_sp": 0.0,
+                        "reduction_pct": 0.0,
+                        "is_new": True,
+                    }
+                )
 
     # Compute simulated aggregate metrics
     n = len(all_loads) or 1
@@ -244,6 +243,7 @@ def _simulate_workloads(
 # ---------------------------------------------------------------------------
 # Simulate timeline redistribution
 # ---------------------------------------------------------------------------
+
 
 def _simulate_timeline(
     snapshot: BoardSnapshot,
@@ -294,7 +294,11 @@ def _simulate_timeline(
         total_members = len(all_assignees)
 
         # Redistribute: move items from overloaded to new members
-        all_items = [(name, issue, s, e) for name, items_list in existing_assignees.items() for issue, s, e in items_list]
+        all_items = [
+            (name, issue, s, e)
+            for name, items_list in existing_assignees.items()
+            for issue, s, e in items_list
+        ]
         # Sort by start date for even distribution
         all_items.sort(key=lambda x: x[2])
 
@@ -331,13 +335,15 @@ def _simulate_timeline(
         bars = groups[name]
         overlaps = _detect_overlaps(bars, name)
         all_overlaps.extend(overlaps)
-        swimlanes.append(TimelineSwimlane(
-            key=name,
-            label=name,
-            bars=sorted(bars, key=lambda b: b.start),
-            overlap_count=len(overlaps),
-            total_points=sum(b.story_points for b in bars),
-        ))
+        swimlanes.append(
+            TimelineSwimlane(
+                key=name,
+                label=name,
+                bars=sorted(bars, key=lambda b: b.start),
+                overlap_count=len(overlaps),
+                total_points=sum(b.story_points for b in bars),
+            )
+        )
 
     swimlanes.sort(key=lambda s: (-s.overlap_count, s.label))
     rng_start, rng_end = _compute_range(all_bars)
@@ -357,8 +363,10 @@ def _simulate_timeline(
 # Compute deltas between baseline and simulated
 # ---------------------------------------------------------------------------
 
+
 def _compute_delta(baseline: SimulationMetrics, simulated: SimulationMetrics) -> MetricDelta:
     """Compute improvement deltas (positive = improvement)."""
+
     def _pct_reduction(before: float, after: float) -> float:
         if before == 0:
             return 0.0
@@ -369,21 +377,22 @@ def _compute_delta(baseline: SimulationMetrics, simulated: SimulationMetrics) ->
         overload_reduced=max(0, baseline.overloaded_people - simulated.overloaded_people),
         wip_violations_reduced=max(0, baseline.wip_violations - simulated.wip_violations),
         timeline_overlaps_reduced=max(0, baseline.timeline_overlaps - simulated.timeline_overlaps),
-        avg_load_reduction_pct=_pct_reduction(baseline.avg_load_per_person, simulated.avg_load_per_person),
+        avg_load_reduction_pct=_pct_reduction(
+            baseline.avg_load_per_person, simulated.avg_load_per_person
+        ),
         peak_load_reduction_pct=_pct_reduction(baseline.max_load_person, simulated.max_load_person),
         utilization_improvement_pct=round(
             simulated.avg_utilization_pct - baseline.avg_utilization_pct, 1
         ),
         risk_teams_reduced=max(0, baseline.at_risk_teams - simulated.at_risk_teams),
-        balance_improvement=round(
-            simulated.team_balance_score - baseline.team_balance_score, 1
-        ),
+        balance_improvement=round(simulated.team_balance_score - baseline.team_balance_score, 1),
     )
 
 
 # ---------------------------------------------------------------------------
 # Team impact analysis — where to hire next
 # ---------------------------------------------------------------------------
+
 
 def compute_team_impacts(
     snapshot: BoardSnapshot,
@@ -404,12 +413,10 @@ def compute_team_impacts(
         member_count = len(members)
         load_per_person = total_sp / member_count if member_count else total_sp
 
-        overloaded = sum(
-            1 for m in members
-            if m.story_points > thresholds.overload_points
-        )
+        overloaded = sum(1 for m in members if m.story_points > thresholds.overload_points)
         collision_contrib = sum(
-            1 for c in snapshot.overlap_conflicts
+            1
+            for c in snapshot.overlap_conflicts
             if any(p in [m.person.display_name for m in members] for p in c.affected_people)
         )
 
@@ -433,16 +440,18 @@ def compute_team_impacts(
 
         score = min(100.0, score)
 
-        impacts.append(TeamImpact(
-            team_key=team_key,
-            team_name=team_name,
-            current_load=round(total_sp, 1),
-            current_members=member_count,
-            load_per_person=round(load_per_person, 1),
-            collision_contribution=collision_contrib,
-            overloaded_members=overloaded,
-            impact_score=round(score, 1),
-        ))
+        impacts.append(
+            TeamImpact(
+                team_key=team_key,
+                team_name=team_name,
+                current_load=round(total_sp, 1),
+                current_members=member_count,
+                load_per_person=round(load_per_person, 1),
+                collision_contribution=collision_contrib,
+                overloaded_members=overloaded,
+                impact_score=round(score, 1),
+            )
+        )
 
     impacts.sort(key=lambda ti: ti.impact_score, reverse=True)
 
@@ -467,6 +476,7 @@ def compute_team_impacts(
 # Global recommendations
 # ---------------------------------------------------------------------------
 
+
 def compute_recommendations(
     snapshot: BoardSnapshot,
     baseline: SimulationMetrics,
@@ -482,6 +492,7 @@ def compute_recommendations(
             return t(key, **kw)
         # Fallback: load English catalog directly
         from flowboard.i18n.translator import Translator
+
         _fallback = Translator("en")
         return _fallback(key, **kw)
 
@@ -491,61 +502,65 @@ def compute_recommendations(
     # 1. Best hire recommendation
     if team_impacts and team_impacts[0].impact_score > 20:
         best = team_impacts[0]
-        recs.append(Recommendation(
-            priority=priority,
-            severity=RiskSeverity.HIGH if best.impact_score > 50 else RiskSeverity.MEDIUM,
-            title=_t("sim.rec.add_resource_title", team=best.team_name),
-            description=_t(
-                "sim.rec.add_resource_desc",
-                team=best.team_name,
-                load=f"{best.load_per_person:.0f}",
-                overloaded=best.overloaded_members,
-            ),
-            team_key=best.team_key,
-            impact_score=best.impact_score,
-        ))
+        recs.append(
+            Recommendation(
+                priority=priority,
+                severity=RiskSeverity.HIGH if best.impact_score > 50 else RiskSeverity.MEDIUM,
+                title=_t("sim.rec.add_resource_title", team=best.team_name),
+                description=_t(
+                    "sim.rec.add_resource_desc",
+                    team=best.team_name,
+                    load=f"{best.load_per_person:.0f}",
+                    overloaded=best.overloaded_members,
+                ),
+                team_key=best.team_key,
+                impact_score=best.impact_score,
+            )
+        )
         priority += 1
 
     # 2. Overload warnings
     for wr in snapshot.workload_records:
         if wr.story_points > thresholds.overload_points * 1.5:
-            recs.append(Recommendation(
-                priority=priority,
-                severity=RiskSeverity.CRITICAL,
-                title=_t("sim.rec.overload_title", person=wr.person.display_name),
-                description=_t(
-                    "sim.rec.overload_desc",
-                    points=f"{wr.story_points:.0f}",
-                    threshold=f"{thresholds.overload_points:.0f}",
-                    excess=f"{wr.story_points - thresholds.overload_points:.0f}",
-                ),
-                team_key=wr.team,
-                impact_score=min(100, wr.story_points / thresholds.overload_points * 50),
-            ))
+            recs.append(
+                Recommendation(
+                    priority=priority,
+                    severity=RiskSeverity.CRITICAL,
+                    title=_t("sim.rec.overload_title", person=wr.person.display_name),
+                    description=_t(
+                        "sim.rec.overload_desc",
+                        points=f"{wr.story_points:.0f}",
+                        threshold=f"{thresholds.overload_points:.0f}",
+                        excess=f"{wr.story_points - thresholds.overload_points:.0f}",
+                    ),
+                    team_key=wr.team,
+                    impact_score=min(100, wr.story_points / thresholds.overload_points * 50),
+                )
+            )
             priority += 1
 
     # 3. WIP limit violations
     wip_violators = [
-        wr for wr in snapshot.workload_records
-        if wr.in_progress_count > thresholds.wip_limit
+        wr for wr in snapshot.workload_records if wr.in_progress_count > thresholds.wip_limit
     ]
     if wip_violators:
         names = ", ".join(wr.person.display_name for wr in wip_violators[:3])
         names_display = (
-            _t("sim.rec.wip_and_others", names=names)
-            if len(wip_violators) > 3 else names
+            _t("sim.rec.wip_and_others", names=names) if len(wip_violators) > 3 else names
         )
-        recs.append(Recommendation(
-            priority=priority,
-            severity=RiskSeverity.HIGH,
-            title=_t("sim.rec.wip_title", count=len(wip_violators)),
-            description=_t(
-                "sim.rec.wip_desc",
-                names=names_display,
-                limit=thresholds.wip_limit,
-            ),
-            impact_score=min(80, len(wip_violators) * 15),
-        ))
+        recs.append(
+            Recommendation(
+                priority=priority,
+                severity=RiskSeverity.HIGH,
+                title=_t("sim.rec.wip_title", count=len(wip_violators)),
+                description=_t(
+                    "sim.rec.wip_desc",
+                    names=names_display,
+                    limit=thresholds.wip_limit,
+                ),
+                impact_score=min(80, len(wip_violators) * 15),
+            )
+        )
         priority += 1
 
     # 4. Team balance
@@ -554,34 +569,38 @@ def compute_recommendations(
         if loads and max(loads) > min(loads) * 2:
             heaviest = team_impacts[0]
             lightest = min(team_impacts, key=lambda ti: ti.load_per_person)
-            recs.append(Recommendation(
-                priority=priority,
-                severity=RiskSeverity.MEDIUM,
-                title=_t("sim.rec.imbalance_title"),
-                description=_t(
-                    "sim.rec.imbalance_desc",
-                    heavy=heaviest.team_name,
-                    heavy_load=f"{heaviest.load_per_person:.0f}",
-                    light=lightest.team_name,
-                    light_load=f"{lightest.load_per_person:.0f}",
-                ),
-                impact_score=40,
-            ))
+            recs.append(
+                Recommendation(
+                    priority=priority,
+                    severity=RiskSeverity.MEDIUM,
+                    title=_t("sim.rec.imbalance_title"),
+                    description=_t(
+                        "sim.rec.imbalance_desc",
+                        heavy=heaviest.team_name,
+                        heavy_load=f"{heaviest.load_per_person:.0f}",
+                        light=lightest.team_name,
+                        light_load=f"{lightest.load_per_person:.0f}",
+                    ),
+                    impact_score=40,
+                )
+            )
             priority += 1
 
     # 5. Blocked work cluster
     blocked_issues = [i for i in snapshot.issues if i.is_blocked and not i.is_done]
     if len(blocked_issues) > 3:
-        recs.append(Recommendation(
-            priority=priority,
-            severity=RiskSeverity.MEDIUM,
-            title=_t("sim.rec.blocked_title", count=len(blocked_issues)),
-            description=_t(
-                "sim.rec.blocked_desc",
-                points=f"{sum(i.story_points for i in blocked_issues):.0f}",
-            ),
-            impact_score=min(60, len(blocked_issues) * 8),
-        ))
+        recs.append(
+            Recommendation(
+                priority=priority,
+                severity=RiskSeverity.MEDIUM,
+                title=_t("sim.rec.blocked_title", count=len(blocked_issues)),
+                description=_t(
+                    "sim.rec.blocked_desc",
+                    points=f"{sum(i.story_points for i in blocked_issues):.0f}",
+                ),
+                impact_score=min(60, len(blocked_issues) * 8),
+            )
+        )
         priority += 1
 
     recs.sort(key=lambda r: (-r.impact_score, r.priority))

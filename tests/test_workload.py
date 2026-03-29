@@ -13,9 +13,7 @@ from flowboard.domain.workload import (
 class TestComputeWorkloadRecords:
     """GIVEN a set of issues, WHEN workload is computed, THEN per-person metrics are correct."""
 
-    def test_story_points_aggregated_per_person(
-        self, sample_issues: list[Issue], config
-    ) -> None:
+    def test_story_points_aggregated_per_person(self, sample_issues: list[Issue], config) -> None:
         # GIVEN issues assigned to alice (P-2: 8sp, P-4: 3sp, P-8: 3sp) = 14 total
         records = compute_workload_records(sample_issues, config.thresholds)
         alice_rec = next(r for r in records if r.person.display_name == "Alice")
@@ -52,9 +50,7 @@ class TestComputeTeamWorkloads:
 
 
 class TestCapacityRecords:
-    def test_completed_points_tracked(
-        self, sample_issues: list[Issue], config
-    ) -> None:
+    def test_completed_points_tracked(self, sample_issues: list[Issue], config) -> None:
         records = compute_workload_records(sample_issues, config.thresholds)
         caps = compute_capacity_records(records, sample_issues, 13.0)
         alice_cap = next(c for c in caps if c.person.display_name == "Alice")

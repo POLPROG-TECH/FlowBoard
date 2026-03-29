@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/assets/logo-full.svg" alt="FlowBoard" width="420">
+  <img src="docs/assets/logo-full.svg" alt="FlowBoard" width="370">
 </p>
 
 <p align="center">

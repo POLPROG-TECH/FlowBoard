@@ -31,6 +31,7 @@ from flowboard.shared.types import (
 # Helpers
 # ---------------------------------------------------------------------------
 
+
 def _person(name: str = "Alice") -> Person:
     return Person(account_id=name.lower(), display_name=name)
 
@@ -58,6 +59,7 @@ def _issue(key: str = "T-1", **kw) -> Issue:
 # Unbounded pagination safety
 # =========================================================================
 
+
 class TestPaginationSafety:
     """Verify get_sprints/get_sprint_issues/get_boards use bounded loops."""
 
@@ -66,6 +68,7 @@ class TestPaginationSafety:
         import inspect
 
         from flowboard.infrastructure.jira.client import JiraClient
+
         src = inspect.getsource(JiraClient.get_sprints)
         assert "max_pages" in src
         assert "for _ in range" in src
@@ -75,6 +78,7 @@ class TestPaginationSafety:
         import inspect
 
         from flowboard.infrastructure.jira.client import JiraClient
+
         src = inspect.getsource(JiraClient.get_sprint_issues)
         assert "max_pages" in src
         assert "for _ in range" in src
@@ -83,6 +87,7 @@ class TestPaginationSafety:
         import inspect
 
         from flowboard.infrastructure.jira.client import JiraClient
+
         src = inspect.getsource(JiraClient.get_boards)
         assert "max_pages" in src
         assert "for _ in range" in src
@@ -92,6 +97,7 @@ class TestPaginationSafety:
 # Connector KeyError swallow removed
 # =========================================================================
 
+
 class TestConnectorKeyErrorRemoved:
     """KeyError must NOT be in the sprint fetch except clause."""
 
@@ -99,6 +105,7 @@ class TestConnectorKeyErrorRemoved:
         import inspect
 
         from flowboard.infrastructure.jira.connector import JiraConnector
+
         src = inspect.getsource(JiraConnector._fetch_sprints)
         assert "KeyError" not in src
 
@@ -107,6 +114,7 @@ class TestConnectorKeyErrorRemoved:
         import inspect
 
         from flowboard.infrastructure.jira.connector import JiraConnector
+
         src = inspect.getsource(JiraConnector._fetch_sprints)
         assert 'b["id"]' not in src
         assert "b.get(" in src
@@ -116,6 +124,7 @@ class TestConnectorKeyErrorRemoved:
 # get_boards pagination
 # =========================================================================
 
+
 class TestBoardsPagination:
     """get_boards must paginate instead of single 200-cap request."""
 
@@ -123,6 +132,7 @@ class TestBoardsPagination:
         import inspect
 
         from flowboard.infrastructure.jira.client import JiraClient
+
         src = inspect.getsource(JiraClient.get_boards)
         assert "isLast" in src  # checks the isLast field
         assert "startAt" in src  # uses startAt parameter
@@ -132,6 +142,7 @@ class TestBoardsPagination:
 # Retro carryover now receives sprint_healths
 # =========================================================================
 
+
 class TestRetroCarryover:
     """compute_ceremonies must use real sprint_healths for carryover."""
 
@@ -140,21 +151,28 @@ class TestRetroCarryover:
             ReadinessReport,
             compute_ceremonies,
         )
+
         healths = [
             SprintHealth(
                 sprint=Sprint(id=1, name="S1", state=SprintState.ACTIVE),
-                total_issues=10, completed_points=5,
+                total_issues=10,
+                completed_points=5,
                 carry_over_count=3,
             ),
             SprintHealth(
                 sprint=Sprint(id=2, name="S2", state=SprintState.CLOSED),
-                total_issues=10, completed_points=8,
+                total_issues=10,
+                completed_points=8,
                 carry_over_count=2,
             ),
         ]
         result = compute_ceremonies(
-            [], [], [], [],
-            ReadinessReport(items=[], avg_readiness=0.0), [],
+            [],
+            [],
+            [],
+            [],
+            ReadinessReport(items=[], avg_readiness=0.0),
+            [],
             sprint_healths=healths,
             today=date(2026, 3, 10),
         )
@@ -162,9 +180,14 @@ class TestRetroCarryover:
 
     def test_carryover_zero_without_healths(self):
         from flowboard.domain.scrum import ReadinessReport, compute_ceremonies
+
         result = compute_ceremonies(
-            [], [], [], [],
-            ReadinessReport(items=[], avg_readiness=0.0), [],
+            [],
+            [],
+            [],
+            [],
+            ReadinessReport(items=[], avg_readiness=0.0),
+            [],
             today=date(2026, 3, 10),
         )
         assert result["retro"].metrics["carryover"] == 0
@@ -173,6 +196,7 @@ class TestRetroCarryover:
 # =========================================================================
 # Timezone mismatch in age_days
 # =========================================================================
+
 
 class TestTimezoneAgeDays:
     """age_days must not crash when created/resolved have mixed tz awareness."""
@@ -187,7 +211,9 @@ class TestTimezoneAgeDays:
 
     def test_naive_created_aware_resolved(self):
         issue = Issue(
-            key="T-2", summary="Test", issue_type=IssueType.STORY,
+            key="T-2",
+            summary="Test",
+            issue_type=IssueType.STORY,
             created=datetime(2026, 1, 1),  # naive
             resolved=datetime(2026, 1, 11, tzinfo=UTC),  # aware
         )
@@ -197,6 +223,7 @@ class TestTimezoneAgeDays:
 # =========================================================================
 # Priority.UNSET sentinel
 # =========================================================================
+
 
 class TestPriorityUnset:
     """Priority.UNSET must exist and be used for unset priorities."""
@@ -212,6 +239,7 @@ class TestPriorityUnset:
     def test_normalizer_uses_unset_for_null(self):
         from flowboard.infrastructure.config.loader import load_config_from_dict
         from flowboard.infrastructure.jira.normalizer import JiraNormalizer
+
         cfg = load_config_from_dict({"jira": {"base_url": "https://x.atlassian.net"}})
         n = JiraNormalizer(cfg)
         assert n._resolve_priority(None) == Priority.UNSET
@@ -220,6 +248,7 @@ class TestPriorityUnset:
     def test_normalizer_medium_stays_medium(self):
         from flowboard.infrastructure.config.loader import load_config_from_dict
         from flowboard.infrastructure.jira.normalizer import JiraNormalizer
+
         cfg = load_config_from_dict({"jira": {"base_url": "https://x.atlassian.net"}})
         n = JiraNormalizer(cfg)
         assert n._resolve_priority("Medium") == Priority.MEDIUM
@@ -229,11 +258,13 @@ class TestPriorityUnset:
 # Firefox event crash — explicit event parameter
 # =========================================================================
 
+
 class TestFirstRunShowFormEvent:
     """Wizard must render the connection step with test connection flow."""
 
     def test_wizard_renders_connection_step(self):
         from flowboard.presentation.html.renderer import render_first_run
+
         html = render_first_run(config_path="/test/path")
         assert "wizard" in html.lower() or "goStep" in html
         assert "testConnection" in html
@@ -243,11 +274,13 @@ class TestFirstRunShowFormEvent:
 # config_path rendered
 # =========================================================================
 
+
 class TestConfigPathRendered:
     """first_run wizard must be renderable without error."""
 
     def test_config_path_visible(self):
         from flowboard.presentation.html.renderer import render_first_run
+
         html = render_first_run(config_path="/home/user/.config/flowboard.json")
         # Wizard must render without error and contain FlowBoard branding
         assert "FlowBoard" in html
@@ -257,12 +290,14 @@ class TestConfigPathRendered:
 # Translation string escaping
 # =========================================================================
 
+
 class TestTranslationEscaping:
     """_t() auto-escape wrapper must exist in components."""
 
     def test_t_helper_exists(self):
         from flowboard.i18n.translator import get_translator
         from flowboard.presentation.html.components import _t
+
         t = get_translator("en")
         result = _t(t, "common.unassigned")
         assert isinstance(result, str)
@@ -271,6 +306,7 @@ class TestTranslationEscaping:
     def test_loc_escapes(self):
         from flowboard.i18n.translator import get_translator
         from flowboard.presentation.html.components import _loc
+
         t = get_translator("en")
         # Normal value passes through escaped
         result = _loc("some<value>", t)
@@ -281,11 +317,13 @@ class TestTranslationEscaping:
 # CSV formula injection on all fields
 # =========================================================================
 
+
 class TestCSVFormulaSanitization:
     """All CSV fields including enums must be sanitized."""
 
     def test_issue_csv_sanitizes_enum_fields(self):
         from flowboard.presentation.export.csv_export import export_issues_csv
+
         snapshot = MagicMock(spec=BoardSnapshot)
         issue = MagicMock()
         issue.key = "T-1"
@@ -310,15 +348,19 @@ class TestCSVFormulaSanitization:
 # JQL injection via project keys
 # =========================================================================
 
+
 class TestJQLProjectKeyValidation:
     """Project keys with special chars must be rejected."""
 
     def test_valid_key_passes(self):
         from flowboard.infrastructure.config.loader import load_config_from_dict
         from flowboard.infrastructure.jira.connector import JiraConnector
-        cfg = load_config_from_dict({
-            "jira": {"base_url": "https://x.atlassian.net", "projects": ["MYPROJ"]},
-        })
+
+        cfg = load_config_from_dict(
+            {
+                "jira": {"base_url": "https://x.atlassian.net", "projects": ["MYPROJ"]},
+            }
+        )
         connector = JiraConnector(MagicMock(), cfg)
         jql = connector._build_jql()
         assert '"MYPROJ"' in jql
@@ -326,9 +368,12 @@ class TestJQLProjectKeyValidation:
     def test_invalid_key_rejected(self):
         from flowboard.infrastructure.config.loader import load_config_from_dict
         from flowboard.infrastructure.jira.connector import JiraConnector
-        cfg = load_config_from_dict({
-            "jira": {"base_url": "https://x.atlassian.net", "projects": ['"; DROP TABLE']},
-        })
+
+        cfg = load_config_from_dict(
+            {
+                "jira": {"base_url": "https://x.atlassian.net", "projects": ['"; DROP TABLE']},
+            }
+        )
         connector = JiraConnector(MagicMock(), cfg)
         jql = connector._build_jql()
         assert "DROP" not in jql
@@ -337,6 +382,7 @@ class TestJQLProjectKeyValidation:
 # =========================================================================
 # Schema max_results cap at 100
 # =========================================================================
+
 
 class TestSchemaMaxResults:
     """config.schema.json must cap max_results at 100."""
@@ -353,14 +399,12 @@ class TestSchemaMaxResults:
 # Empty chart no-data overlay
 # =========================================================================
 
+
 class TestEmptyChartOverlay:
     """Dashboard JS must detect empty chart data and show overlay."""
 
     def test_has_data_function_exists(self):
-        tmpl_dir = (
-            Path(__file__).resolve().parents[1]
-            / "src/flowboard/presentation/html/templates"
-        )
+        tmpl_dir = Path(__file__).resolve().parents[1] / "src/flowboard/presentation/html/templates"
         content = "".join(p.read_text() for p in tmpl_dir.glob("*.html"))
         assert "function _hasData(cfg)" in content
         assert "No data available" in content or "chart_no_data" in content
@@ -370,23 +414,28 @@ class TestEmptyChartOverlay:
 # Schema cache thread safety
 # =========================================================================
 
+
 class TestSchemaCacheThreadSafe:
     """_load_schema must use a threading.Lock."""
 
     def test_lock_exists(self):
         from flowboard.infrastructure.config import validator
+
         assert hasattr(validator, "_schema_lock")
         assert isinstance(validator._schema_lock, type(threading.Lock()))
 
     def test_concurrent_loads_dont_crash(self):
         from flowboard.infrastructure.config.validator import _load_schema
+
         results = []
         errors = []
+
         def loader():
             try:
                 results.append(_load_schema())
             except Exception as e:
                 errors.append(e)
+
         threads = [threading.Thread(target=loader) for _ in range(10)]
         for t in threads:
             t.start()
@@ -400,17 +449,20 @@ class TestSchemaCacheThreadSafe:
 # config_to_dict auth comment
 # =========================================================================
 
+
 class TestConfigToDictAuthComment:
     """config_to_dict must document why auth is omitted."""
 
     def test_docstring_mentions_auth(self):
         from flowboard.infrastructure.config.loader import config_to_dict
+
         assert "credential" in (config_to_dict.__doc__ or "").lower()
 
 
 # =========================================================================
 # Retro headline uses average churn
 # =========================================================================
+
 
 class TestRetroHeadlineAverage:
     """Retro headline must use average churn, not sum."""
@@ -421,13 +473,18 @@ class TestRetroHeadlineAverage:
             ScopeChangeReport,
             compute_ceremonies,
         )
+
         scope = [
             ScopeChangeReport(sprint_name="S1", original_count=10, added_count=3, churn_pct=30.0),
             ScopeChangeReport(sprint_name="S2", original_count=10, added_count=1, churn_pct=10.0),
         ]
         result = compute_ceremonies(
-            [], [], [], scope,
-            ReadinessReport(items=[], avg_readiness=0.0), [],
+            [],
+            [],
+            [],
+            scope,
+            ReadinessReport(items=[], avg_readiness=0.0),
+            [],
             today=date(2026, 3, 10),
         )
         # Average churn = (30+10)/2 = 20, headline should contain "20"
@@ -438,15 +495,17 @@ class TestRetroHeadlineAverage:
 # first_run innerHTML XSS — uses textContent
 # =========================================================================
 
+
 class TestTourNoInnerHTML:
     """renderTour must use textContent, not innerHTML."""
 
     def test_no_innerhtml_in_tour(self):
         from flowboard.presentation.html.renderer import render_first_run
+
         html = render_first_run()
         # The wizard JS should not use innerHTML anywhere
         # Allow innerHTML only in safe contexts (button label updates via .innerHTML with spinner)
-        js_section = html[html.find("<script"):html.rfind("</script>")]
+        js_section = html[html.find("<script") : html.rfind("</script>")]
         # Count innerHTML uses — minimal or zero
         count = js_section.count("innerHTML")
         assert count <= 3, f"Found {count} innerHTML uses — prefer textContent/DOM methods"
@@ -456,6 +515,7 @@ class TestTourNoInnerHTML:
 # StatusCategory enum comparison in timeline
 # =========================================================================
 
+
 class TestTimelineStatusEnum:
     """Timeline epic bar must use enum comparison, not .value == 'Done'."""
 
@@ -463,6 +523,7 @@ class TestTimelineStatusEnum:
         import inspect
 
         from flowboard.domain.timeline import build_epic_timeline
+
         src = inspect.getsource(build_epic_timeline)
         assert '.value == "Done"' not in src
         assert "StatusCategory.DONE" in src
@@ -472,6 +533,7 @@ class TestTimelineStatusEnum:
 # Schema path CWD evaluated lazily
 # =========================================================================
 
+
 class TestSchemaPathCWD:
     """Path.cwd() must be evaluated inside _find_schema_path, not at module level."""
 
@@ -479,11 +541,14 @@ class TestSchemaPathCWD:
         import inspect
 
         from flowboard.infrastructure.config import validator
+
         src = inspect.getsource(validator)
         # Find module-level assignments (before first def)
-        module_header = src[:src.find("\ndef ")]
+        module_header = src[: src.find("\ndef ")]
         # Remove comment lines
-        code_lines = [line for line in module_header.split("\n") if not line.strip().startswith("#")]
+        code_lines = [
+            line for line in module_header.split("\n") if not line.strip().startswith("#")
+        ]
         code_only = "\n".join(code_lines)
         assert "Path.cwd()" not in code_only
 
@@ -492,6 +557,7 @@ class TestSchemaPathCWD:
 # Demo fixture JSON parse
 # =========================================================================
 
+
 class TestDemoFixtureParse:
     """Demo fixture load must have try/except for JSONDecodeError."""
 
@@ -499,6 +565,7 @@ class TestDemoFixtureParse:
         import inspect
 
         from flowboard.cli.main import demo
+
         src = inspect.getsource(demo)
         assert "JSONDecodeError" in src or "json.JSONDecodeError" in src
 
@@ -506,6 +573,7 @@ class TestDemoFixtureParse:
 # =========================================================================
 # Simulation collision metric
 # =========================================================================
+
 
 class TestSimCollisionMetric:
     """Simulated collision count must be based on concurrent tasks, not len(wrs)."""
@@ -521,14 +589,19 @@ class TestSimCollisionMetric:
         cfg = load_config_from_dict({"jira": {"base_url": "https://x.atlassian.net"}})
         wrs = [
             WorkloadRecord(
-                person=_person("A"), team="api",
-                issue_count=5, story_points=15.0,
-                in_progress_count=3, blocked_count=0,
+                person=_person("A"),
+                team="api",
+                issue_count=5,
+                story_points=15.0,
+                in_progress_count=3,
+                blocked_count=0,
             ),
         ]
         teams = [Team(key="api", name="API", members=["a"])]
         scenario = SimulationScenario(
-            id="test", name="Test", description="Test",
+            id="test",
+            name="Test",
+            description="Test",
             changes=(ResourceChange(team_key="api", delta=1),),
         )
         _, metrics = _simulate_workloads(wrs, teams, scenario, cfg.thresholds)
@@ -549,14 +622,19 @@ class TestSimCollisionMetric:
         cfg = load_config_from_dict({"jira": {"base_url": "https://x.atlassian.net"}})
         wrs = [
             WorkloadRecord(
-                person=_person("A"), team="api",
-                issue_count=1, story_points=5.0,
-                in_progress_count=1, blocked_count=0,
+                person=_person("A"),
+                team="api",
+                issue_count=1,
+                story_points=5.0,
+                in_progress_count=1,
+                blocked_count=0,
             ),
         ]
         teams = [Team(key="api", name="API", members=["a"])]
         scenario = SimulationScenario(
-            id="test", name="Test", description="Test",
+            id="test",
+            name="Test",
+            description="Test",
             changes=(ResourceChange(team_key="api", delta=1),),
         )
         _, metrics = _simulate_workloads(wrs, teams, scenario, cfg.thresholds)
@@ -566,6 +644,7 @@ class TestSimCollisionMetric:
 # =========================================================================
 # Sprint field string format warning
 # =========================================================================
+
 
 class TestSprintFieldStringWarning:
     """Normalizer must warn when sprint field is a string (Jira Server)."""
@@ -577,15 +656,20 @@ class TestSprintFieldStringWarning:
         cfg = load_config_from_dict({"jira": {"base_url": "https://x.atlassian.net"}})
         n = JiraNormalizer(cfg)
         with patch("flowboard.infrastructure.jira.normalizer.logger") as mock_log:
-            result = n._extract_sprint({"customfield_10020": "com.atlassian.greenhopper.service..."})
+            result = n._extract_sprint(
+                {"customfield_10020": "com.atlassian.greenhopper.service..."}
+            )
             assert result is None
             mock_log.warning.assert_called_once()
-            assert "string" in str(mock_log.warning.call_args).lower() or "Unexpected" in str(mock_log.warning.call_args)
+            assert "string" in str(mock_log.warning.call_args).lower() or "Unexpected" in str(
+                mock_log.warning.call_args
+            )
 
 
 # =========================================================================
 # Retry context in error messages
 # =========================================================================
+
 
 class TestRetryContext:
     """Rate-limit errors must include retry context."""
@@ -594,6 +678,7 @@ class TestRetryContext:
         import inspect
 
         from flowboard.infrastructure.jira.client import JiraClient
+
         src = inspect.getsource(JiraClient._request)
         assert "after" in src and "retries" in src.lower()
 
@@ -602,11 +687,13 @@ class TestRetryContext:
 # Health check CLI command
 # =========================================================================
 
+
 class TestHealthCommand:
     """CLI must have a 'health' command."""
 
     def test_health_command_exists(self):
         from flowboard.cli.main import app
+
         command_names = [
             cmd.name or (cmd.callback.__name__.replace("_", "-") if cmd.callback else None)
             for cmd in app.registered_commands
@@ -618,12 +705,14 @@ class TestHealthCommand:
 # Structured logging with pipeline timing
 # =========================================================================
 
+
 class TestPipelineTiming:
     """Orchestrator must log pipeline stage timing."""
 
     def test_timed_context_manager(self):
 
         from flowboard.application.orchestrator import _timed
+
         with patch("flowboard.application.orchestrator.logger") as mock_log:
             with _timed("test_stage"):
                 pass
@@ -636,6 +725,7 @@ class TestPipelineTiming:
         import inspect
 
         from flowboard.application.orchestrator import Orchestrator
+
         src = inspect.getsource(Orchestrator.run)
         assert "pipeline_start" in src
         assert "total pipeline" in src.lower() or "total" in src.lower()

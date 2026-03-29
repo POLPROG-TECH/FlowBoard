@@ -26,17 +26,21 @@ logger = logging.getLogger(__name__)
 
 def _timed(stage: str):
     """Log pipeline stage timing at INFO level."""
+
     class _Timer:
         def __enter__(self):
             self.start = time.monotonic()
             logger.info("Pipeline stage '%s' started.", stage)
             return self
+
         def __exit__(self, *exc):
             elapsed = time.monotonic() - self.start
             logger.info(
                 "Pipeline stage '%s' completed in %.2fs.",
-                stage, elapsed,
+                stage,
+                elapsed,
             )
+
     return _Timer()
 
 
@@ -70,7 +74,9 @@ class Orchestrator:
         total = time.monotonic() - pipeline_start
         logger.info(
             "Dashboard generated: %s (total pipeline: %.2fs, issues: %d)",
-            output_path, total, len(snapshot.issues),
+            output_path,
+            total,
+            len(snapshot.issues),
         )
         return output_path
 
@@ -93,9 +99,7 @@ class Orchestrator:
         # Blocker #16: pre-check output directory writability
         output_path.parent.mkdir(parents=True, exist_ok=True)
         if not os.access(output_path.parent, os.W_OK):
-            raise PermissionError(
-                f"Output directory is not writable: {output_path.parent}"
-            )
+            raise PermissionError(f"Output directory is not writable: {output_path.parent}")
         output_path.write_text(html, encoding="utf-8")
         return output_path
 
@@ -116,6 +120,7 @@ class Orchestrator:
 # ------------------------------------------------------------------
 # Standalone analysis helper (no orchestrator instance needed)
 # ------------------------------------------------------------------
+
 
 def analyse_raw_payload(
     raw: dict[str, Any],

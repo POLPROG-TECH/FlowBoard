@@ -33,7 +33,9 @@ def describe_config(config: FlowBoardConfig, t: Translator | None = None) -> dic
     return {
         "jira_url": config.jira.base_url or t("config.not_set"),
         "auth_email": config.jira.auth_email or t("config.not_set"),
-        "auth_token": mask_secret(config.jira.auth_token) if config.jira.auth_token else t("config.not_set"),
+        "auth_token": mask_secret(config.jira.auth_token)
+        if config.jira.auth_token
+        else t("config.not_set"),
         "projects": ", ".join(config.jira.projects) or t("config.all"),
         "boards": ", ".join(str(b) for b in config.jira.boards) or t("config.auto_detect"),
         "teams": str(len(config.teams)),

@@ -39,6 +39,7 @@ from flowboard.shared.types import (
 # Helpers
 # ---------------------------------------------------------------------------
 
+
 def _person(name: str, team: str = "alpha") -> Person:
     return Person(account_id=name.lower(), display_name=name, team=team)
 
@@ -96,6 +97,7 @@ def _snapshot(
 # Preset scenario generation
 # ---------------------------------------------------------------------------
 
+
 class TestPresetScenarios:
     def test_creates_per_team_presets(self) -> None:
         teams = [
@@ -141,13 +143,18 @@ class TestPresetScenarios:
 # Baseline metrics computation
 # ---------------------------------------------------------------------------
 
+
 class TestBaselineMetrics:
     def test_basic_metrics(self) -> None:
         alice = _person("Alice", "ui")
         bob = _person("Bob", "api")
         wrs = [
-            WorkloadRecord(person=alice, team="ui", issue_count=4, story_points=20.0, in_progress_count=2),
-            WorkloadRecord(person=bob, team="api", issue_count=3, story_points=10.0, in_progress_count=1),
+            WorkloadRecord(
+                person=alice, team="ui", issue_count=4, story_points=20.0, in_progress_count=2
+            ),
+            WorkloadRecord(
+                person=bob, team="api", issue_count=3, story_points=10.0, in_progress_count=1
+            ),
         ]
         snap = _snapshot(workloads=wrs)
         th = _thresholds(overload_points=15.0)
@@ -200,8 +207,12 @@ class TestBaselineMetrics:
 
     def test_collision_count(self) -> None:
         conflicts = [
-            OverlapConflict(category="resource_contention", severity=RiskSeverity.HIGH, description="x"),
-            OverlapConflict(category="timeline_overlap", severity=RiskSeverity.MEDIUM, description="y"),
+            OverlapConflict(
+                category="resource_contention", severity=RiskSeverity.HIGH, description="x"
+            ),
+            OverlapConflict(
+                category="timeline_overlap", severity=RiskSeverity.MEDIUM, description="y"
+            ),
         ]
         snap = _snapshot(conflicts=conflicts)
         th = _thresholds()
@@ -213,6 +224,7 @@ class TestBaselineMetrics:
 # ---------------------------------------------------------------------------
 # Team impact analysis
 # ---------------------------------------------------------------------------
+
 
 class TestTeamImpacts:
     def test_highest_impact_sorted_first(self) -> None:
@@ -256,13 +268,18 @@ class TestTeamImpacts:
 # Scenario execution
 # ---------------------------------------------------------------------------
 
+
 class TestRunScenario:
     def test_scenario_reduces_overload(self) -> None:
         alice = _person("Alice", "ui")
         bob = _person("Bob", "ui")
         wrs = [
-            WorkloadRecord(person=alice, team="ui", issue_count=6, story_points=25.0, in_progress_count=4),
-            WorkloadRecord(person=bob, team="ui", issue_count=5, story_points=20.0, in_progress_count=3),
+            WorkloadRecord(
+                person=alice, team="ui", issue_count=6, story_points=25.0, in_progress_count=4
+            ),
+            WorkloadRecord(
+                person=bob, team="ui", issue_count=5, story_points=20.0, in_progress_count=3
+            ),
         ]
         issues = [
             _issue("T-1", alice, 10.0),
@@ -277,7 +294,9 @@ class TestRunScenario:
         baseline = compute_baseline_metrics(snap, th)
 
         scenario = SimulationScenario(
-            id="plus1-ui", name="+1 UI", description="Add 1 UI",
+            id="plus1-ui",
+            name="+1 UI",
+            description="Add 1 UI",
             changes=(ResourceChange(team_key="ui", delta=1),),
         )
         result = run_scenario(snap, scenario, baseline, th)
@@ -296,7 +315,9 @@ class TestRunScenario:
         baseline = compute_baseline_metrics(snap, th)
 
         scenario = SimulationScenario(
-            id="plus1-api", name="+1 API", description="test",
+            id="plus1-api",
+            name="+1 API",
+            description="test",
             changes=(ResourceChange(team_key="api", delta=1),),
         )
         result = run_scenario(snap, scenario, baseline, th)
@@ -308,7 +329,9 @@ class TestRunScenario:
         th = _thresholds()
         baseline = compute_baseline_metrics(snap, th)
         scenario = SimulationScenario(
-            id="test", name="Test", description="test",
+            id="test",
+            name="Test",
+            description="test",
             changes=(ResourceChange(team_key="x", delta=1),),
         )
         result = run_scenario(snap, scenario, baseline, th)
@@ -319,13 +342,18 @@ class TestRunScenario:
 # Full simulation suite
 # ---------------------------------------------------------------------------
 
+
 class TestSimulationSuite:
     def test_suite_runs_with_teams(self) -> None:
         alice = _person("Alice", "ui")
         bob = _person("Bob", "api")
         wrs = [
-            WorkloadRecord(person=alice, team="ui", issue_count=5, story_points=20.0, in_progress_count=3),
-            WorkloadRecord(person=bob, team="api", issue_count=3, story_points=10.0, in_progress_count=1),
+            WorkloadRecord(
+                person=alice, team="ui", issue_count=5, story_points=20.0, in_progress_count=3
+            ),
+            WorkloadRecord(
+                person=bob, team="api", issue_count=3, story_points=10.0, in_progress_count=1
+            ),
         ]
         issues = [_issue("T-1", alice, 10.0), _issue("T-2", alice, 10.0), _issue("T-3", bob, 10.0)]
         teams = [Team(key="ui", name="UI"), Team(key="api", name="API")]
@@ -342,7 +370,11 @@ class TestSimulationSuite:
 
     def test_suite_sorted_by_impact(self) -> None:
         alice = _person("Alice", "ui")
-        wrs = [WorkloadRecord(person=alice, team="ui", issue_count=5, story_points=25.0, in_progress_count=4)]
+        wrs = [
+            WorkloadRecord(
+                person=alice, team="ui", issue_count=5, story_points=25.0, in_progress_count=4
+            )
+        ]
         issues = [_issue(f"T-{i}", alice, 5.0) for i in range(5)]
         teams = [Team(key="ui", name="UI"), Team(key="api", name="API")]
         snap = _snapshot(issues=issues, teams=teams, workloads=wrs)
@@ -365,14 +397,20 @@ class TestSimulationSuite:
 # Recommendations
 # ---------------------------------------------------------------------------
 
+
 class TestRecommendations:
     def test_best_hire_recommendation(self) -> None:
         impacts = [
             TeamImpact(
-                team_key="ui", team_name="UI", current_load=30.0,
-                current_members=2, load_per_person=15.0,
-                collision_contribution=3, overloaded_members=1,
-                impact_score=65.0, recommendation="Add here",
+                team_key="ui",
+                team_name="UI",
+                current_load=30.0,
+                current_members=2,
+                load_per_person=15.0,
+                collision_contribution=3,
+                overloaded_members=1,
+                impact_score=65.0,
+                recommendation="Add here",
             ),
         ]
         snap = _snapshot()
@@ -395,10 +433,13 @@ class TestRecommendations:
         alice = _person("Alice")
         from flowboard.domain.models import IssueLink
         from flowboard.shared.types import LinkType
+
         blocked_issues = [
             Issue(
-                key=f"B-{i}", summary=f"Blocked {i}",
-                story_points=3.0, assignee=alice,
+                key=f"B-{i}",
+                summary=f"Blocked {i}",
+                story_points=3.0,
+                assignee=alice,
                 links=[IssueLink(target_key=f"X-{i}", link_type=LinkType.IS_BLOCKED_BY)],
                 created=datetime(2026, 3, 1, tzinfo=UTC),
             )
@@ -413,6 +454,7 @@ class TestRecommendations:
 # Component rendering
 # ---------------------------------------------------------------------------
 
+
 class TestSimulationViewComponent:
     def test_renders_none_gracefully(self) -> None:
         html = simulation_view(None)
@@ -422,8 +464,12 @@ class TestSimulationViewComponent:
         alice = _person("Alice", "ui")
         bob = _person("Bob", "api")
         wrs = [
-            WorkloadRecord(person=alice, team="ui", issue_count=5, story_points=20.0, in_progress_count=3),
-            WorkloadRecord(person=bob, team="api", issue_count=3, story_points=10.0, in_progress_count=1),
+            WorkloadRecord(
+                person=alice, team="ui", issue_count=5, story_points=20.0, in_progress_count=3
+            ),
+            WorkloadRecord(
+                person=bob, team="api", issue_count=3, story_points=10.0, in_progress_count=1
+            ),
         ]
         issues = [_issue("T-1", alice, 10.0), _issue("T-2", bob, 10.0)]
         teams = [Team(key="ui", name="UI"), Team(key="api", name="API")]
@@ -440,7 +486,11 @@ class TestSimulationViewComponent:
 
     def test_best_hire_rendered(self) -> None:
         alice = _person("Alice", "ui")
-        wrs = [WorkloadRecord(person=alice, team="ui", issue_count=5, story_points=25.0, in_progress_count=4)]
+        wrs = [
+            WorkloadRecord(
+                person=alice, team="ui", issue_count=5, story_points=25.0, in_progress_count=4
+            )
+        ]
         issues = [_issue(f"T-{i}", alice, 5.0) for i in range(5)]
         teams = [Team(key="ui", name="UI")]
         snap = _snapshot(issues=issues, teams=teams, workloads=wrs)
@@ -457,7 +507,11 @@ class TestSimulationViewComponent:
             _issue("T-1", alice, 5.0, due=date(2026, 3, 20)),
             _issue("T-2", alice, 5.0, due=date(2026, 3, 25)),
         ]
-        wrs = [WorkloadRecord(person=alice, team="ui", issue_count=2, story_points=10.0, in_progress_count=2)]
+        wrs = [
+            WorkloadRecord(
+                person=alice, team="ui", issue_count=2, story_points=10.0, in_progress_count=2
+            )
+        ]
         teams = [Team(key="ui", name="UI")]
         snap = _snapshot(issues=issues, teams=teams, workloads=wrs)
         suite = run_simulation_suite(snap, _thresholds())
@@ -471,6 +525,7 @@ class TestSimulationViewComponent:
 # Integration: simulation in board snapshot via analytics
 # ---------------------------------------------------------------------------
 
+
 class TestSimulationIntegration:
     def test_snapshot_includes_simulation_when_enabled(self) -> None:
         from flowboard.domain.analytics import build_board_snapshot
@@ -482,17 +537,23 @@ class TestSimulationIntegration:
             _issue("T-2", bob, 8.0),
         ]
         teams = [Team(key="alpha", name="Alpha"), Team(key="beta", name="Beta")]
-        config = load_config_from_dict({
-            "jira": {"base_url": "https://test.atlassian.net"},
-            "teams": [
-                {"key": "alpha", "name": "Alpha", "members": ["alice"]},
-                {"key": "beta", "name": "Beta", "members": ["bob"]},
-            ],
-            "simulation": {"enabled": True},
-        })
+        config = load_config_from_dict(
+            {
+                "jira": {"base_url": "https://test.atlassian.net"},
+                "teams": [
+                    {"key": "alpha", "name": "Alpha", "members": ["alice"]},
+                    {"key": "beta", "name": "Beta", "members": ["bob"]},
+                ],
+                "simulation": {"enabled": True},
+            }
+        )
         snap = build_board_snapshot(
-            issues=issues, sprints=[], teams=teams,
-            roadmap_items=[], dependencies=[], people=[alice, bob],
+            issues=issues,
+            sprints=[],
+            teams=teams,
+            roadmap_items=[],
+            dependencies=[],
+            people=[alice, bob],
             config=config,
         )
         assert snap.simulation is not None
@@ -502,13 +563,19 @@ class TestSimulationIntegration:
     def test_snapshot_no_simulation_when_disabled(self) -> None:
         from flowboard.domain.analytics import build_board_snapshot
 
-        config = load_config_from_dict({
-            "jira": {"base_url": "https://test.atlassian.net"},
-            "simulation": {"enabled": False},
-        })
+        config = load_config_from_dict(
+            {
+                "jira": {"base_url": "https://test.atlassian.net"},
+                "simulation": {"enabled": False},
+            }
+        )
         snap = build_board_snapshot(
-            issues=[], sprints=[], teams=[],
-            roadmap_items=[], dependencies=[], people=[],
+            issues=[],
+            sprints=[],
+            teams=[],
+            roadmap_items=[],
+            dependencies=[],
+            people=[],
             config=config,
         )
         assert snap.simulation is None
@@ -518,14 +585,17 @@ class TestSimulationIntegration:
 # Config
 # ---------------------------------------------------------------------------
 
+
 class TestSimulationConfig:
     def test_default_enabled(self) -> None:
         cfg = load_config_from_dict({"jira": {"base_url": "https://x.atlassian.net"}})
         assert cfg.simulation.enabled is True
 
     def test_explicit_disabled(self) -> None:
-        cfg = load_config_from_dict({
-            "jira": {"base_url": "https://x.atlassian.net"},
-            "simulation": {"enabled": False},
-        })
+        cfg = load_config_from_dict(
+            {
+                "jira": {"base_url": "https://x.atlassian.net"},
+                "simulation": {"enabled": False},
+            }
+        )
         assert cfg.simulation.enabled is False

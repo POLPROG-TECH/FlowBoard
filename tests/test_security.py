@@ -60,13 +60,15 @@ class TestXSSPrevention:
     """Verify that user-controlled content is HTML-escaped in all components."""
 
     XSS_SCRIPT = '<script>alert("xss")</script>'
-    XSS_IMG = '<img src=x onerror=alert(1)>'
+    XSS_IMG = "<img src=x onerror=alert(1)>"
     XSS_ENCODED_SCRIPT = "&lt;script&gt;"  # what escaped version should contain
 
     def _make_person(self, name: str = "Alice") -> Person:
         return Person(account_id="u1", display_name=name, team="alpha")
 
-    def _make_issue(self, key: str = "T-1", summary: str = "Test", assignee: Person | None = None) -> Issue:
+    def _make_issue(
+        self, key: str = "T-1", summary: str = "Test", assignee: Person | None = None
+    ) -> Issue:
         return Issue(
             key=key,
             summary=summary,
@@ -116,7 +118,13 @@ class TestXSSPrevention:
         assert "&lt;img" in html
 
     def test_sprint_health_escapes_sprint_name(self) -> None:
-        sp = Sprint(id=1, name=self.XSS_SCRIPT, state=SprintState.ACTIVE, start_date=date(2026, 3, 1), end_date=date(2026, 3, 14))
+        sp = Sprint(
+            id=1,
+            name=self.XSS_SCRIPT,
+            state=SprintState.ACTIVE,
+            start_date=date(2026, 3, 1),
+            end_date=date(2026, 3, 14),
+        )
         sh = SprintHealth(sprint=sp, total_issues=10, done_issues=5)
         html = sprint_health_cards([sh])
         assert "<script>" not in html
@@ -194,7 +202,9 @@ class TestConnectorAuthErrorPropagation:
         from flowboard.infrastructure.jira.client import JiraAuthError
         from flowboard.infrastructure.jira.connector import JiraConnector
 
-        config = load_config_from_dict({"jira": {"base_url": "https://test.atlassian.net", "boards": [1]}})
+        config = load_config_from_dict(
+            {"jira": {"base_url": "https://test.atlassian.net", "boards": [1]}}
+        )
         mock_client = MagicMock()
         mock_client.get_sprints.side_effect = JiraAuthError(401, "Unauthorized")
 
@@ -207,7 +217,9 @@ class TestConnectorAuthErrorPropagation:
         from flowboard.infrastructure.jira.client import JiraApiError
         from flowboard.infrastructure.jira.connector import JiraConnector
 
-        config = load_config_from_dict({"jira": {"base_url": "https://test.atlassian.net", "boards": [1]}})
+        config = load_config_from_dict(
+            {"jira": {"base_url": "https://test.atlassian.net", "boards": [1]}}
+        )
         mock_client = MagicMock()
         mock_client.get_sprints.side_effect = JiraApiError(500, "Internal error")
 
@@ -220,7 +232,9 @@ class TestConnectorAuthErrorPropagation:
         """Narrowed except clause no longer swallows programming errors."""
         from flowboard.infrastructure.jira.connector import JiraConnector
 
-        config = load_config_from_dict({"jira": {"base_url": "https://test.atlassian.net", "boards": [1]}})
+        config = load_config_from_dict(
+            {"jira": {"base_url": "https://test.atlassian.net", "boards": [1]}}
+        )
         mock_client = MagicMock()
         mock_client.get_sprints.side_effect = RuntimeError("Bug in code")
 
@@ -241,12 +255,15 @@ class TestLocaleDetectionDeprecation:
         import inspect
 
         from flowboard.i18n.translator import detect_locale
+
         source = inspect.getsource(detect_locale)
-        assert "getdefaultlocale" not in source, \
+        assert "getdefaultlocale" not in source, (
             "detect_locale still uses deprecated locale.getdefaultlocale()"
+        )
 
     def test_detect_locale_returns_valid_locale(self) -> None:
         from flowboard.i18n.translator import detect_locale
+
         result = detect_locale()
         assert result in ("en", "pl")
 
@@ -254,12 +271,14 @@ class TestLocaleDetectionDeprecation:
         import warnings
 
         from flowboard.i18n.translator import detect_locale
+
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter("always")
             detect_locale()
             deprecation_warnings = [x for x in w if issubclass(x.category, DeprecationWarning)]
-            assert len(deprecation_warnings) == 0, \
+            assert len(deprecation_warnings) == 0, (
                 f"detect_locale raised DeprecationWarning: {deprecation_warnings}"
+            )
 
 
 # ======================================================================
@@ -310,13 +329,16 @@ class TestUtilsImportFix:
         import inspect
 
         from flowboard.shared import utils
+
         source = inspect.getsource(utils.business_days_between)
         # The function body should NOT contain 'from datetime import timedelta'
-        assert "from datetime import timedelta" not in source, \
+        assert "from datetime import timedelta" not in source, (
             "timedelta should be imported at module level, not inside function"
+        )
 
     def test_business_days_between_still_works(self) -> None:
         from flowboard.shared.utils import business_days_between
+
         # Mon-Fri: 5 business days
         assert business_days_between(date(2026, 3, 16), date(2026, 3, 20)) == 5
         # Span including weekend
@@ -337,13 +359,19 @@ class TestPITimelineXSS:
 
     def test_pi_name_escaped(self) -> None:
         from flowboard.domain.pi import PISnapshot, PISprintSlot
+
         slot = PISprintSlot(
-            index=1, name="Sprint 1", start_date=date(2026, 3, 2),
-            end_date=date(2026, 3, 13), is_current=True,
-            working_days_total=10, working_days_elapsed=5, working_days_remaining=5,
+            index=1,
+            name="Sprint 1",
+            start_date=date(2026, 3, 2),
+            end_date=date(2026, 3, 13),
+            is_current=True,
+            working_days_total=10,
+            working_days_elapsed=5,
+            working_days_remaining=5,
         )
         pi = PISnapshot(
-            name='<script>alert(1)</script>',
+            name="<script>alert(1)</script>",
             start_date=date(2026, 3, 2),
             end_date=date(2026, 4, 24),
             sprints=[slot],
@@ -360,17 +388,26 @@ class TestPITimelineXSS:
 
     def test_sprint_name_escaped_in_pi_view(self) -> None:
         from flowboard.domain.pi import PISnapshot, PISprintSlot
+
         slot = PISprintSlot(
-            index=1, name='<img src=x onerror=alert(1)>',
-            start_date=date(2026, 3, 2), end_date=date(2026, 3, 13),
-            is_current=False, working_days_total=10,
-            working_days_elapsed=10, working_days_remaining=0,
+            index=1,
+            name="<img src=x onerror=alert(1)>",
+            start_date=date(2026, 3, 2),
+            end_date=date(2026, 3, 13),
+            is_current=False,
+            working_days_total=10,
+            working_days_elapsed=10,
+            working_days_remaining=0,
         )
         pi = PISnapshot(
-            name="PI 1", start_date=date(2026, 3, 2),
-            end_date=date(2026, 3, 13), sprints=[slot],
-            total_working_days=10, elapsed_working_days=10,
-            remaining_working_days=0, progress_pct=100.0,
+            name="PI 1",
+            start_date=date(2026, 3, 2),
+            end_date=date(2026, 3, 13),
+            sprints=[slot],
+            total_working_days=10,
+            elapsed_working_days=10,
+            remaining_working_days=0,
+            progress_pct=100.0,
             today=date(2026, 3, 14),
         )
         html = pi_timeline_view(pi, [])
@@ -390,12 +427,14 @@ class TestJQLInjection:
     def test_project_name_with_double_quote_is_escaped(self) -> None:
         from flowboard.infrastructure.jira.connector import JiraConnector
 
-        config = load_config_from_dict({
-            "jira": {
-                "base_url": "https://test.atlassian.net",
-                "projects": ['MY"PROJECT'],
+        config = load_config_from_dict(
+            {
+                "jira": {
+                    "base_url": "https://test.atlassian.net",
+                    "projects": ['MY"PROJECT'],
+                }
             }
-        })
+        )
         mock_client = MagicMock()
         connector = JiraConnector(mock_client, config)
         jql = connector._build_jql()
@@ -407,12 +446,14 @@ class TestJQLInjection:
     def test_normal_project_names_unchanged(self) -> None:
         from flowboard.infrastructure.jira.connector import JiraConnector
 
-        config = load_config_from_dict({
-            "jira": {
-                "base_url": "https://test.atlassian.net",
-                "projects": ["PROJ1", "PROJ2"],
+        config = load_config_from_dict(
+            {
+                "jira": {
+                    "base_url": "https://test.atlassian.net",
+                    "projects": ["PROJ1", "PROJ2"],
+                }
             }
-        })
+        )
         mock_client = MagicMock()
         connector = JiraConnector(mock_client, config)
         jql = connector._build_jql()
@@ -435,17 +476,27 @@ class TestRetryAfterParsing:
         from flowboard.infrastructure.config.loader import JiraConfig
         from flowboard.infrastructure.jira.client import JiraClient
 
-        cfg = JiraConfig(base_url="https://test.atlassian.net", auth_token="tok", auth_email="e@x.com")
+        cfg = JiraConfig(
+            base_url="https://test.atlassian.net", auth_token="tok", auth_email="e@x.com"
+        )
         client = JiraClient(cfg)
 
         with resp_lib.RequestsMock() as rsps:
             # First call: 429 with fractional Retry-After
-            rsps.add(resp_lib.GET, "https://test.atlassian.net/rest/api/2/serverInfo",
-                     json={"error": "rate limited"}, status=429,
-                     headers={"Retry-After": "1.5"})
+            rsps.add(
+                resp_lib.GET,
+                "https://test.atlassian.net/rest/api/2/serverInfo",
+                json={"error": "rate limited"},
+                status=429,
+                headers={"Retry-After": "1.5"},
+            )
             # Second call: success
-            rsps.add(resp_lib.GET, "https://test.atlassian.net/rest/api/2/serverInfo",
-                     json={"serverTitle": "Jira"}, status=200)
+            rsps.add(
+                resp_lib.GET,
+                "https://test.atlassian.net/rest/api/2/serverInfo",
+                json={"serverTitle": "Jira"},
+                status=200,
+            )
 
             result = client.verify_connection()
             assert result["serverTitle"] == "Jira"
@@ -457,15 +508,25 @@ class TestRetryAfterParsing:
         from flowboard.infrastructure.config.loader import JiraConfig
         from flowboard.infrastructure.jira.client import JiraClient
 
-        cfg = JiraConfig(base_url="https://test.atlassian.net", auth_token="tok", auth_email="e@x.com")
+        cfg = JiraConfig(
+            base_url="https://test.atlassian.net", auth_token="tok", auth_email="e@x.com"
+        )
         client = JiraClient(cfg)
 
         with resp_lib.RequestsMock() as rsps:
-            rsps.add(resp_lib.GET, "https://test.atlassian.net/rest/api/2/serverInfo",
-                     json={"error": "rate limited"}, status=429,
-                     headers={"Retry-After": "not-a-number"})
-            rsps.add(resp_lib.GET, "https://test.atlassian.net/rest/api/2/serverInfo",
-                     json={"serverTitle": "Jira"}, status=200)
+            rsps.add(
+                resp_lib.GET,
+                "https://test.atlassian.net/rest/api/2/serverInfo",
+                json={"error": "rate limited"},
+                status=429,
+                headers={"Retry-After": "not-a-number"},
+            )
+            rsps.add(
+                resp_lib.GET,
+                "https://test.atlassian.net/rest/api/2/serverInfo",
+                json={"serverTitle": "Jira"},
+                status=200,
+            )
 
             result = client.verify_connection()
             assert result["serverTitle"] == "Jira"
@@ -485,14 +546,20 @@ class TestErrorResponseSanitisation:
         from flowboard.infrastructure.config.loader import JiraConfig
         from flowboard.infrastructure.jira.client import JiraApiError, JiraClient
 
-        cfg = JiraConfig(base_url="https://test.atlassian.net", auth_token="tok", auth_email="e@x.com")
+        cfg = JiraConfig(
+            base_url="https://test.atlassian.net", auth_token="tok", auth_email="e@x.com"
+        )
         client = JiraClient(cfg)
 
         sensitive_body = "java.lang.NullPointerException at com.atlassian.jira.internal.Secret"
         with resp_lib.RequestsMock() as rsps:
             # 500 is not in _BACKOFF_CODES so it raises immediately (no retry)
-            rsps.add(resp_lib.GET, "https://test.atlassian.net/rest/api/2/serverInfo",
-                     body=sensitive_body, status=500)
+            rsps.add(
+                resp_lib.GET,
+                "https://test.atlassian.net/rest/api/2/serverInfo",
+                body=sensitive_body,
+                status=500,
+            )
 
             with pytest.raises(JiraApiError) as exc_info:
                 client.verify_connection()
@@ -514,7 +581,9 @@ class TestConnectorNarrowedExceptions:
     def test_memory_error_propagates(self) -> None:
         from flowboard.infrastructure.jira.connector import JiraConnector
 
-        config = load_config_from_dict({"jira": {"base_url": "https://test.atlassian.net", "boards": [1]}})
+        config = load_config_from_dict(
+            {"jira": {"base_url": "https://test.atlassian.net", "boards": [1]}}
+        )
         mock_client = MagicMock()
         mock_client.get_sprints.side_effect = MemoryError("OOM")
 
@@ -533,8 +602,7 @@ class TestBoardSnapshotTimezone:
 
     def test_generated_at_is_timezone_aware(self) -> None:
         snap = BoardSnapshot()
-        assert snap.generated_at.tzinfo is not None, \
-            "generated_at must be timezone-aware"
+        assert snap.generated_at.tzinfo is not None, "generated_at must be timezone-aware"
 
     def test_generated_at_is_utc(self) -> None:
         snap = BoardSnapshot()
@@ -543,8 +611,10 @@ class TestBoardSnapshotTimezone:
     def test_age_days_with_aware_created(self) -> None:
         """Issue with tz-aware created no longer risks TypeError."""
         from datetime import timedelta
+
         issue = Issue(
-            key="T-1", summary="Test",
+            key="T-1",
+            summary="Test",
             created=datetime.now(tz=UTC) - timedelta(days=5),
         )
         assert issue.age_days == 5
@@ -562,6 +632,7 @@ class TestConfigEncoding:
         import inspect
 
         from flowboard.infrastructure.config import loader
+
         source = inspect.getsource(loader.load_config)
         assert 'encoding="utf-8"' in source or "encoding='utf-8'" in source
 
@@ -569,6 +640,7 @@ class TestConfigEncoding:
         import inspect
 
         from flowboard.infrastructure.config import validator
+
         source = inspect.getsource(validator._load_schema)
         assert 'encoding="utf-8"' in source or "encoding='utf-8'" in source
 
@@ -627,6 +699,7 @@ class TestCSVFormulaInjection:
     def test_risks_csv_escapes_formulas(self) -> None:
         from flowboard.domain.models import RiskSignal
         from flowboard.shared.types import RiskCategory, RiskSeverity
+
         rs = RiskSignal(
             severity=RiskSeverity.HIGH,
             category=RiskCategory.OVERLOAD,

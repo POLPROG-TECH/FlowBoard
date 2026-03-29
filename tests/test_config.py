@@ -45,12 +45,16 @@ class TestConfigValidation:
 
     def test_extra_keys_rejected(self) -> None:
         with pytest.raises(ConfigValidationError):
-            load_config_from_dict({
-                "jira": {"base_url": "https://x.com"},
-                "unknown_key": 123,
-            })
+            load_config_from_dict(
+                {
+                    "jira": {"base_url": "https://x.com"},
+                    "unknown_key": 123,
+                }
+            )
 
-    def test_env_override_token(self, minimal_config_dict: dict, monkeypatch: pytest.MonkeyPatch) -> None:
+    def test_env_override_token(
+        self, minimal_config_dict: dict, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
         # GIVEN env var FLOWBOARD_JIRA_TOKEN is set
         monkeypatch.setenv("FLOWBOARD_JIRA_TOKEN", "secret-tok")
         # WHEN loaded
@@ -58,7 +62,9 @@ class TestConfigValidation:
         # THEN the token comes from env
         assert cfg.jira.auth_token == "secret-tok"
 
-    def test_env_override_email(self, minimal_config_dict: dict, monkeypatch: pytest.MonkeyPatch) -> None:
+    def test_env_override_email(
+        self, minimal_config_dict: dict, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
         monkeypatch.setenv("FLOWBOARD_JIRA_EMAIL", "env@co.com")
         cfg = load_config_from_dict(minimal_config_dict)
         assert cfg.jira.auth_email == "env@co.com"

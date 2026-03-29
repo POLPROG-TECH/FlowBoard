@@ -35,6 +35,7 @@ FIXTURES_DIR = Path(__file__).parent.parent / "examples" / "fixtures"
 # Config
 # ---------------------------------------------------------------------------
 
+
 @pytest.fixture()
 def minimal_config_dict() -> dict:
     return {
@@ -70,6 +71,7 @@ def config(full_config_dict: dict) -> FlowBoardConfig:
 # People & Teams
 # ---------------------------------------------------------------------------
 
+
 @pytest.fixture()
 def alice() -> Person:
     return Person(account_id="u1", display_name="Alice", email="alice@co.com", team="alpha")
@@ -99,6 +101,7 @@ def team_beta(carol: Person) -> Team:
 # Sprints
 # ---------------------------------------------------------------------------
 
+
 @pytest.fixture()
 def active_sprint() -> Sprint:
     return Sprint(
@@ -113,6 +116,7 @@ def active_sprint() -> Sprint:
 # ---------------------------------------------------------------------------
 # Issues
 # ---------------------------------------------------------------------------
+
 
 def _make_issue(
     key: str = "TEST-1",
@@ -155,21 +159,97 @@ def make_issue():
 def sample_issues(alice: Person, bob: Person, carol: Person, active_sprint: Sprint) -> list[Issue]:
     """A set of 8 issues with a realistic mix of types, statuses, and assignments."""
     return [
-        _make_issue("P-1", "Epic Alpha", IssueType.EPIC, StatusCategory.IN_PROGRESS, alice, 0, Priority.HIGH, due_date=date(2026, 4, 1)),
-        _make_issue("P-2", "Story A", IssueType.STORY, StatusCategory.IN_PROGRESS, alice, 8, Priority.HIGH, active_sprint, "P-1"),
-        _make_issue("P-3", "Story B", IssueType.STORY, StatusCategory.TODO, bob, 13, Priority.HIGH, active_sprint, "P-1",
-                     links=[IssueLink("P-2", LinkType.IS_BLOCKED_BY, is_resolved=False)]),
-        _make_issue("P-4", "Bug fix", IssueType.BUG, StatusCategory.DONE, alice, 3, Priority.HIGHEST, active_sprint, "P-1"),
-        _make_issue("P-5", "Story C", IssueType.STORY, StatusCategory.IN_PROGRESS, carol, 5, Priority.MEDIUM, active_sprint),
-        _make_issue("P-6", "Task X", IssueType.TASK, StatusCategory.TODO, bob, 5, Priority.LOW, active_sprint),
-        _make_issue("P-7", "Story D", IssueType.STORY, StatusCategory.DONE, carol, 5, Priority.MEDIUM, active_sprint),
-        _make_issue("P-8", "Task Y", IssueType.TASK, StatusCategory.IN_PROGRESS, alice, 3, Priority.HIGH, active_sprint),
+        _make_issue(
+            "P-1",
+            "Epic Alpha",
+            IssueType.EPIC,
+            StatusCategory.IN_PROGRESS,
+            alice,
+            0,
+            Priority.HIGH,
+            due_date=date(2026, 4, 1),
+        ),
+        _make_issue(
+            "P-2",
+            "Story A",
+            IssueType.STORY,
+            StatusCategory.IN_PROGRESS,
+            alice,
+            8,
+            Priority.HIGH,
+            active_sprint,
+            "P-1",
+        ),
+        _make_issue(
+            "P-3",
+            "Story B",
+            IssueType.STORY,
+            StatusCategory.TODO,
+            bob,
+            13,
+            Priority.HIGH,
+            active_sprint,
+            "P-1",
+            links=[IssueLink("P-2", LinkType.IS_BLOCKED_BY, is_resolved=False)],
+        ),
+        _make_issue(
+            "P-4",
+            "Bug fix",
+            IssueType.BUG,
+            StatusCategory.DONE,
+            alice,
+            3,
+            Priority.HIGHEST,
+            active_sprint,
+            "P-1",
+        ),
+        _make_issue(
+            "P-5",
+            "Story C",
+            IssueType.STORY,
+            StatusCategory.IN_PROGRESS,
+            carol,
+            5,
+            Priority.MEDIUM,
+            active_sprint,
+        ),
+        _make_issue(
+            "P-6",
+            "Task X",
+            IssueType.TASK,
+            StatusCategory.TODO,
+            bob,
+            5,
+            Priority.LOW,
+            active_sprint,
+        ),
+        _make_issue(
+            "P-7",
+            "Story D",
+            IssueType.STORY,
+            StatusCategory.DONE,
+            carol,
+            5,
+            Priority.MEDIUM,
+            active_sprint,
+        ),
+        _make_issue(
+            "P-8",
+            "Task Y",
+            IssueType.TASK,
+            StatusCategory.IN_PROGRESS,
+            alice,
+            3,
+            Priority.HIGH,
+            active_sprint,
+        ),
     ]
 
 
 # ---------------------------------------------------------------------------
 # Raw Jira payload (from fixture file)
 # ---------------------------------------------------------------------------
+
 
 @pytest.fixture()
 def mock_jira_payload() -> dict:

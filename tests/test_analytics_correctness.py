@@ -45,6 +45,7 @@ from flowboard.shared.types import (
 # Helpers
 # ---------------------------------------------------------------------------
 
+
 def _person(aid: str = "u1", name: str = "Alice", team: str = "alpha") -> Person:
     return Person(account_id=aid, display_name=name, team=team)
 
@@ -103,6 +104,7 @@ def _thresholds(**kw) -> Thresholds:
 # _detect_sprint_risks now uses injected `today` parameter
 # ====================================================================
 
+
 class TestSprintRiskUsesDeterministicDate:
     """sprint risk detection was using date.today() instead of
     the injected `today` parameter, making it non-deterministic and
@@ -119,11 +121,20 @@ class TestSprintRiskUsesDeterministicDate:
         ]
         wr = compute_workload_records(issues, _thresholds())
         sh = compute_sprint_health(
-            {sprint.id: issues}, [sprint], aging_days=14, today=date(2026, 3, 18),
+            {sprint.id: issues},
+            [sprint],
+            aging_days=14,
+            today=date(2026, 3, 18),
         )
         t = get_translator("en")
         risks = detect_all_risks(
-            issues, wr, sh, [], _thresholds(), today=date(2026, 3, 18), t=t,
+            issues,
+            wr,
+            sh,
+            [],
+            _thresholds(),
+            today=date(2026, 3, 18),
+            t=t,
         )
         # Must contain CRITICAL sprint risk
         critical = [r for r in risks if r.severity == RiskSeverity.CRITICAL]
@@ -139,11 +150,20 @@ class TestSprintRiskUsesDeterministicDate:
         ]
         wr = compute_workload_records(issues, _thresholds())
         sh = compute_sprint_health(
-            {sprint.id: issues}, [sprint], aging_days=14, today=date(2026, 3, 18),
+            {sprint.id: issues},
+            [sprint],
+            aging_days=14,
+            today=date(2026, 3, 18),
         )
         t = get_translator("en")
         risks = detect_all_risks(
-            issues, wr, sh, [], _thresholds(), today=date(2026, 3, 18), t=t,
+            issues,
+            wr,
+            sh,
+            [],
+            _thresholds(),
+            today=date(2026, 3, 18),
+            t=t,
         )
         critical = [r for r in risks if r.severity == RiskSeverity.CRITICAL]
         assert not critical
@@ -152,6 +172,7 @@ class TestSprintRiskUsesDeterministicDate:
 # ====================================================================
 # compute_sprint_health uses injected `today`
 # ====================================================================
+
 
 class TestSprintHealthDeterministicDate:
     """carry_over computation was using date.today() instead of
@@ -168,7 +189,10 @@ class TestSprintHealthDeterministicDate:
             _issue("C-3", 5, StatusCategory.DONE, alice, sprint=sprint),
         ]
         healths = compute_sprint_health(
-            {sprint.id: issues}, [sprint], aging_days=14, today=date(2026, 3, 17),
+            {sprint.id: issues},
+            [sprint],
+            aging_days=14,
+            today=date(2026, 3, 17),
         )
         assert len(healths) == 1
         assert healths[0].carry_over_count == 2  # 1 todo + 1 in_progress
@@ -178,7 +202,10 @@ class TestSprintHealthDeterministicDate:
         alice = _person()
         issues = [_issue("C-1", 5, StatusCategory.TODO, alice, sprint=sprint)]
         healths = compute_sprint_health(
-            {sprint.id: issues}, [sprint], aging_days=14, today=date(2026, 3, 10),
+            {sprint.id: issues},
+            [sprint],
+            aging_days=14,
+            today=date(2026, 3, 10),
         )
         assert healths[0].carry_over_count == 0
 
@@ -188,7 +215,10 @@ class TestSprintHealthDeterministicDate:
         sprint = _sprint(sid=99)
         issues = [_issue("C-4", 5, StatusCategory.TODO, alice, sprint=sprint)]
         healths = compute_sprint_health(
-            {99: issues}, [], aging_days=14, today=date(2026, 3, 10),
+            {99: issues},
+            [],
+            aging_days=14,
+            today=date(2026, 3, 10),
         )
         assert len(healths) == 0
 
@@ -196,6 +226,7 @@ class TestSprintHealthDeterministicDate:
 # ====================================================================
 # summary_cards uses config thresholds, not hardcoded values
 # ====================================================================
+
 
 class TestSummaryCardsConfigThresholds:
     """summary_cards was hardcoded to overload at 20 SP / 8 issues
@@ -227,6 +258,7 @@ class TestSummaryCardsConfigThresholds:
 # workload_table uses config thresholds
 # ====================================================================
 
+
 class TestWorkloadTableConfigThresholds:
     """workload_table was also hardcoded with magic numbers."""
 
@@ -249,22 +281,27 @@ class TestWorkloadTableConfigThresholds:
 # Jinja2 autoescape enabled (XSS protection)
 # ====================================================================
 
+
 class TestAutoescapeEnabled:
     """The Jinja2 environment was using autoescape=False, creating
     XSS vulnerability. Now autoescape=True is used with Markup for safe HTML."""
 
     def test_autoescape_is_on(self):
         from flowboard.presentation.html.renderer import _build_env
+
         env = _build_env()
         assert env.autoescape is True
 
     def test_render_does_not_double_escape_components(self):
         """Pre-rendered HTML components must not be double-escaped."""
         from flowboard.presentation.html.renderer import render_dashboard
-        cfg = load_config_from_dict({
-            "jira": {"base_url": "https://test.atlassian.net"},
-            "output": {"title": "Test"},
-        })
+
+        cfg = load_config_from_dict(
+            {
+                "jira": {"base_url": "https://test.atlassian.net"},
+                "output": {"title": "Test"},
+            }
+        )
         snap = BoardSnapshot(title="Test")
         html = render_dashboard(snap, cfg)
         # Component HTML should be embedded, not escaped
@@ -276,12 +313,14 @@ class TestAutoescapeEnabled:
 # JiraClient has close() and context manager
 # ====================================================================
 
+
 class TestJiraClientSessionManagement:
     """JiraClient.Session was never closed, leaking resources."""
 
     def test_client_has_close_method(self):
         from flowboard.infrastructure.config.loader import JiraConfig
         from flowboard.infrastructure.jira.client import JiraClient
+
         cfg = JiraConfig(base_url="https://test.atlassian.net")
         client = JiraClient(cfg)
         assert hasattr(client, "close")
@@ -290,6 +329,7 @@ class TestJiraClientSessionManagement:
     def test_client_context_manager(self):
         from flowboard.infrastructure.config.loader import JiraConfig
         from flowboard.infrastructure.jira.client import JiraClient
+
         cfg = JiraConfig(base_url="https://test.atlassian.net")
         with JiraClient(cfg) as client:
             assert client is not None
@@ -298,6 +338,7 @@ class TestJiraClientSessionManagement:
 # ====================================================================
 # Pagination safety limit
 # ====================================================================
+
 
 class TestPaginationSafetyLimit:
     """search_issues had no upper bound on pages, risking OOM."""
@@ -313,6 +354,7 @@ class TestPaginationSafetyLimit:
         # The for-loop safety limit exists in the implementation
         # Verify the code has a bounded iteration structure
         import inspect
+
         src = inspect.getsource(client.search_issues)
         assert "range(" in src or "max_pages" in src
 
@@ -320,6 +362,7 @@ class TestPaginationSafetyLimit:
 # ====================================================================
 # Aging risk uses date comparison (no timezone mismatch)
 # ====================================================================
+
 
 class TestAgingRiskTimezoneHandling:
     """_detect_aging_risks constructed a datetime with potentially
@@ -329,13 +372,21 @@ class TestAgingRiskTimezoneHandling:
         """Issue created with UTC timezone should not crash."""
         alice = _person()
         issue = _issue(
-            "AGE-1", 5, StatusCategory.TODO, alice,
+            "AGE-1",
+            5,
+            StatusCategory.TODO,
+            alice,
             created=datetime(2026, 2, 1, tzinfo=UTC),
         )
         t = get_translator("en")
         risks = detect_all_risks(
-            [issue], [], [], [], _thresholds(aging_days=10),
-            today=date(2026, 3, 18), t=t,
+            [issue],
+            [],
+            [],
+            [],
+            _thresholds(aging_days=10),
+            today=date(2026, 3, 18),
+            t=t,
         )
         aging = [r for r in risks if "aging" in r.title.lower()]
         assert len(aging) == 1
@@ -344,13 +395,21 @@ class TestAgingRiskTimezoneHandling:
         """Issue created with naive datetime (no timezone) should not crash."""
         alice = _person()
         issue = _issue(
-            "AGE-2", 5, StatusCategory.TODO, alice,
+            "AGE-2",
+            5,
+            StatusCategory.TODO,
+            alice,
             created=datetime(2026, 2, 1),
         )
         t = get_translator("en")
         risks = detect_all_risks(
-            [issue], [], [], [], _thresholds(aging_days=10),
-            today=date(2026, 3, 18), t=t,
+            [issue],
+            [],
+            [],
+            [],
+            _thresholds(aging_days=10),
+            today=date(2026, 3, 18),
+            t=t,
         )
         aging = [r for r in risks if "aging" in r.title.lower()]
         assert len(aging) == 1
@@ -359,13 +418,21 @@ class TestAgingRiskTimezoneHandling:
         """Issue with created date in the future should be skipped."""
         alice = _person()
         issue = _issue(
-            "AGE-3", 5, StatusCategory.TODO, alice,
+            "AGE-3",
+            5,
+            StatusCategory.TODO,
+            alice,
             created=datetime(2026, 4, 1, tzinfo=UTC),
         )
         t = get_translator("en")
         risks = detect_all_risks(
-            [issue], [], [], [], _thresholds(aging_days=10),
-            today=date(2026, 3, 18), t=t,
+            [issue],
+            [],
+            [],
+            [],
+            _thresholds(aging_days=10),
+            today=date(2026, 3, 18),
+            t=t,
         )
         aging = [r for r in risks if "aging" in r.title.lower()]
         assert len(aging) == 0
@@ -374,6 +441,7 @@ class TestAgingRiskTimezoneHandling:
 # ====================================================================
 # Dependency chain DFS handles branches correctly
 # ====================================================================
+
 
 class TestDependencyChainDFS:
     """build_dependency_chains had a DFS bug where the shared
@@ -429,8 +497,11 @@ class TestDependencyChainDFS:
     def test_done_deps_excluded(self):
         """Resolved dependencies (target done) should be excluded."""
         dep = Dependency(
-            source_key="A", target_key="B", link_type=LinkType.BLOCKS,
-            source_status=StatusCategory.TODO, target_status=StatusCategory.DONE,
+            source_key="A",
+            target_key="B",
+            link_type=LinkType.BLOCKS,
+            source_status=StatusCategory.TODO,
+            target_status=StatusCategory.DONE,
         )
         chains = build_dependency_chains([dep])
         assert len(chains) == 0
@@ -443,6 +514,7 @@ class TestDependencyChainDFS:
 # analytics.py uses proper imports (not __import__)
 # ====================================================================
 
+
 class TestAnalyticsImports:
     """analytics.py used __import__() for type annotations which
     is fragile and non-standard."""
@@ -451,6 +523,7 @@ class TestAnalyticsImports:
         import inspect
 
         from flowboard.domain.analytics import build_board_snapshot
+
         # Should not contain __import__ in annotations
         src = inspect.getsource(build_board_snapshot)
         assert "__import__" not in src
@@ -460,27 +533,34 @@ class TestAnalyticsImports:
 # CapacityRecord.utilization_pct clamped at 100%
 # ====================================================================
 
+
 class TestCapacityRecordClamped:
     """utilization_pct could exceed 100% if completed > allocated."""
 
     def test_utilization_capped_at_100(self):
         alice = _person()
         cr = CapacityRecord(
-            person=alice, allocated_points=10, completed_points=15,
+            person=alice,
+            allocated_points=10,
+            completed_points=15,
         )
         assert cr.utilization_pct == 100.0
 
     def test_utilization_normal_case(self):
         alice = _person()
         cr = CapacityRecord(
-            person=alice, allocated_points=10, completed_points=5,
+            person=alice,
+            allocated_points=10,
+            completed_points=5,
         )
         assert cr.utilization_pct == 50.0
 
     def test_utilization_zero_allocated(self):
         alice = _person()
         cr = CapacityRecord(
-            person=alice, allocated_points=0, completed_points=5,
+            person=alice,
+            allocated_points=0,
+            completed_points=5,
         )
         assert cr.utilization_pct == 0.0
 
@@ -488,6 +568,7 @@ class TestCapacityRecordClamped:
 # ====================================================================
 # Additional regression: empty data edge cases
 # ====================================================================
+
 
 class TestEmptyDataEdgeCases:
     """Regression guard for empty input data edge cases."""

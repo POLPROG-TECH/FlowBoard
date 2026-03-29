@@ -59,7 +59,11 @@ class TestJiraClient:
         responses.add(
             responses.GET,
             "https://test.atlassian.net/rest/api/2/serverInfo",
-            json={"baseUrl": "https://test.atlassian.net", "version": "9.0", "serverTitle": "Test Jira"},
+            json={
+                "baseUrl": "https://test.atlassian.net",
+                "version": "9.0",
+                "serverTitle": "Test Jira",
+            },
         )
         client = JiraClient(jira_config)
         info = client.verify_connection()

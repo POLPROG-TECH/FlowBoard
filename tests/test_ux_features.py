@@ -41,6 +41,7 @@ from flowboard.shared.types import (
 # Helpers
 # ---------------------------------------------------------------------------
 
+
 def _person(name: str = "Alice", team: str = "Alpha") -> Person:
     return Person(account_id=f"acc-{name.lower()}", display_name=name, team=team)
 
@@ -64,6 +65,7 @@ def _issue(
     created = datetime.now(UTC)
     if age_days_approx:
         from datetime import timedelta
+
         created = datetime.now(UTC) - timedelta(days=age_days_approx)
     issue_links = links or []
     if blocked and not issue_links:
@@ -96,6 +98,7 @@ def _snapshot(
 # ---------------------------------------------------------------------------
 # Table Container Structure Tests
 # ---------------------------------------------------------------------------
+
 
 class TestTableContainerStructure:
     """Verify fb-table-container wrapping for all table functions."""
@@ -150,6 +153,7 @@ class TestTableContainerStructure:
 # ---------------------------------------------------------------------------
 # Table Sorting Attribute Tests
 # ---------------------------------------------------------------------------
+
 
 class TestTableSortAttributes:
     """Verify data-sort-type on headers and data-sort-value on cells."""
@@ -213,22 +217,23 @@ class TestTableSortAttributes:
 # Dependencies & Blockers Detail View Tests
 # ---------------------------------------------------------------------------
 
+
 class TestDepsBlockersDetail:
     """Verify the deps_blockers_detail component."""
 
     def test_empty_snapshot_shows_empty_state(self):
         snap = _snapshot()
         html = deps_blockers_detail(snap, t=get_translator("en"))
-        assert 'card-value' in html
-        assert '>0<' in html  # Zero blocked items
+        assert "card-value" in html
+        assert ">0<" in html  # Zero blocked items
 
     def test_summary_cards_present(self):
         snap = _snapshot()
         html = deps_blockers_detail(snap, t=get_translator("en"))
-        assert 'summary-card' in html
-        assert 'card-danger' in html
-        assert 'card-warning' in html
-        assert 'card-default' in html
+        assert "summary-card" in html
+        assert "card-danger" in html
+        assert "card-warning" in html
+        assert "card-default" in html
 
     def test_blocked_issues_shown(self):
         blocked = _issue(
@@ -241,8 +246,8 @@ class TestDepsBlockersDetail:
         )
         snap = _snapshot(issues=[blocked])
         html = deps_blockers_detail(snap, t=get_translator("en"))
-        assert 'BLK-1' in html
-        assert 'Charlie' in html
+        assert "BLK-1" in html
+        assert "Charlie" in html
 
     def test_cross_team_deps_counted(self):
         dep = Dependency(
@@ -257,7 +262,7 @@ class TestDepsBlockersDetail:
         snap = _snapshot(issues=issues, dependencies=[dep])
         html = deps_blockers_detail(snap, t=get_translator("en"))
         # Cross-team count should be 1
-        assert '>1<' in html
+        assert ">1<" in html
 
     def test_aging_blocked_count(self):
         blocked = _issue(
@@ -268,7 +273,7 @@ class TestDepsBlockersDetail:
         snap = _snapshot(issues=[blocked])
         html = deps_blockers_detail(snap, t=get_translator("en"))
         # Aging card should show 1
-        parts = html.split('card-danger')
+        parts = html.split("card-danger")
         # At least 2 card-danger sections (blocked items + aging)
         assert len(parts) >= 3  # split produces n+1 parts for n occurrences
 
@@ -284,44 +289,45 @@ class TestDepsBlockersDetail:
         ]
         snap = _snapshot(issues=issues, dependencies=[dep])
         html = deps_blockers_detail(snap, t=get_translator("en"))
-        assert 'Backend' in html
-        assert 'chip' in html
+        assert "Backend" in html
+        assert "chip" in html
 
     def test_blocked_items_table_has_container(self):
         blocked = _issue(key="BLK-2", blocked=True)
         snap = _snapshot(issues=[blocked])
         html = deps_blockers_detail(snap, t=get_translator("en"))
         assert 'data-table-id="deps-blockers"' in html
-        assert 'fb-table-container' in html
+        assert "fb-table-container" in html
 
     def test_age_highlighting_danger(self):
         blocked = _issue(key="OLD-2", blocked=True, age_days_approx=20)
         snap = _snapshot(issues=[blocked])
         html = deps_blockers_detail(snap, t=get_translator("en"))
-        assert 'color:var(--color-danger)' in html
+        assert "color:var(--color-danger)" in html
 
     def test_age_highlighting_warning(self):
         blocked = _issue(key="MED-1", blocked=True, age_days_approx=10)
         snap = _snapshot(issues=[blocked])
         html = deps_blockers_detail(snap, t=get_translator("en"))
-        assert 'color:var(--color-warning)' in html
+        assert "color:var(--color-warning)" in html
 
     def test_no_blocked_shows_empty_state(self):
         """When no issues are blocked, show empty state message."""
         snap = _snapshot(issues=[_issue(blocked=False)])
         html = deps_blockers_detail(snap, t=get_translator("en"))
-        assert 'empty-state' in html
+        assert "empty-state" in html
 
     def test_polish_translation(self):
         snap = _snapshot()
         html = deps_blockers_detail(snap, t=get_translator("pl"))
         # Polish keys should be resolved
-        assert 'Zablokowane' in html or 'blocked' not in html.lower()
+        assert "Zablokowane" in html or "blocked" not in html.lower()
 
 
 # ---------------------------------------------------------------------------
 # i18n Key Tests
 # ---------------------------------------------------------------------------
+
 
 class TestI18nNewKeys:
     """Verify all new i18n keys exist in both locales."""
@@ -373,17 +379,21 @@ class TestI18nNewKeys:
 # Renderer Context Tests
 # ---------------------------------------------------------------------------
 
+
 def _render_html(snap: BoardSnapshot | None = None, locale: str = "en") -> str:
     """Render dashboard HTML using proper config."""
     from flowboard.infrastructure.config.loader import load_config_from_dict
     from flowboard.presentation.html.renderer import render_dashboard
+
     if snap is None:
         snap = _snapshot(issues=[_issue()])
-    cfg = load_config_from_dict({
-        "jira": {"base_url": "https://test.atlassian.net"},
-        "output": {"title": "Test Board"},
-        "locale": locale,
-    })
+    cfg = load_config_from_dict(
+        {
+            "jira": {"base_url": "https://test.atlassian.net"},
+            "output": {"title": "Test Board"},
+            "locale": locale,
+        }
+    )
     return render_dashboard(snap, cfg)
 
 
@@ -392,91 +402,98 @@ class TestRendererContext:
 
     def test_version_in_context(self):
         from flowboard import __version__
+
         html = _render_html()
         assert __version__ in html
 
     def test_deps_blockers_html_in_output(self):
         html = _render_html()
-        assert 'insightsDepsBlockers' in html
+        assert "insightsDepsBlockers" in html
 
     def test_footer_has_brand(self):
         html = _render_html()
-        assert 'footer-brand' in html or 'FlowBoard' in html
+        assert "footer-brand" in html or "FlowBoard" in html
 
 
 # ---------------------------------------------------------------------------
 # Chart Theme Fix Tests
 # ---------------------------------------------------------------------------
 
+
 class TestChartThemeFix:
     """Verify chart theme-switch fix elements in rendered HTML."""
 
     def test_chart_instances_destroy_present(self):
         html = _render_html()
-        assert 'Chart.instances' in html
+        assert "Chart.instances" in html
 
     def test_request_animation_frame_present(self):
         html = _render_html()
-        assert 'requestAnimationFrame' in html
+        assert "requestAnimationFrame" in html
 
     def test_no_max_height_on_chart_card(self):
         """Chart cards should not have max-height that causes clipping."""
         import re
+
         html = _render_html()
-        chart_card_css = re.findall(r'\.chart-card\s*\{[^}]+\}', html)
+        chart_card_css = re.findall(r"\.chart-card\s*\{[^}]+\}", html)
         for block in chart_card_css:
-            assert 'max-height' not in block, f"chart-card still has max-height: {block}"
+            assert "max-height" not in block, f"chart-card still has max-height: {block}"
 
 
 # ---------------------------------------------------------------------------
 # CSS Animation Tests
 # ---------------------------------------------------------------------------
 
+
 class TestCSSAnimations:
     """Verify animation CSS is present and reduced-motion is respected."""
 
     def test_fade_slide_keyframes_present(self):
         html = _render_html()
-        assert 'fadeSlideIn' in html
+        assert "fadeSlideIn" in html
 
     def test_reduced_motion_media_query(self):
         html = _render_html()
-        assert 'prefers-reduced-motion' in html
+        assert "prefers-reduced-motion" in html
 
 
 # ---------------------------------------------------------------------------
 # Table Engine JS Tests
 # ---------------------------------------------------------------------------
 
+
 class TestTableEngineJS:
     """Verify table engine JavaScript is included."""
 
     def test_init_table_engine_present(self):
         html = _render_html()
-        assert 'initTableEngine' in html
+        assert "initTableEngine" in html
 
     def test_table_sort_js_elements(self):
         html = _render_html()
-        assert 'sort-asc' in html
-        assert 'sort-desc' in html
+        assert "sort-asc" in html
+        assert "sort-desc" in html
 
 
 # ---------------------------------------------------------------------------
 # Footer Tests
 # ---------------------------------------------------------------------------
 
+
 class TestFooterRedesign:
     """Verify footer matches ReleaseBoard structure."""
 
     def test_footer_structure(self):
         html = _render_html()
-        assert 'app-footer' in html
+        assert "app-footer" in html
 
     def test_footer_tools_section(self):
         html = _render_html()
-        assert 'app-footer-tools' in html
+        assert "app-footer-tools" in html
 
     def test_footer_version_displayed(self):
         from flowboard import __version__
+
         html = _render_html()
-        assert f'v{__version__}' in html or __version__ in html
+        assert f"v{__version__}" in html or __version__ in html

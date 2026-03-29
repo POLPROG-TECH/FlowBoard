@@ -109,9 +109,7 @@ class TestNormalizeSprint:
 
 
 class TestNormalizeBulk:
-    def test_normalize_mock_payload(
-        self, mock_jira_payload: dict, config: FlowBoardConfig
-    ) -> None:
+    def test_normalize_mock_payload(self, mock_jira_payload: dict, config: FlowBoardConfig) -> None:
         # GIVEN the full mock Jira payload
         norm = JiraNormalizer(config)
         # WHEN normalised
@@ -136,9 +134,7 @@ class TestNormalizeBulk:
         assert auth_epic.child_count == 3
         assert auth_epic.done_count == 1  # PROJ-4 is Done
 
-    def test_dependencies_extracted(
-        self, mock_jira_payload: dict, config: FlowBoardConfig
-    ) -> None:
+    def test_dependencies_extracted(self, mock_jira_payload: dict, config: FlowBoardConfig) -> None:
         norm = JiraNormalizer(config)
         issues = norm.normalize_issues(mock_jira_payload["issues"])
         deps = norm.extract_dependencies(issues)

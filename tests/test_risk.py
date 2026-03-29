@@ -16,9 +16,14 @@ from flowboard.shared.types import (
 class TestOverloadRisks:
     def test_sp_overload_detected(self, alice, make_issue) -> None:
         # GIVEN Alice assigned 25 SP (threshold=15)
-        issues = [make_issue("T-1", assignee=alice, story_points=25, status_category=StatusCategory.IN_PROGRESS)]
+        issues = [
+            make_issue(
+                "T-1", assignee=alice, story_points=25, status_category=StatusCategory.IN_PROGRESS
+            )
+        ]
         thresholds = Thresholds(overload_points=15)
         from flowboard.domain.workload import compute_workload_records
+
         records = compute_workload_records(issues, thresholds)
 
         # WHEN
@@ -46,7 +51,8 @@ class TestAgingRisks:
 class TestRoadmapRisks:
     def test_overdue_epic_flagged(self) -> None:
         item = RoadmapItem(
-            key="E-1", title="Late Epic",
+            key="E-1",
+            title="Late Epic",
             target_date=date(2026, 3, 1),
             progress_pct=40.0,
             status=StatusCategory.IN_PROGRESS,

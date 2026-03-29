@@ -199,7 +199,6 @@ class TestMiddleware:
         from flowboard.web import middleware  # noqa: F401
 
 
-
 class TestI18nKeyParity:
     """Ensure EN and PL translation files have identical key sets."""
 

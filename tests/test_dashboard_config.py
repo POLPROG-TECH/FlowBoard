@@ -21,6 +21,7 @@ SCHEMA_PATH = Path(__file__).parent.parent / "config.schema.json"
 # Dashboard config defaults
 # ---------------------------------------------------------------------------
 
+
 class TestDashboardConfigDefaults:
     """GIVEN no dashboard section, WHEN config is loaded, THEN sane defaults are applied."""
 
@@ -35,8 +36,7 @@ class TestDashboardConfigDefaults:
 
     def test_default_tabs_include_all(self, minimal_config_dict: dict) -> None:
         cfg = load_config_from_dict(minimal_config_dict)
-        expected = ["overview", "workload", "sprints", "timeline", "pi",
-                    "insights", "issues"]
+        expected = ["overview", "workload", "sprints", "timeline", "pi", "insights", "issues"]
         assert cfg.dashboard.tabs.visible == expected
 
     def test_default_layout_is_comfortable(self, minimal_config_dict: dict) -> None:
@@ -57,6 +57,7 @@ class TestDashboardConfigDefaults:
 # ---------------------------------------------------------------------------
 # PI config defaults
 # ---------------------------------------------------------------------------
+
 
 class TestPIConfigDefaults:
     """GIVEN no pi section, WHEN config is loaded, THEN PI defaults are applied."""
@@ -82,6 +83,7 @@ class TestPIConfigDefaults:
 # ---------------------------------------------------------------------------
 # Dashboard config from dict
 # ---------------------------------------------------------------------------
+
 
 class TestDashboardConfigFromDict:
     """GIVEN explicit dashboard config, WHEN loaded, THEN values are set correctly."""
@@ -154,6 +156,7 @@ class TestDashboardConfigFromDict:
 # PI config from dict
 # ---------------------------------------------------------------------------
 
+
 class TestPIConfigFromDict:
     def test_enabled_pi_with_start_date(self) -> None:
         raw = {
@@ -185,6 +188,7 @@ class TestPIConfigFromDict:
 # ---------------------------------------------------------------------------
 # Round-trip: config_to_dict
 # ---------------------------------------------------------------------------
+
 
 class TestConfigRoundTrip:
     """GIVEN a config, WHEN serialized, THEN it produces a valid JSON-safe dict."""
@@ -244,6 +248,7 @@ class TestConfigRoundTrip:
 # Schema validation of dashboard/pi sections
 # ---------------------------------------------------------------------------
 
+
 class TestSchemaValidation:
     """GIVEN the JSON Schema, WHEN config with dashboard/pi is validated, THEN it passes or rejects."""
 
@@ -290,6 +295,7 @@ class TestSchemaValidation:
 # ---------------------------------------------------------------------------
 # Section visibility
 # ---------------------------------------------------------------------------
+
 
 class TestSectionVisibility:
     """GIVEN config with limited visible tabs, WHEN checked, THEN invisible tabs are excluded."""

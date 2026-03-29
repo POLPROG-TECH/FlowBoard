@@ -19,6 +19,7 @@ from flowboard.domain.pi import (
 # is_working_day
 # ---------------------------------------------------------------------------
 
+
 class TestIsWorkingDay:
     def test_monday_is_working(self) -> None:
         assert is_working_day(date(2026, 3, 2)) is True  # Monday
@@ -42,6 +43,7 @@ class TestIsWorkingDay:
 # ---------------------------------------------------------------------------
 # add_business_days
 # ---------------------------------------------------------------------------
+
 
 class TestAddBusinessDays:
     def test_one_business_day_from_monday(self) -> None:
@@ -83,6 +85,7 @@ class TestAddBusinessDays:
 # count_working_days
 # ---------------------------------------------------------------------------
 
+
 class TestCountWorkingDays:
     def test_single_working_day(self) -> None:
         assert count_working_days(date(2026, 3, 2), date(2026, 3, 2)) == 1
@@ -114,6 +117,7 @@ class TestCountWorkingDays:
 # ---------------------------------------------------------------------------
 # compute_sprint_boundaries
 # ---------------------------------------------------------------------------
+
 
 class TestComputeSprintBoundaries:
     def test_default_five_sprints(self) -> None:
@@ -166,6 +170,7 @@ class TestComputeSprintBoundaries:
 # compute_pi_snapshot
 # ---------------------------------------------------------------------------
 
+
 class TestComputePISnapshot:
     def test_basic_snapshot_structure(self) -> None:
         snap = compute_pi_snapshot("PI 2026.1", "2026-03-02", today=date(2026, 3, 5))
@@ -214,8 +219,9 @@ class TestComputePISnapshot:
         assert names == ["Sprint 1", "Sprint 2", "Sprint 3", "Sprint 4", "Sprint 5"]
 
     def test_custom_sprint_name_prefix(self) -> None:
-        snap = compute_pi_snapshot("PI", "2026-03-02", today=date(2026, 3, 2),
-                                   sprint_name_prefix="Iteration")
+        snap = compute_pi_snapshot(
+            "PI", "2026-03-02", today=date(2026, 3, 2), sprint_name_prefix="Iteration"
+        )
         assert snap.sprints[0].name == "Iteration 1"
 
     def test_progress_midway(self) -> None:
@@ -232,7 +238,8 @@ class TestComputePISnapshot:
     def test_custom_working_days(self) -> None:
         # Mon-Thu only (4-day work week)
         snap = compute_pi_snapshot(
-            "PI", "2026-03-02",
+            "PI",
+            "2026-03-02",
             sprint_length=8,
             num_sprints=2,
             working_days=[1, 2, 3, 4],

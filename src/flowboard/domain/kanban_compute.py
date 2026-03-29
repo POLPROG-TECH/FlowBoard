@@ -221,7 +221,11 @@ def compute_flow_metrics(
 
     avg_ct = statistics.mean(ct_values) if ct_values else 0.0
     median_ct = statistics.median(ct_values) if ct_values else 0.0
-    p85_ct = sorted(ct_values)[min(int(len(ct_values) * 0.85), len(ct_values) - 1)] if len(ct_values) > 1 else avg_ct
+    p85_ct = (
+        sorted(ct_values)[min(int(len(ct_values) * 0.85), len(ct_values) - 1)]
+        if len(ct_values) > 1
+        else avg_ct
+    )
     avg_lt = statistics.mean(lt_values) if lt_values else 0.0
 
     # Throughput per week (average of non-zero weeks)

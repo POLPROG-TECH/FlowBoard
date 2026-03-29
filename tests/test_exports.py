@@ -30,7 +30,9 @@ class TestJsonExport:
 
 
 class TestCsvExport:
-    def test_workload_csv_has_headers(self, mock_jira_payload: dict, config: FlowBoardConfig) -> None:
+    def test_workload_csv_has_headers(
+        self, mock_jira_payload: dict, config: FlowBoardConfig
+    ) -> None:
         snapshot = analyse_raw_payload(mock_jira_payload, config, today=date(2026, 3, 15))
         csv_str = export_workload_csv(snapshot)
         assert "Person,Team,Issues,Story Points" in csv_str
