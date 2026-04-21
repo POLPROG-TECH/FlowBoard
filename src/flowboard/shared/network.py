@@ -1,8 +1,8 @@
-"""Shared networking utilities — CA bundle resolution, session SSL, proxy config.
+"""Shared networking utilities - CA bundle resolution, session SSL, proxy config.
 
 This module centralises corporate-network concerns (proxy CAs, Zscaler,
-custom cert bundles) so that the Jira HTTP client — and any future outgoing
-HTTPS calls — works reliably behind corporate proxies and VPNs.
+custom cert bundles) so that the Jira HTTP client - and any future outgoing
+HTTPS calls - works reliably behind corporate proxies and VPNs.
 
 Corporate environments commonly intercept HTTPS traffic via proxy CAs
 (Zscaler, Netskope, etc.).  The ``requests`` library uses ``certifi`` by
@@ -13,7 +13,7 @@ the same strategy as ReleaseBoard's ``make_ssl_context()``.
 Resolution order for CA certificates:
 
 1. ``SSL_CERT_FILE`` / ``REQUESTS_CA_BUNDLE`` env var  (explicit override)
-2. ``certifi`` package  (ships Mozilla CA bundle — ``requests`` default)
+2. ``certifi`` package  (ships Mozilla CA bundle - ``requests`` default)
 3. macOS system keychain export  (includes corporate CAs like Zscaler)
 4. ``True`` (let ``requests`` use its built-in default)
 
@@ -72,7 +72,7 @@ def get_ca_bundle_path() -> str | bool:
 
 
 def _resolve_ca_bundle() -> str | bool:
-    """Internal resolver — not cached."""
+    """Internal resolver - not cached."""
     # 1. Honour explicit env var
     for env in ("SSL_CERT_FILE", "REQUESTS_CA_BUNDLE"):
         ca = os.environ.get(env)
@@ -80,7 +80,7 @@ def _resolve_ca_bundle() -> str | bool:
             logger.debug("SSL: using CA bundle from %s=%s", env, ca)
             return ca
 
-    # 2. certifi is requests' default — check if it's available
+    # 2. certifi is requests' default - check if it's available
     try:
         import certifi
 
@@ -94,7 +94,7 @@ def _resolve_ca_bundle() -> str | bool:
     if pem_path:
         return pem_path
 
-    # 4. Default — let requests figure it out
+    # 4. Default - let requests figure it out
     logger.debug("SSL: using requests built-in defaults")
     return True
 
@@ -146,7 +146,7 @@ def _export_macos_certs() -> str | None:
             logger.debug("SSL: exported macOS system certs to %s", tmp.name)
             return tmp.name
     except subprocess.TimeoutExpired:
-        logger.warning("macOS CA bundle export timed out after 5s — using default CA bundle")
+        logger.warning("macOS CA bundle export timed out after 5s - using default CA bundle")
         return None
     except OSError as exc:
         logger.debug("macOS CA bundle export failed: %s", exc)
@@ -178,7 +178,7 @@ def configure_session_ssl(session: object, *, verify: bool | str = True) -> None
 
 
 # ---------------------------------------------------------------------------
-# SSL context (stdlib — for any future non-requests HTTP usage)
+# SSL context (stdlib - for any future non-requests HTTP usage)
 # ---------------------------------------------------------------------------
 
 _cached_ssl_ctx: ssl.SSLContext | None = None
@@ -206,7 +206,7 @@ def make_ssl_context(*, force_new: bool = False) -> ssl.SSLContext:
 
 
 def _build_ssl_context() -> ssl.SSLContext:
-    """Internal builder — not cached."""
+    """Internal builder - not cached."""
     for env in ("SSL_CERT_FILE", "REQUESTS_CA_BUNDLE"):
         ca = os.environ.get(env)
         if ca and os.path.isfile(ca):

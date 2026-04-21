@@ -4,7 +4,7 @@ FlowBoard uses custom field IDs to read story points, epic links, and sprint dat
 
 ## Quick Start
 
-The Configuration Wizard auto-detects fields for you. Run `flowboard serve` and follow the wizard — it will scan your Jira instance automatically.
+The Configuration Wizard auto-detects fields for you. Run `flowboard serve` and follow the wizard - it will scan your Jira instance automatically.
 
 ## Manual Field Discovery
 
@@ -63,12 +63,12 @@ Server instances often use different field IDs than Cloud. The auto-detect featu
 | Epic Link | `customfield_10014` | `customfield_10008` |
 | Sprint | `customfield_10020` | `customfield_10004` |
 
-> **Tip:** Always verify via the REST API — field IDs are instance-specific.
+> **Tip:** Always verify via the REST API - field IDs are instance-specific.
 
 ## Troubleshooting
 
-**"Story points are all 0"** — The field ID is wrong. Use the REST API method above to find the correct ID.
+**"Story points are all 0"** - The field ID is wrong. Use the REST API method above to find the correct ID.
 
-**"Epic column is empty"** — For Jira Cloud with next-gen projects, epic link may be under `parent` instead of a custom field. FlowBoard handles this automatically.
+**"Epic column is empty"** - For Jira Cloud with next-gen projects, epic link may be under `parent` instead of a custom field. FlowBoard handles this automatically.
 
-**"Sprint data missing"** — Ensure the Sprint field is a Jira Software field (not a custom text field). It should return an array of sprint objects, not a string.
+**"Sprint data missing"** - Ensure the Sprint field is a Jira Software field (not a custom text field). It should return an array of sprint objects, not a string.

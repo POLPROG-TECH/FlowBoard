@@ -11,10 +11,11 @@ from flowboard.shared.types import Priority, StatusCategory
 
 
 class TestResourceContention:
-    """GIVEN a person with excessive WIP, WHEN conflicts detected, THEN flagged."""
+    """Tests for resource contention."""
 
+    """GIVEN resource contention and the scenario: wip over limit flagged"""
     def test_wip_over_limit_flagged(self, alice, make_issue, active_sprint) -> None:
-        # GIVEN Alice has 6 items in progress (limit=5)
+        """WHEN the code under test is exercised for: wip over limit flagged"""
         issues = [
             make_issue(
                 f"T-{i}",
@@ -31,17 +32,19 @@ class TestResourceContention:
 
         records = compute_workload_records(issues, thresholds)
 
-        # WHEN
         conflicts = detect_all_conflicts(issues, records, [], thresholds)
 
-        # THEN at least one resource_contention conflict
         contention = [c for c in conflicts if c.category == "resource_contention"]
+
+        """THEN the expected behaviour holds: wip over limit flagged"""
         assert len(contention) >= 1
         assert "Alice" in contention[0].description
 
 
 class TestPriorityPileUp:
+    """GIVEN priority pile up and the scenario: too many high priority items"""
     def test_too_many_high_priority_items(self, alice, make_issue) -> None:
+        """WHEN the code under test is exercised for: too many high priority items"""
         issues = [
             make_issue(
                 f"T-{i}",
@@ -59,11 +62,15 @@ class TestPriorityPileUp:
 
         conflicts = detect_all_conflicts(issues, records, [], thresholds)
         pile_ups = [c for c in conflicts if c.category == "priority_pile_up"]
+
+        """THEN the expected behaviour holds: too many high priority items"""
         assert len(pile_ups) == 1
 
 
 class TestTimelineOverlap:
+    """GIVEN timeline overlap and the scenario: overlapping epics for same owner"""
     def test_overlapping_epics_for_same_owner(self, alice) -> None:
+        """WHEN the code under test is exercised for: overlapping epics for same owner"""
         items = [
             RoadmapItem(
                 key="E-1",
@@ -85,6 +92,8 @@ class TestTimelineOverlap:
         thresholds = Thresholds()
         conflicts = detect_all_conflicts([], [], items, thresholds, today=date(2026, 3, 15))
         overlaps = [c for c in conflicts if c.category == "timeline_overlap"]
+
+        """THEN the expected behaviour holds: overlapping epics for same owner"""
         assert len(overlaps) == 1
         assert "E-1" in overlaps[0].affected_keys
         assert "E-2" in overlaps[0].affected_keys

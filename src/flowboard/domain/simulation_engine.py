@@ -275,7 +275,7 @@ def _simulate_timeline(
     for team_key, items in team_bars.items():
         delta = change_map.get(team_key, 0)
         if delta <= 0:
-            # No change — keep original assignment
+            # No change - keep original assignment
             for issue, start, end in items:
                 bar = _make_bar(issue, start, end)
                 assignee_name = bar.assignee
@@ -390,7 +390,7 @@ def _compute_delta(baseline: SimulationMetrics, simulated: SimulationMetrics) ->
 
 
 # ---------------------------------------------------------------------------
-# Team impact analysis — where to hire next
+# Team impact analysis - where to hire next
 # ---------------------------------------------------------------------------
 
 
@@ -465,7 +465,7 @@ def compute_team_impacts(
             )
         elif ti.overloaded_members > 0:
             ti.recommendation = (
-                f"{ti.overloaded_members} overloaded member(s) — "
+                f"{ti.overloaded_members} overloaded member(s) - "
                 f"additional capacity would reduce pressure"
             )
 

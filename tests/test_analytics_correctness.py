@@ -1,4 +1,4 @@
-"""Tests for analytics correctness — sprint risk date handling, carry-over
+"""Tests for analytics correctness - sprint risk date handling, carry-over
 computation, summary card thresholds, workload table thresholds, autoescape,
 session management, pagination safety, aging risk timezone handling, dependency
 chain DFS, import conventions, capacity clamping, and empty data edge cases.
@@ -106,12 +106,11 @@ def _thresholds(**kw) -> Thresholds:
 
 
 class TestSprintRiskUsesDeterministicDate:
-    """sprint risk detection was using date.today() instead of
-    the injected `today` parameter, making it non-deterministic and
-    untestable."""
+    """Tests for sprint risk uses deterministic date."""
 
+    """GIVEN sprint risk uses deterministic date and the scenario: sprint risk fires when today is near end"""
     def test_sprint_risk_fires_when_today_is_near_end(self):
-        """Sprint ending in 2 days with <30% done must trigger CRITICAL risk."""
+        """WHEN the code under test is exercised for: sprint risk fires when today is near end"""
         sprint = _sprint(end_date=date(2026, 3, 20), state=SprintState.ACTIVE)
         alice = _person()
         issues = [
@@ -138,11 +137,14 @@ class TestSprintRiskUsesDeterministicDate:
         )
         # Must contain CRITICAL sprint risk
         critical = [r for r in risks if r.severity == RiskSeverity.CRITICAL]
+
+        """THEN the expected behaviour holds: sprint risk fires when today is near end"""
         assert len(critical) >= 1
         assert any("sprint" in r.title.lower() or "Sprint" in r.title for r in critical)
 
+    """GIVEN sprint risk uses deterministic date and the scenario: sprint risk does not fire when today is far from end"""
     def test_sprint_risk_does_not_fire_when_today_is_far_from_end(self):
-        """Sprint ending in 10 days should NOT trigger the 'at risk' signal."""
+        """WHEN the code under test is exercised for: sprint risk does not fire when today is far from end"""
         sprint = _sprint(end_date=date(2026, 3, 28), state=SprintState.ACTIVE)
         alice = _person()
         issues = [
@@ -166,6 +168,8 @@ class TestSprintRiskUsesDeterministicDate:
             t=t,
         )
         critical = [r for r in risks if r.severity == RiskSeverity.CRITICAL]
+
+        """THEN the expected behaviour holds: sprint risk does not fire when today is far from end"""
         assert not critical
 
 
@@ -175,12 +179,11 @@ class TestSprintRiskUsesDeterministicDate:
 
 
 class TestSprintHealthDeterministicDate:
-    """carry_over computation was using date.today() instead of
-    injected today parameter."""
+    """Tests for sprint health deterministic date."""
 
+    """GIVEN sprint health deterministic date and the scenario: carry over calculated with injected today"""
     def test_carry_over_calculated_with_injected_today(self):
-        """When today is ≤2 days from sprint end, carry_over should include
-        todo + in_progress issues."""
+        """WHEN the code under test is exercised for: carry over calculated with injected today"""
         sprint = _sprint(end_date=date(2026, 3, 18), state=SprintState.ACTIVE)
         alice = _person()
         issues = [
@@ -194,10 +197,14 @@ class TestSprintHealthDeterministicDate:
             aging_days=14,
             today=date(2026, 3, 17),
         )
+
+        """THEN the expected behaviour holds: carry over calculated with injected today"""
         assert len(healths) == 1
         assert healths[0].carry_over_count == 2  # 1 todo + 1 in_progress
 
+    """GIVEN sprint health deterministic date and the scenario: no carry over when far from end"""
     def test_no_carry_over_when_far_from_end(self):
+        """WHEN the code under test is exercised for: no carry over when far from end"""
         sprint = _sprint(end_date=date(2026, 3, 28), state=SprintState.ACTIVE)
         alice = _person()
         issues = [_issue("C-1", 5, StatusCategory.TODO, alice, sprint=sprint)]
@@ -207,10 +214,13 @@ class TestSprintHealthDeterministicDate:
             aging_days=14,
             today=date(2026, 3, 10),
         )
+
+        """THEN the expected behaviour holds: no carry over when far from end"""
         assert healths[0].carry_over_count == 0
 
+    """GIVEN sprint health deterministic date and the scenario: missing sprint logged and skipped"""
     def test_missing_sprint_logged_and_skipped(self):
-        """Issues referencing a sprint not in the sprints list should be skipped."""
+        """WHEN the code under test is exercised for: missing sprint logged and skipped"""
         alice = _person()
         sprint = _sprint(sid=99)
         issues = [_issue("C-4", 5, StatusCategory.TODO, alice, sprint=sprint)]
@@ -220,6 +230,8 @@ class TestSprintHealthDeterministicDate:
             aging_days=14,
             today=date(2026, 3, 10),
         )
+
+        """THEN the expected behaviour holds: missing sprint logged and skipped"""
         assert len(healths) == 0
 
 
@@ -229,28 +241,33 @@ class TestSprintHealthDeterministicDate:
 
 
 class TestSummaryCardsConfigThresholds:
-    """summary_cards was hardcoded to overload at 20 SP / 8 issues
-    instead of using the configured thresholds."""
+    """Tests for summary cards config thresholds."""
 
     def _snapshot_with_workload(self, sp: float, issues: int) -> BoardSnapshot:
         alice = _person()
         wr = WorkloadRecord(person=alice, team="alpha", issue_count=issues, story_points=sp)
         return BoardSnapshot(workload_records=[wr])
 
+    """GIVEN summary cards config thresholds and the scenario: custom low threshold flags overload"""
     def test_custom_low_threshold_flags_overload(self):
-        """With threshold=10, a person at 12 SP should be flagged overloaded."""
+        """WHEN the code under test is exercised for: custom low threshold flags overload"""
         snap = self._snapshot_with_workload(sp=12, issues=3)
         t = get_translator("en")
         html = summary_cards(snap, t=t, overload_points=10, overload_issues=5)
         # The overloaded card should show "1"
+
+        """THEN the expected behaviour holds: custom low threshold flags overload"""
         assert ">1<" in html
 
+    """GIVEN summary cards config thresholds and the scenario: default threshold does not flag low workload"""
     def test_default_threshold_does_not_flag_low_workload(self):
-        """With default threshold=20, a person at 15 SP should NOT be flagged."""
+        """WHEN the code under test is exercised for: default threshold does not flag low workload"""
         snap = self._snapshot_with_workload(sp=15, issues=5)
         t = get_translator("en")
         html = summary_cards(snap, t=t, overload_points=20, overload_issues=8)
         # The overloaded card should show "0"
+
+        """THEN the expected behaviour holds: default threshold does not flag low workload"""
         assert "card-amber" not in html or ">0<" in html
 
 
@@ -260,20 +277,28 @@ class TestSummaryCardsConfigThresholds:
 
 
 class TestWorkloadTableConfigThresholds:
-    """workload_table was also hardcoded with magic numbers."""
+    """Tests for workload table config thresholds."""
 
+    """GIVEN workload table config thresholds and the scenario: row warn applied with custom threshold"""
     def test_row_warn_applied_with_custom_threshold(self):
+        """WHEN the code under test is exercised for: row warn applied with custom threshold"""
         alice = _person()
         wr = WorkloadRecord(person=alice, team="alpha", issue_count=3, story_points=12)
         t = get_translator("en")
         html = workload_table([wr], t=t, overload_points=10, overload_issues=5)
+
+        """THEN the expected behaviour holds: row warn applied with custom threshold"""
         assert "row-warn" in html
 
+    """GIVEN workload table config thresholds and the scenario: row warn not applied below threshold"""
     def test_row_warn_not_applied_below_threshold(self):
+        """WHEN the code under test is exercised for: row warn not applied below threshold"""
         alice = _person()
         wr = WorkloadRecord(person=alice, team="alpha", issue_count=3, story_points=8)
         t = get_translator("en")
         html = workload_table([wr], t=t, overload_points=20, overload_issues=8)
+
+        """THEN the expected behaviour holds: row warn not applied below threshold"""
         assert "row-warn" not in html
 
 
@@ -283,17 +308,21 @@ class TestWorkloadTableConfigThresholds:
 
 
 class TestAutoescapeEnabled:
-    """The Jinja2 environment was using autoescape=False, creating
-    XSS vulnerability. Now autoescape=True is used with Markup for safe HTML."""
+    """Tests for autoescape enabled."""
 
+    """GIVEN autoescape enabled and the scenario: autoescape is on"""
     def test_autoescape_is_on(self):
+        """WHEN the code under test is exercised for: autoescape is on"""
         from flowboard.presentation.html.renderer import _build_env
 
         env = _build_env()
+
+        """THEN the expected behaviour holds: autoescape is on"""
         assert env.autoescape is True
 
+    """GIVEN autoescape enabled and the scenario: render does not double escape components"""
     def test_render_does_not_double_escape_components(self):
-        """Pre-rendered HTML components must not be double-escaped."""
+        """WHEN the code under test is exercised for: render does not double escape components"""
         from flowboard.presentation.html.renderer import render_dashboard
 
         cfg = load_config_from_dict(
@@ -305,6 +334,8 @@ class TestAutoescapeEnabled:
         snap = BoardSnapshot(title="Test")
         html = render_dashboard(snap, cfg)
         # Component HTML should be embedded, not escaped
+
+        """THEN the expected behaviour holds: render does not double escape components"""
         assert "&lt;div" not in html or html.count("&lt;div") == 0
         assert "<!DOCTYPE html>" in html
 
@@ -315,22 +346,30 @@ class TestAutoescapeEnabled:
 
 
 class TestJiraClientSessionManagement:
-    """JiraClient.Session was never closed, leaking resources."""
+    """Tests for jira client session management."""
 
+    """GIVEN jira client session management and the scenario: client has close method"""
     def test_client_has_close_method(self):
+        """WHEN the code under test is exercised for: client has close method"""
         from flowboard.infrastructure.config.loader import JiraConfig
         from flowboard.infrastructure.jira.client import JiraClient
 
         cfg = JiraConfig(base_url="https://test.atlassian.net")
         client = JiraClient(cfg)
+
+        """THEN the expected behaviour holds: client has close method"""
         assert hasattr(client, "close")
         client.close()
 
+    """GIVEN jira client session management and the scenario: client context manager"""
     def test_client_context_manager(self):
+        """WHEN the code under test is exercised for: client context manager"""
         from flowboard.infrastructure.config.loader import JiraConfig
         from flowboard.infrastructure.jira.client import JiraClient
 
         cfg = JiraConfig(base_url="https://test.atlassian.net")
+
+        """THEN the expected behaviour holds: client context manager"""
         with JiraClient(cfg) as client:
             assert client is not None
 
@@ -341,10 +380,11 @@ class TestJiraClientSessionManagement:
 
 
 class TestPaginationSafetyLimit:
-    """search_issues had no upper bound on pages, risking OOM."""
+    """Tests for pagination safety limit."""
 
+    """GIVEN pagination safety limit and the scenario: search issues stops at safety limit"""
     def test_search_issues_stops_at_safety_limit(self):
-
+        """WHEN the code under test is exercised for: search issues stops at safety limit"""
         from flowboard.infrastructure.config.loader import JiraConfig
         from flowboard.infrastructure.jira.client import JiraClient
 
@@ -356,6 +396,8 @@ class TestPaginationSafetyLimit:
         import inspect
 
         src = inspect.getsource(client.search_issues)
+
+        """THEN the expected behaviour holds: search issues stops at safety limit"""
         assert "range(" in src or "max_pages" in src
 
 
@@ -365,11 +407,11 @@ class TestPaginationSafetyLimit:
 
 
 class TestAgingRiskTimezoneHandling:
-    """_detect_aging_risks constructed a datetime with potentially
-    mismatched timezone info. Now uses date-level comparison."""
+    """Tests for aging risk timezone handling."""
 
+    """GIVEN aging risk timezone handling and the scenario: aging with utc created"""
     def test_aging_with_utc_created(self):
-        """Issue created with UTC timezone should not crash."""
+        """WHEN the code under test is exercised for: aging with utc created"""
         alice = _person()
         issue = _issue(
             "AGE-1",
@@ -389,10 +431,13 @@ class TestAgingRiskTimezoneHandling:
             t=t,
         )
         aging = [r for r in risks if "aging" in r.title.lower()]
+
+        """THEN the expected behaviour holds: aging with utc created"""
         assert len(aging) == 1
 
+    """GIVEN aging risk timezone handling and the scenario: aging with naive created"""
     def test_aging_with_naive_created(self):
-        """Issue created with naive datetime (no timezone) should not crash."""
+        """WHEN the code under test is exercised for: aging with naive created"""
         alice = _person()
         issue = _issue(
             "AGE-2",
@@ -412,10 +457,13 @@ class TestAgingRiskTimezoneHandling:
             t=t,
         )
         aging = [r for r in risks if "aging" in r.title.lower()]
+
+        """THEN the expected behaviour holds: aging with naive created"""
         assert len(aging) == 1
 
+    """GIVEN aging risk timezone handling and the scenario: future created date skipped"""
     def test_future_created_date_skipped(self):
-        """Issue with created date in the future should be skipped."""
+        """WHEN the code under test is exercised for: future created date skipped"""
         alice = _person()
         issue = _issue(
             "AGE-3",
@@ -435,6 +483,8 @@ class TestAgingRiskTimezoneHandling:
             t=t,
         )
         aging = [r for r in risks if "aging" in r.title.lower()]
+
+        """THEN the expected behaviour holds: future created date skipped"""
         assert len(aging) == 0
 
 
@@ -444,8 +494,7 @@ class TestAgingRiskTimezoneHandling:
 
 
 class TestDependencyChainDFS:
-    """build_dependency_chains had a DFS bug where the shared
-    visited set prevented finding multiple branches."""
+    """Tests for dependency chain d f s."""
 
     def _dep(self, src: str, tgt: str) -> Dependency:
         return Dependency(
@@ -456,27 +505,35 @@ class TestDependencyChainDFS:
             target_status=StatusCategory.TODO,
         )
 
+    """GIVEN dependency chain d f s and the scenario: linear chain"""
     def test_linear_chain(self):
+        """WHEN the code under test is exercised for: linear chain"""
         deps = [self._dep("A", "B"), self._dep("B", "C")]
         chains = build_dependency_chains(deps)
+
+        """THEN the expected behaviour holds: linear chain"""
         assert len(chains) == 1
         assert chains[0] == ["A", "B", "C"]
 
+    """GIVEN dependency chain d f s and the scenario: branching graph produces multiple chains"""
     def test_branching_graph_produces_multiple_chains(self):
-        """A → B → C and A → D must produce TWO chains."""
+        """WHEN the code under test is exercised for: branching graph produces multiple chains"""
         deps = [
             self._dep("A", "B"),
             self._dep("B", "C"),
             self._dep("A", "D"),
         ]
         chains = build_dependency_chains(deps)
+
+        """THEN the expected behaviour holds: branching graph produces multiple chains"""
         assert len(chains) == 2
         chain_sets = [tuple(c) for c in chains]
         assert ("A", "B", "C") in chain_sets
         assert ("A", "D") in chain_sets
 
+    """GIVEN dependency chain d f s and the scenario: diamond graph"""
     def test_diamond_graph(self):
-        """A → B, A → C, B → D, C → D must produce chains A→B→D and A→C→D."""
+        """WHEN the code under test is exercised for: diamond graph"""
         deps = [
             self._dep("A", "B"),
             self._dep("A", "C"),
@@ -484,18 +541,24 @@ class TestDependencyChainDFS:
             self._dep("C", "D"),
         ]
         chains = build_dependency_chains(deps)
+
+        """THEN the expected behaviour holds: diamond graph"""
         assert len(chains) == 2
 
+    """GIVEN dependency chain d f s and the scenario: cycle does not hang"""
     def test_cycle_does_not_hang(self):
-        """A → B → A cycle must not cause infinite recursion."""
+        """WHEN the code under test is exercised for: cycle does not hang"""
         deps = [self._dep("A", "B"), self._dep("B", "A")]
-        # Should not hang — must complete
+        # Should not hang - must complete
         chains = build_dependency_chains(deps)
         # At least one chain path should be recorded
+
+        """THEN the expected behaviour holds: cycle does not hang"""
         assert isinstance(chains, list)
 
+    """GIVEN dependency chain d f s and the scenario: done deps excluded"""
     def test_done_deps_excluded(self):
-        """Resolved dependencies (target done) should be excluded."""
+        """WHEN the code under test is exercised for: done deps excluded"""
         dep = Dependency(
             source_key="A",
             target_key="B",
@@ -504,9 +567,13 @@ class TestDependencyChainDFS:
             target_status=StatusCategory.DONE,
         )
         chains = build_dependency_chains([dep])
+
+        """THEN the expected behaviour holds: done deps excluded"""
         assert len(chains) == 0
 
+    """GIVEN dependency chain d f s and the scenario: empty deps"""
     def test_empty_deps(self):
+        """THEN the expected behaviour holds: empty deps"""
         assert build_dependency_chains([]) == []
 
 
@@ -516,16 +583,19 @@ class TestDependencyChainDFS:
 
 
 class TestAnalyticsImports:
-    """analytics.py used __import__() for type annotations which
-    is fragile and non-standard."""
+    """Tests for analytics imports."""
 
+    """GIVEN analytics imports and the scenario: build board snapshot type annotations"""
     def test_build_board_snapshot_type_annotations(self):
+        """WHEN the code under test is exercised for: build board snapshot type annotations"""
         import inspect
 
         from flowboard.domain.analytics import build_board_snapshot
 
         # Should not contain __import__ in annotations
         src = inspect.getsource(build_board_snapshot)
+
+        """THEN the expected behaviour holds: build board snapshot type annotations"""
         assert "__import__" not in src
 
 
@@ -535,33 +605,45 @@ class TestAnalyticsImports:
 
 
 class TestCapacityRecordClamped:
-    """utilization_pct could exceed 100% if completed > allocated."""
+    """Tests for capacity record clamped."""
 
+    """GIVEN capacity record clamped and the scenario: utilization capped at 100"""
     def test_utilization_capped_at_100(self):
+        """WHEN the code under test is exercised for: utilization capped at 100"""
         alice = _person()
         cr = CapacityRecord(
             person=alice,
             allocated_points=10,
             completed_points=15,
         )
+
+        """THEN the expected behaviour holds: utilization capped at 100"""
         assert cr.utilization_pct == 100.0
 
+    """GIVEN capacity record clamped and the scenario: utilization normal case"""
     def test_utilization_normal_case(self):
+        """WHEN the code under test is exercised for: utilization normal case"""
         alice = _person()
         cr = CapacityRecord(
             person=alice,
             allocated_points=10,
             completed_points=5,
         )
+
+        """THEN the expected behaviour holds: utilization normal case"""
         assert cr.utilization_pct == 50.0
 
+    """GIVEN capacity record clamped and the scenario: utilization zero allocated"""
     def test_utilization_zero_allocated(self):
+        """WHEN the code under test is exercised for: utilization zero allocated"""
         alice = _person()
         cr = CapacityRecord(
             person=alice,
             allocated_points=0,
             completed_points=5,
         )
+
+        """THEN the expected behaviour holds: utilization zero allocated"""
         assert cr.utilization_pct == 0.0
 
 
@@ -571,21 +653,35 @@ class TestCapacityRecordClamped:
 
 
 class TestEmptyDataEdgeCases:
-    """Regression guard for empty input data edge cases."""
+    """Tests for empty data edge cases."""
 
+    """GIVEN empty data edge cases and the scenario: sprint health empty sprint issues"""
     def test_sprint_health_empty_sprint_issues(self):
+        """WHEN the code under test is exercised for: sprint health empty sprint issues"""
         healths = compute_sprint_health({}, [], today=date(2026, 3, 18))
+
+        """THEN the expected behaviour holds: sprint health empty sprint issues"""
         assert healths == []
 
+    """GIVEN empty data edge cases and the scenario: risk detection with no issues"""
     def test_risk_detection_with_no_issues(self):
+        """WHEN the code under test is exercised for: risk detection with no issues"""
         t = get_translator("en")
         risks = detect_all_risks([], [], [], [], _thresholds(), today=date(2026, 3, 18), t=t)
+
+        """THEN the expected behaviour holds: risk detection with no issues"""
         assert risks == []
 
+    """GIVEN empty data edge cases and the scenario: conflict detection with no issues"""
     def test_conflict_detection_with_no_issues(self):
+        """WHEN the code under test is exercised for: conflict detection with no issues"""
         t = get_translator("en")
         conflicts = detect_all_conflicts([], [], [], _thresholds(), today=date(2026, 3, 18), t=t)
+
+        """THEN the expected behaviour holds: conflict detection with no issues"""
         assert conflicts == []
 
+    """GIVEN empty data edge cases and the scenario: dependency chains empty"""
     def test_dependency_chains_empty(self):
+        """THEN the expected behaviour holds: dependency chains empty"""
         assert build_dependency_chains([]) == []

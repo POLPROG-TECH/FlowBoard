@@ -1,4 +1,4 @@
-"""Extended domain edge case tests — simulation resources, risk filtering, backlog quality, config deep copy."""
+"""Extended domain edge case tests - simulation resources, risk filtering, backlog quality, config deep copy."""
 
 from __future__ import annotations
 
@@ -108,18 +108,26 @@ def _minimal_config() -> dict:
 
 
 class TestPiEmptyWorkingDaysGuard:
-    """Covers: empty working_days must raise ValueError, not hang."""
+    """Tests for pi empty working days guard."""
 
+    """GIVEN pi empty working days guard and the scenario: empty frozenset raises"""
     def test_empty_frozenset_raises(self):
+        """WHEN the code under test is exercised for: empty frozenset raises"""
         with pytest.raises(ValueError, match="cannot be empty"):
             _to_wd_set(frozenset())
 
+    """GIVEN pi empty working days guard and the scenario: empty list raises"""
     def test_empty_list_raises(self):
+        """WHEN the code under test is exercised for: empty list raises"""
         with pytest.raises(ValueError, match="cannot be empty"):
             _to_wd_set([])
 
+    """GIVEN pi empty working days guard and the scenario: none uses defaults"""
     def test_none_uses_defaults(self):
+        """WHEN the code under test is exercised for: none uses defaults"""
         result = _to_wd_set(None)
+
+        """THEN the expected behaviour holds: none uses defaults"""
         assert len(result) == 5  # Mon-Fri
 
 
@@ -129,9 +137,11 @@ class TestPiEmptyWorkingDaysGuard:
 
 
 class TestScopeChurnDenominator:
-    """Covers: churn must be calculated against original scope, not total."""
+    """Tests for scope churn denominator."""
 
+    """GIVEN scope churn denominator and the scenario: churn is added over original"""
     def test_churn_is_added_over_original(self):
+        """WHEN the code under test is exercised for: churn is added over original"""
         sp = _sprint()
         sh = _sprint_health(sp)
         alice = _person("Alice")
@@ -142,6 +152,8 @@ class TestScopeChurnDenominator:
             _issue("A-1", assignee=alice, sprint=sp, created=datetime(2026, 3, 5, tzinfo=UTC)),
         ]
         reports = compute_scope_changes(issues, [sh])
+
+        """THEN the expected behaviour holds: churn is added over original"""
         assert reports[0].churn_pct == 50.0  # 1 added / 2 original * 100
 
 
@@ -151,9 +163,11 @@ class TestScopeChurnDenominator:
 
 
 class TestSimulationResourceRemoval:
-    """Covers: removing a resource must increase remaining members' load."""
+    """Tests for simulation resource removal."""
 
+    """GIVEN simulation resource removal and the scenario: removing member increases load"""
     def test_removing_member_increases_load(self):
+        """WHEN the code under test is exercised for: removing member increases load"""
         teams = [Team(key="api", name="API", members=("a", "b", "c"))]
         wrs = [
             WorkloadRecord(
@@ -192,6 +206,8 @@ class TestSimulationResourceRemoval:
         sim_workloads, _metrics = _simulate_workloads(wrs, teams, scenario, Thresholds())
         # After removing 1, remaining 2 members should carry more load
         existing_loads = [w["story_points"] for w in sim_workloads if not w.get("is_new")]
+
+        """THEN the expected behaviour holds: removing member increases load"""
         assert all(sp > 9.0 for sp in existing_loads)
 
 
@@ -201,9 +217,11 @@ class TestSimulationResourceRemoval:
 
 
 class TestRiskBlockerLinkFiltering:
-    """Covers: only IS_BLOCKED_BY/DEPENDS_ON links should appear as blockers."""
+    """Tests for risk blocker link filtering."""
 
+    """GIVEN risk blocker link filtering and the scenario: relates to not listed as blocker"""
     def test_relates_to_not_listed_as_blocker(self):
+        """WHEN the code under test is exercised for: relates to not listed as blocker"""
         from flowboard.domain.risk import _detect_blocked_risks
 
         t = Translator("en")
@@ -233,6 +251,8 @@ class TestRiskBlockerLinkFiltering:
         signals = _detect_blocked_risks([issue], t=t)
         # Find the per-issue signal
         per_issue = [s for s in signals if s.category.value == "blocked" and "T-1" in s.title]
+
+        """THEN the expected behaviour holds: relates to not listed as blocker"""
         assert len(per_issue) == 1
         # The affected_keys should include B-1 but not R-1
         assert "B-1" in per_issue[0].affected_keys
@@ -245,14 +265,18 @@ class TestRiskBlockerLinkFiltering:
 
 
 class TestBacklogQualityScoreIncludesNoPriority:
-    """Covers: no_priority must reduce the quality score."""
+    """Tests for backlog quality score includes no priority."""
 
+    """GIVEN backlog quality score includes no priority and the scenario: score penalizes missing priority"""
     def test_score_penalizes_missing_priority(self):
+        """WHEN the code under test is exercised for: score penalizes missing priority"""
         issues = [
             _issue("B-1", status_cat=StatusCategory.TODO, priority=Priority.UNSET, sp=0),
         ]
         report = compute_backlog_quality(issues, stale_days=30, today=date(2026, 3, 10))
         # With 5 checks per item and 2 issues found (no_est=1 from sp=0, no_pri=1), score < 100
+
+        """THEN the expected behaviour holds: score penalizes missing priority"""
         assert report.quality_score < 100.0
         assert report.no_priority == 1
 
@@ -263,12 +287,16 @@ class TestBacklogQualityScoreIncludesNoPriority:
 
 
 class TestConfigLoadDeepCopy:
-    """Covers: load_config_from_dict must not mutate the input dict."""
+    """Tests for config load deep copy."""
 
+    """GIVEN config load deep copy and the scenario: input dict not mutated"""
     def test_input_dict_not_mutated(self):
+        """WHEN the code under test is exercised for: input dict not mutated"""
         original = _minimal_config()
         original_jira = original["jira"].copy()
         load_config_from_dict(original)
+
+        """THEN the expected behaviour holds: input dict not mutated"""
         assert original["jira"] == original_jira  # original not mutated
 
 
@@ -278,30 +306,38 @@ class TestConfigLoadDeepCopy:
 
 
 class TestPluralEmptyFormKeys:
-    """Plural() crashed with IndexError when called with no form_keys."""
+    """Tests for plural empty form keys."""
 
+    """GIVEN plural empty form keys and the scenario: plural no form keys returns str n"""
     def test_plural_no_form_keys_returns_str_n(self):
+        """WHEN the code under test is exercised for: plural no form keys returns str n"""
         from flowboard.i18n.translator import Translator
 
         t = Translator("en")
         result = t.plural(5)
+
+        """THEN the expected behaviour holds: plural no form keys returns str n"""
         assert result == "5"
 
+    """GIVEN plural empty form keys and the scenario: plural single form key works"""
     def test_plural_single_form_key_works(self):
+        """WHEN the code under test is exercised for: plural single form key works"""
         from flowboard.i18n.translator import Translator
 
         t = Translator("en")
         result = t.plural(1, "sprint.label")
+
+        """THEN the expected behaviour holds: plural single form key works"""
         assert isinstance(result, str)
         assert len(result) > 0
 
 
 class TestScopeChangeAllAdded:
-    """Churn reported 0% when all items were added post-sprint (no originals)."""
+    """Tests for scope change all added."""
 
+    """GIVEN scope change all added and the scenario: all items added reports 100 churn"""
     def test_all_items_added_reports_100_churn(self):
-        """When every issue was created after sprint start and no original items
-        existed, churn must be 100% (not 0%)."""
+        """WHEN the code under test is exercised for: all items added reports 100 churn"""
         from flowboard.domain.scrum_compute import compute_scope_changes
 
         sprint_start = date(2020, 1, 1)
@@ -330,15 +366,19 @@ class TestScopeChangeAllAdded:
             issues.append(iss)
 
         reports = compute_scope_changes(issues, [sh])
+
+        """THEN the expected behaviour holds: all items added reports 100 churn"""
         assert len(reports) == 1
         assert reports[0].churn_pct == 100.0
         assert reports[0].stability != "stable"
 
 
 class TestInvalidPIDateSafe:
-    """Invalid pi.start_date no longer crashes analytics pipeline."""
+    """Tests for invalid p i date safe."""
 
+    """GIVEN invalid p i date safe and the scenario: invalid date raises value error"""
     def test_invalid_date_raises_value_error(self):
+        """WHEN the code under test is exercised for: invalid date raises value error"""
         from flowboard.domain.pi import compute_pi_snapshot
 
         with pytest.raises(ValueError):

@@ -106,7 +106,7 @@ def build_board_snapshot(
             import logging
 
             logging.getLogger("flowboard.analytics").warning(
-                "Failed to compute PI snapshot — check pi config dates"
+                "Failed to compute PI snapshot - check pi config dates"
             )
             pi_snap = None
 

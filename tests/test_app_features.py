@@ -1,4 +1,4 @@
-"""Application feature tests — Docker, config reload, thresholds, OpenAPI, env vars, webhooks, data freshness."""
+"""Application feature tests - Docker, config reload, thresholds, OpenAPI, env vars, webhooks, data freshness."""
 
 from __future__ import annotations
 
@@ -36,31 +36,51 @@ def _read_template(name: str) -> str:
 
 
 class TestDockerfile:
-    """Verify Dockerfile follows best practices."""
+    """Tests for dockerfile."""
 
+    """GIVEN dockerfile and the scenario: dockerfile exists"""
     def test_dockerfile_exists(self):
+        """THEN the expected behaviour holds: dockerfile exists"""
         assert (_REPO_ROOT / "Dockerfile").exists()
 
+    """GIVEN dockerfile and the scenario: multi stage build"""
     def test_multi_stage_build(self):
+        """WHEN the code under test is exercised for: multi stage build"""
         content = (_REPO_ROOT / "Dockerfile").read_text()
+
+        """THEN the expected behaviour holds: multi stage build"""
         assert "AS builder" in content or "as builder" in content
 
+    """GIVEN dockerfile and the scenario: non root user"""
     def test_non_root_user(self):
+        """WHEN the code under test is exercised for: non root user"""
         content = (_REPO_ROOT / "Dockerfile").read_text()
+
+        """THEN the expected behaviour holds: non root user"""
         assert "USER" in content
 
+    """GIVEN dockerfile and the scenario: healthcheck"""
     def test_healthcheck(self):
+        """WHEN the code under test is exercised for: healthcheck"""
         content = (_REPO_ROOT / "Dockerfile").read_text()
+
+        """THEN the expected behaviour holds: healthcheck"""
         assert "HEALTHCHECK" in content
 
+    """GIVEN dockerfile and the scenario: docker compose exists"""
     def test_docker_compose_exists(self):
+        """THEN the expected behaviour holds: docker compose exists"""
         assert (_REPO_ROOT / "docker-compose.yml").exists()
 
+    """GIVEN dockerfile and the scenario: docker compose valid yaml"""
     def test_docker_compose_valid_yaml(self):
+        """WHEN the code under test is exercised for: docker compose valid yaml"""
         import yaml
 
         content = (_REPO_ROOT / "docker-compose.yml").read_text()
         data = yaml.safe_load(content)
+
+        """THEN the expected behaviour holds: docker compose valid yaml"""
         assert "services" in data
         assert "flowboard" in data["services"]
 
@@ -71,9 +91,11 @@ class TestDockerfile:
 
 
 class TestHotConfigReload:
-    """Test POST /api/config/reload endpoint."""
+    """Tests for hot config reload."""
 
+    """GIVEN hot config reload and the scenario: reload no config"""
     def test_reload_no_config(self):
+        """WHEN the code under test is exercised for: reload no config"""
         import asyncio
 
         from httpx import ASGITransport, AsyncClient
@@ -89,6 +111,8 @@ class TestHotConfigReload:
                 return r
 
         resp = asyncio.get_event_loop().run_until_complete(_run())
+
+        """THEN the expected behaviour holds: reload no config"""
         assert resp.status_code == 400
         assert "No configuration" in resp.json()["error"]
 
@@ -99,9 +123,11 @@ class TestHotConfigReload:
 
 
 class TestPerTeamThresholds:
-    """Test per-team threshold overrides in config loader."""
+    """Tests for per team thresholds."""
 
+    """GIVEN per team thresholds and the scenario: team thresholds parsed"""
     def test_team_thresholds_parsed(self):
+        """WHEN the code under test is exercised for: team thresholds parsed"""
         from flowboard.infrastructure.config.loader import _build_teams
 
         raw = {
@@ -116,19 +142,29 @@ class TestPerTeamThresholds:
             ]
         }
         teams = _build_teams(raw)
+
+        """THEN the expected behaviour holds: team thresholds parsed"""
         assert teams[0].thresholds == {"overload_points": 30}
         assert teams[1].thresholds is None
 
+    """GIVEN per team thresholds and the scenario: empty thresholds becomes none"""
     def test_empty_thresholds_becomes_none(self):
+        """WHEN the code under test is exercised for: empty thresholds becomes none"""
         from flowboard.infrastructure.config.loader import _build_teams
 
         raw = {"teams": [{"key": "t", "name": "T", "members": [], "thresholds": {}}]}
         teams = _build_teams(raw)
+
+        """THEN the expected behaviour holds: empty thresholds becomes none"""
         assert teams[0].thresholds is None
 
+    """GIVEN per team thresholds and the scenario: schema allows team thresholds"""
     def test_schema_allows_team_thresholds(self):
+        """WHEN the code under test is exercised for: schema allows team thresholds"""
         schema = json.loads((_REPO_ROOT / "config.schema.json").read_text())
         team_props = schema["properties"]["teams"]["items"]["properties"]
+
+        """THEN the expected behaviour holds: schema allows team thresholds"""
         assert "thresholds" in team_props
 
 
@@ -138,9 +174,11 @@ class TestPerTeamThresholds:
 
 
 class TestOpenAPIDocs:
-    """Test that OpenAPI docs are enabled."""
+    """Tests for open a p i docs."""
 
+    """GIVEN open a p i docs and the scenario: docs endpoint"""
     def test_docs_endpoint(self):
+        """WHEN the code under test is exercised for: docs endpoint"""
         import asyncio
 
         from httpx import ASGITransport, AsyncClient
@@ -155,6 +193,8 @@ class TestOpenAPIDocs:
                 return r
 
         resp = asyncio.get_event_loop().run_until_complete(_run())
+
+        """THEN the expected behaviour holds: docs endpoint"""
         assert resp.status_code == 200
         assert "swagger" in resp.text.lower() or "openapi" in resp.text.lower()
 
@@ -165,45 +205,64 @@ class TestOpenAPIDocs:
 
 
 class TestEnvVarExpansion:
-    """Test ${VAR} expansion in config strings (restricted to safe keys)."""
+    """Tests for env var expansion."""
 
+    """GIVEN env var expansion and the scenario: expand simple string"""
     def test_expand_simple_string(self):
+        """WHEN the code under test is exercised for: expand simple string"""
         from flowboard.infrastructure.config.loader import _expand_env_vars
 
+        """THEN the expected behaviour holds: expand simple string"""
         with patch.dict(os.environ, {"MY_TOKEN": "secret123"}):
             result = _expand_env_vars("Bearer ${MY_TOKEN}", _key="auth_token")
             assert result == "Bearer secret123"
 
+    """GIVEN env var expansion and the scenario: expand nested dict"""
     def test_expand_nested_dict(self):
+        """WHEN the code under test is exercised for: expand nested dict"""
         from flowboard.infrastructure.config.loader import _expand_env_vars
 
+        """THEN the expected behaviour holds: expand nested dict"""
         with patch.dict(os.environ, {"DB_HOST": "localhost"}):
             result = _expand_env_vars({"base_url": "${DB_HOST}", "port": 5432})
             assert result == {"base_url": "localhost", "port": 5432}
 
+    """GIVEN env var expansion and the scenario: expand list"""
     def test_expand_list(self):
+        """WHEN the code under test is exercised for: expand list"""
         from flowboard.infrastructure.config.loader import _expand_env_vars
 
+        """THEN the expected behaviour holds: expand list"""
         with patch.dict(os.environ, {"A": "1", "B": "2"}):
             result = _expand_env_vars(["${A}", "${B}", "plain"], _key="path")
             assert result == ["1", "2", "plain"]
 
+    """GIVEN env var expansion and the scenario: missing env var preserved"""
     def test_missing_env_var_preserved(self):
+        """WHEN the code under test is exercised for: missing env var preserved"""
         from flowboard.infrastructure.config.loader import _expand_env_vars
 
         result = _expand_env_vars("${NONEXISTENT_VAR_12345}", _key="base_url")
+
+        """THEN the expected behaviour holds: missing env var preserved"""
         assert result == "${NONEXISTENT_VAR_12345}"
 
+    """GIVEN env var expansion and the scenario: non string passthrough"""
     def test_non_string_passthrough(self):
+        """WHEN the code under test is exercised for: non string passthrough"""
         from flowboard.infrastructure.config.loader import _expand_env_vars
 
+        """THEN the expected behaviour holds: non string passthrough"""
         assert _expand_env_vars(42) == 42
         assert _expand_env_vars(None) is None
         assert _expand_env_vars(True) is True
 
+    """GIVEN env var expansion and the scenario: unsafe key not expanded"""
     def test_unsafe_key_not_expanded(self):
+        """WHEN the code under test is exercised for: unsafe key not expanded"""
         from flowboard.infrastructure.config.loader import _expand_env_vars
 
+        """THEN the expected behaviour holds: unsafe key not expanded"""
         with patch.dict(os.environ, {"SECRET": "leaked"}):
             result = _expand_env_vars("${SECRET}", _key="arbitrary_field")
             assert result == "${SECRET}"
@@ -215,9 +274,11 @@ class TestEnvVarExpansion:
 
 
 class TestCorrelationIdMiddleware:
-    """Test X-Request-ID header propagation."""
+    """Tests for correlation id middleware."""
 
+    """GIVEN correlation id middleware and the scenario: generates request id"""
     def test_generates_request_id(self):
+        """WHEN the code under test is exercised for: generates request id"""
         import asyncio
 
         from httpx import ASGITransport, AsyncClient
@@ -232,10 +293,14 @@ class TestCorrelationIdMiddleware:
                 return r
 
         resp = asyncio.get_event_loop().run_until_complete(_run())
+
+        """THEN the expected behaviour holds: generates request id"""
         assert "x-request-id" in resp.headers
         assert len(resp.headers["x-request-id"]) >= 8
 
+    """GIVEN correlation id middleware and the scenario: propagates provided id"""
     def test_propagates_provided_id(self):
+        """WHEN the code under test is exercised for: propagates provided id"""
         import asyncio
 
         from httpx import ASGITransport, AsyncClient
@@ -251,6 +316,8 @@ class TestCorrelationIdMiddleware:
                 return r
 
         resp = asyncio.get_event_loop().run_until_complete(_run())
+
+        """THEN the expected behaviour holds: propagates provided id"""
         assert resp.headers["x-request-id"] == custom_id
 
 
@@ -260,9 +327,11 @@ class TestCorrelationIdMiddleware:
 
 
 class TestDuplicateSprintDetection:
-    """Test data quality check for sprints on multiple boards."""
+    """Tests for duplicate sprint detection."""
 
+    """GIVEN duplicate sprint detection and the scenario: no duplicates"""
     def test_no_duplicates(self):
+        """WHEN the code under test is exercised for: no duplicates"""
         from flowboard.application.data_quality import check_duplicate_sprints
 
         sprints = [
@@ -270,9 +339,13 @@ class TestDuplicateSprintDetection:
             {"name": "Sprint 2", "originBoardId": 1},
         ]
         warnings = check_duplicate_sprints(sprints)
+
+        """THEN the expected behaviour holds: no duplicates"""
         assert warnings == []
 
+    """GIVEN duplicate sprint detection and the scenario: detects duplicates"""
     def test_detects_duplicates(self):
+        """WHEN the code under test is exercised for: detects duplicates"""
         from flowboard.application.data_quality import check_duplicate_sprints
 
         sprints = [
@@ -280,13 +353,18 @@ class TestDuplicateSprintDetection:
             {"name": "Sprint 1", "originBoardId": 2},
         ]
         warnings = check_duplicate_sprints(sprints)
+
+        """THEN the expected behaviour holds: detects duplicates"""
         assert len(warnings) == 1
         assert "Sprint 1" in warnings[0]
         assert "2 boards" in warnings[0]
 
+    """GIVEN duplicate sprint detection and the scenario: empty sprints"""
     def test_empty_sprints(self):
+        """WHEN the code under test is exercised for: empty sprints"""
         from flowboard.application.data_quality import check_duplicate_sprints
 
+        """THEN the expected behaviour holds: empty sprints"""
         assert check_duplicate_sprints([]) == []
 
 
@@ -296,9 +374,11 @@ class TestDuplicateSprintDetection:
 
 
 class TestTeamMemberPresence:
-    """Test data quality check for team member existence in issues."""
+    """Tests for team member presence."""
 
+    """GIVEN team member presence and the scenario: all members found"""
     def test_all_members_found(self):
+        """WHEN the code under test is exercised for: all members found"""
         from flowboard.application.data_quality import check_team_member_presence
 
         config = MagicMock()
@@ -308,9 +388,13 @@ class TestTeamMemberPresence:
 
         issues = [MagicMock(assignee="alice"), MagicMock(assignee="bob")]
         warnings = check_team_member_presence(config, issues)
+
+        """THEN the expected behaviour holds: all members found"""
         assert warnings == []
 
+    """GIVEN team member presence and the scenario: missing member"""
     def test_missing_member(self):
+        """WHEN the code under test is exercised for: missing member"""
         from flowboard.application.data_quality import check_team_member_presence
 
         config = MagicMock()
@@ -320,15 +404,21 @@ class TestTeamMemberPresence:
 
         issues = [MagicMock(assignee="alice"), MagicMock(assignee="bob")]
         warnings = check_team_member_presence(config, issues)
+
+        """THEN the expected behaviour holds: missing member"""
         assert len(warnings) == 1
         assert "charlie" in warnings[0]
 
+    """GIVEN team member presence and the scenario: no teams"""
     def test_no_teams(self):
+        """WHEN the code under test is exercised for: no teams"""
         from flowboard.application.data_quality import check_team_member_presence
 
         config = MagicMock()
         config.teams = []
         warnings = check_team_member_presence(config, [])
+
+        """THEN the expected behaviour holds: no teams"""
         assert warnings == []
 
 
@@ -338,29 +428,41 @@ class TestTeamMemberPresence:
 
 
 class TestDataFreshness:
-    """Test stale data detection."""
+    """Tests for data freshness."""
 
+    """GIVEN data freshness and the scenario: fresh data"""
     def test_fresh_data(self):
+        """WHEN the code under test is exercised for: fresh data"""
         from flowboard.application.data_quality import check_data_freshness
 
         issue = MagicMock()
         issue.updated = date.today()
         warnings = check_data_freshness([issue])
+
+        """THEN the expected behaviour holds: fresh data"""
         assert warnings == []
 
+    """GIVEN data freshness and the scenario: stale data"""
     def test_stale_data(self):
+        """WHEN the code under test is exercised for: stale data"""
         from flowboard.application.data_quality import check_data_freshness
 
         issue = MagicMock()
         issue.updated = date.today() - timedelta(days=30)
         warnings = check_data_freshness([issue], max_age_days=7)
+
+        """THEN the expected behaviour holds: stale data"""
         assert len(warnings) == 1
         assert "stale" in warnings[0].lower() or "ago" in warnings[0].lower()
 
+    """GIVEN data freshness and the scenario: no issues"""
     def test_no_issues(self):
+        """WHEN the code under test is exercised for: no issues"""
         from flowboard.application.data_quality import check_data_freshness
 
         warnings = check_data_freshness([])
+
+        """THEN the expected behaviour holds: no issues"""
         assert len(warnings) == 1
         assert "empty" in warnings[0].lower() or "no issues" in warnings[0].lower()
 
@@ -371,9 +473,11 @@ class TestDataFreshness:
 
 
 class TestJiraWebhook:
-    """Test Jira webhook endpoint."""
+    """Tests for jira webhook."""
 
+    """GIVEN jira webhook and the scenario: webhook stores event"""
     def test_webhook_stores_event(self):
+        """WHEN the code under test is exercised for: webhook stores event"""
         import asyncio
 
         from httpx import ASGITransport, AsyncClient
@@ -395,12 +499,16 @@ class TestJiraWebhook:
                 return r
 
         resp = asyncio.get_event_loop().run_until_complete(_run())
+
+        """THEN the expected behaviour holds: webhook stores event"""
         assert resp.status_code == 200
         data = resp.json()
         assert data["ok"] is True
         assert data["event"] == "jira:issue_updated"
 
+    """GIVEN jira webhook and the scenario: webhook invalid json"""
     def test_webhook_invalid_json(self):
+        """WHEN the code under test is exercised for: webhook invalid json"""
         import asyncio
 
         from httpx import ASGITransport, AsyncClient
@@ -419,9 +527,13 @@ class TestJiraWebhook:
                 return r
 
         resp = asyncio.get_event_loop().run_until_complete(_run())
+
+        """THEN the expected behaviour holds: webhook invalid json"""
         assert resp.status_code == 400
 
+    """GIVEN jira webhook and the scenario: webhook events endpoint"""
     def test_webhook_events_endpoint(self):
+        """WHEN the code under test is exercised for: webhook events endpoint"""
         import asyncio
 
         from httpx import ASGITransport, AsyncClient
@@ -436,10 +548,14 @@ class TestJiraWebhook:
                 return r
 
         resp = asyncio.get_event_loop().run_until_complete(_run())
+
+        """THEN the expected behaviour holds: webhook events endpoint"""
         assert resp.status_code == 200
         assert resp.json()["ok"] is True
 
+    """GIVEN jira webhook and the scenario: webhook sprint triggers refresh"""
     def test_webhook_sprint_triggers_refresh(self):
+        """WHEN the code under test is exercised for: webhook sprint triggers refresh"""
         import asyncio
 
         from httpx import ASGITransport, AsyncClient
@@ -460,6 +576,8 @@ class TestJiraWebhook:
                 return r
 
         resp = asyncio.get_event_loop().run_until_complete(_run())
+
+        """THEN the expected behaviour holds: webhook sprint triggers refresh"""
         assert resp.json()["refresh_triggered"] is True
 
 
@@ -469,9 +587,11 @@ class TestJiraWebhook:
 
 
 class TestSnapshotHistory:
-    """Test snapshot save/list/get endpoints."""
+    """Tests for snapshot history."""
 
+    """GIVEN snapshot history and the scenario: save no dashboard"""
     def test_save_no_dashboard(self):
+        """WHEN the code under test is exercised for: save no dashboard"""
         import asyncio
 
         from httpx import ASGITransport, AsyncClient
@@ -486,9 +606,13 @@ class TestSnapshotHistory:
                 return r
 
         resp = asyncio.get_event_loop().run_until_complete(_run())
+
+        """THEN the expected behaviour holds: save no dashboard"""
         assert resp.status_code == 400
 
+    """GIVEN snapshot history and the scenario: list snapshots empty"""
     def test_list_snapshots_empty(self):
+        """WHEN the code under test is exercised for: list snapshots empty"""
         import asyncio
 
         from httpx import ASGITransport, AsyncClient
@@ -503,10 +627,14 @@ class TestSnapshotHistory:
                 return r
 
         resp = asyncio.get_event_loop().run_until_complete(_run())
+
+        """THEN the expected behaviour holds: list snapshots empty"""
         assert resp.status_code == 200
         assert resp.json()["ok"] is True
 
+    """GIVEN snapshot history and the scenario: get snapshot invalid format"""
     def test_get_snapshot_invalid_format(self):
+        """WHEN the code under test is exercised for: get snapshot invalid format"""
         import asyncio
 
         from httpx import ASGITransport, AsyncClient
@@ -521,9 +649,13 @@ class TestSnapshotHistory:
                 return r
 
         resp = asyncio.get_event_loop().run_until_complete(_run())
+
+        """THEN the expected behaviour holds: get snapshot invalid format"""
         assert resp.status_code == 400
 
+    """GIVEN snapshot history and the scenario: get snapshot not found"""
     def test_get_snapshot_not_found(self):
+        """WHEN the code under test is exercised for: get snapshot not found"""
         import asyncio
 
         from httpx import ASGITransport, AsyncClient
@@ -538,6 +670,8 @@ class TestSnapshotHistory:
                 return r
 
         resp = asyncio.get_event_loop().run_until_complete(_run())
+
+        """THEN the expected behaviour holds: get snapshot not found"""
         assert resp.status_code == 404
 
 
@@ -547,9 +681,11 @@ class TestSnapshotHistory:
 
 
 class TestMultiDashboard:
-    """Test dashboard listing and generation endpoints."""
+    """Tests for multi dashboard."""
 
+    """GIVEN multi dashboard and the scenario: list dashboards"""
     def test_list_dashboards(self):
+        """WHEN the code under test is exercised for: list dashboards"""
         import asyncio
 
         from httpx import ASGITransport, AsyncClient
@@ -564,11 +700,15 @@ class TestMultiDashboard:
                 return r
 
         resp = asyncio.get_event_loop().run_until_complete(_run())
+
+        """THEN the expected behaviour holds: list dashboards"""
         assert resp.status_code == 200
         assert resp.json()["ok"] is True
         assert isinstance(resp.json()["dashboards"], list)
 
+    """GIVEN multi dashboard and the scenario: generate invalid id"""
     def test_generate_invalid_id(self):
+        """WHEN the code under test is exercised for: generate invalid id"""
         import asyncio
 
         from httpx import ASGITransport, AsyncClient
@@ -584,9 +724,13 @@ class TestMultiDashboard:
 
         resp = asyncio.get_event_loop().run_until_complete(_run())
         # Should be 404 (config not found) since path traversal won't work with valid ID chars
+
+        """THEN the expected behaviour holds: generate invalid id"""
         assert resp.status_code in (400, 404)
 
+    """GIVEN multi dashboard and the scenario: generate nonexistent config"""
     def test_generate_nonexistent_config(self):
+        """WHEN the code under test is exercised for: generate nonexistent config"""
         import asyncio
 
         from httpx import ASGITransport, AsyncClient
@@ -601,6 +745,8 @@ class TestMultiDashboard:
                 return r
 
         resp = asyncio.get_event_loop().run_until_complete(_run())
+
+        """THEN the expected behaviour holds: generate nonexistent config"""
         assert resp.status_code == 404
 
 

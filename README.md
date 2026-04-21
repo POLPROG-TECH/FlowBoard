@@ -1,48 +1,55 @@
+<div align="center">
+  <img alt="flowboard" src="docs/assets/logo-full.svg" width="520">
+</div>
+
+<br>
+
 <p align="center">
-  <img src="docs/assets/logo-full.svg" alt="FlowBoard" width="370">
+  <a href="https://www.python.org/downloads/"><img src="https://img.shields.io/badge/python-3.12%2B-3776ab?style=flat-square&logo=python&logoColor=white" alt="Python 3.12+"></a>
+  <img src="https://img.shields.io/badge/tests-1274%20passed-22c55e?style=flat-square&logo=pytest&logoColor=white" alt="Tests: 1274 passed">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-AGPL--3.0-6366f1?style=flat-square" alt="License: AGPL-3.0"></a>
+  <a href="https://github.com/POLPROG-TECH/FlowBoard/actions"><img src="https://img.shields.io/github/actions/workflow/status/POLPROG-TECH/FlowBoard/ci.yml?branch=main&style=flat-square" alt="CI"></a>
+  <img src="https://img.shields.io/badge/Jira-Cloud%20%7C%20Server%20%7C%20DC-0052cc?style=flat-square&logo=jira&logoColor=white" alt="Jira">
 </p>
 
 <p align="center">
-  <a href="https://www.python.org/"><img src="https://img.shields.io/badge/python-3.12%2B-3776AB?style=flat-square&logo=python&logoColor=white" alt="Python 3.12+"></a>
-  <img src="https://img.shields.io/badge/tests-1242%20passed-brightgreen?style=flat-square" alt="1242 tests">
-  <a href="LICENSE"><img src="https://img.shields.io/badge/license-AGPL--3.0-blue?style=flat-square" alt="AGPL-3.0 License"></a>
-  <img src="https://img.shields.io/badge/Jira-Cloud%20%7C%20Server%20%7C%20DC-0052CC?style=flat-square&logo=jira&logoColor=white" alt="Jira">
-</p>
-
-<p align="center">
-  <b>Transform Jira data into interactive, decision-oriented HTML dashboards — instantly.</b><br>
+  <b>Transform Jira data into interactive, decision-oriented HTML dashboards - instantly.</b><br>
   <sub>Delivery Intelligence · Workload Analytics · Sprint Health · Roadmap Tracking · What-If Simulation · Risk Detection</sub>
 </p>
 
 <p align="center">
-  <a href="#what-is-flowboard">What is FlowBoard?</a> •
-  <a href="#screenshots">Screenshots</a> •
-  <a href="#features">Features</a> •
-  <a href="#installation">Installation</a> •
-  <a href="#quick-start">Quick Start</a> •
-  <a href="#configuration">Configuration</a> •
-  <a href="#dashboard">Dashboard</a> •
-  <a href="#cli-reference">CLI</a> •
-  <a href="#architecture">Architecture</a> •
+  <a href="#what-is-flowboard">About</a> ·
+  <a href="#screenshots">Screenshots</a> ·
+  <a href="#features">Features</a> ·
+  <a href="#installation">Installation</a> ·
+  <a href="#quick-start">Quick Start</a> ·
+  <a href="#configuration">Configuration</a> ·
+  <a href="#dashboard">Dashboard</a> ·
+  <a href="#cli-reference">CLI</a> ·
+  <a href="#architecture">Architecture</a> ·
   <a href="#testing">Testing</a>
+</p>
+
+<p align="center">
+  <a href="https://buymeacoffee.com/polprog"><img src="https://img.shields.io/badge/Support%20this%20project-ffdd00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black" alt="Support this project"></a>
 </p>
 
 ---
 
 ## What is FlowBoard?
 
-FlowBoard is a Jira-powered delivery intelligence tool that generates self-contained HTML dashboards for engineering managers, Scrum masters, product owners, and leadership. It fetches live data from Jira Cloud, Server, or Data Center, runs analytics locally, and produces a single portable HTML file — no server, no database, no ongoing infrastructure.
+FlowBoard is a Jira-powered delivery intelligence tool that generates self-contained HTML dashboards for engineering managers, Scrum masters, product owners, and leadership. It fetches live data from Jira Cloud, Server, or Data Center, runs analytics locally, and produces a single portable HTML file - no server, no database, no ongoing infrastructure.
 
 Open the file in any browser and get immediate answers to the questions that drive delivery decisions:
 
-- **Who is overloaded?** — capacity matrix with per-person story points, WIP counts, and overload alerts
-- **Is the sprint on track?** — progress bars, blocked items, aging work, carry-over risk
-- **Are epics slipping?** — roadmap timeline with progress percentages and risk badges
-- **Where are delivery risks?** — automated risk detection across six categories
-- **What's blocking us?** — dependency chains, critical blockers, cross-team friction
-- **What happens if we add a resource to API?** — what-if capacity simulation with instant metric deltas
-- **Are there scheduling conflicts?** — resource contention, priority pile-ups, timeline overlaps
-- **How healthy is the team?** — sprint goals, velocity trends, blocker patterns
+- **Who is overloaded?** - capacity matrix with per-person story points, WIP counts, and overload alerts
+- **Is the sprint on track?** - progress bars, blocked items, aging work, carry-over risk
+- **Are epics slipping?** - roadmap timeline with progress percentages and risk badges
+- **Where are delivery risks?** - automated risk detection across six categories
+- **What's blocking us?** - dependency chains, critical blockers, cross-team friction
+- **What happens if we add a resource to API?** - what-if capacity simulation with instant metric deltas
+- **Are there scheduling conflicts?** - resource contention, priority pile-ups, timeline overlaps
+- **How healthy is the team?** - sprint goals, velocity trends, blocker patterns
 
 ---
 
@@ -50,10 +57,10 @@ Open the file in any browser and get immediate answers to the questions that dri
 
 ### Overview Dashboard
 
-Executive Summary with metric cards, status distribution charts, risk severity breakdown, team story points, top risk signals, product progress with epic tracking, and ceremony mode — all in a single scrollable view.
+Executive Summary with metric cards, status distribution charts, risk severity breakdown, team story points, top risk signals, product progress with epic tracking, and ceremony mode - all in a single scrollable view.
 
 <p align="center">
-  <img src="docs/assets/screenshots/overview-dashboard.png" alt="FlowBoard — Overview dashboard with executive summary, charts, and risk signals" width="800">
+  <img src="docs/assets/screenshots/overview-dashboard.png" alt="FlowBoard - Overview dashboard with executive summary, charts, and risk signals" width="800">
 </p>
 
 ### Sprint Health & Goals
@@ -61,15 +68,15 @@ Executive Summary with metric cards, status distribution charts, risk severity b
 Sprint Health tab with progress bars, completion tracking, sprint goals with blocked item alerts, scope change analysis with churn percentages, and capacity vs. commitment table per team.
 
 <p align="center">
-  <img src="docs/assets/screenshots/sprint-health.png" alt="FlowBoard — Sprint health, goals, scope changes, and capacity vs commitment" width="800">
+  <img src="docs/assets/screenshots/sprint-health.png" alt="FlowBoard - Sprint health, goals, scope changes, and capacity vs commitment" width="800">
 </p>
 
 ### What-If Simulation
 
-Interactive capacity simulation with Gantt-style before/after timelines, "Best Next Hire" recommendation engine, preset scenarios, and overlap reduction tracking — shown here in Kanban mode.
+Interactive capacity simulation with Gantt-style before/after timelines, "Best Next Hire" recommendation engine, preset scenarios, and overlap reduction tracking - shown here in Kanban mode.
 
 <p align="center">
-  <img src="docs/assets/screenshots/simulation-timeline.png" alt="FlowBoard — What-if simulation with before and after timeline comparison" width="800">
+  <img src="docs/assets/screenshots/simulation-timeline.png" alt="FlowBoard - What-if simulation with before and after timeline comparison" width="800">
 </p>
 
 ---
@@ -78,44 +85,44 @@ Interactive capacity simulation with Gantt-style before/after timelines, "Best N
 
 ### Delivery Intelligence
 
-- **Automated Risk Detection** — identifies overload, aging work, blocked chains, scope creep, sprint danger, and deadline risk across every issue
-- **Dependency Analysis** — maps blocking chains, critical blockers, and cross-team dependencies with source/target status tracking
-- **Workload Distribution** — per-person and per-team story point allocation with configurable overload thresholds
-- **Sprint Health Scoring** — progress percentages, blocked item counts, aging alerts, and carry-over risk indicators
-- **Roadmap Tracking** — epic-level timeline with progress bars, start/target dates, owner attribution, and risk badges
-- **Conflict Detection** — surfaces resource contention, priority pile-ups, and timeline overlaps automatically
-- **Executive Summary** — instant-scan cards for total issues, blocked items, open story points, critical risks, and overloaded team members
-- **Severity Classification** — risk signals sorted and color-coded by severity with configurable display modes
-- **Chart Analytics** — Chart.js-powered doughnut, bar, and stacked charts for status distribution, type breakdown, and workload visualization
+- **Automated Risk Detection** - identifies overload, aging work, blocked chains, scope creep, sprint danger, and deadline risk across every issue
+- **Dependency Analysis** - maps blocking chains, critical blockers, and cross-team dependencies with source/target status tracking
+- **Workload Distribution** - per-person and per-team story point allocation with configurable overload thresholds
+- **Sprint Health Scoring** - progress percentages, blocked item counts, aging alerts, and carry-over risk indicators
+- **Roadmap Tracking** - epic-level timeline with progress bars, start/target dates, owner attribution, and risk badges
+- **Conflict Detection** - surfaces resource contention, priority pile-ups, and timeline overlaps automatically
+- **Executive Summary** - instant-scan cards for total issues, blocked items, open story points, critical risks, and overloaded team members
+- **Severity Classification** - risk signals sorted and color-coded by severity with configurable display modes
+- **Chart Analytics** - Chart.js-powered doughnut, bar, and stacked charts for status distribution, type breakdown, and workload visualization
 
 ### Interactive Dashboard
 
-- **8 Main Tabs** — Overview, Workload, Sprints, Timeline, PI / Roadmap, Insights, Dependencies, and Issues
-- **17 Sub-Views** — each tab expands into focused views (timeline alone has 6 modes: Assignee, Team, Epic, Conflict, Executive, Simulation)
-- **5 Built-In Themes** — light, dark, midnight, slate, and system (auto-detect) — switchable at runtime
-- **Settings Drawer** — 36 controls across 5 cards for branding, thresholds, layout, chart, and timeline configuration
-- **Global Search & Filter** — search/filter across all issue tables, timeline swimlanes, and dependency graphs
-- **JSON & CSV Export** — export workload data, risk registers, and full issue lists in structured formats
-- **Zoom & Navigation** — timeline zoom controls, today marker, sprint boundaries, and swimlane filtering
-- **Responsive Layout** — density modes (compact, comfortable, spacious) with field-level visibility controls
-- **Config Import/Export** — save and restore dashboard settings as JSON with schema validation
+- **8 Main Tabs** - Overview, Workload, Sprints, Timeline, PI / Roadmap, Insights, Dependencies, and Issues
+- **17 Sub-Views** - each tab expands into focused views (timeline alone has 6 modes: Assignee, Team, Epic, Conflict, Executive, Simulation)
+- **5 Built-In Themes** - light, dark, midnight, slate, and system (auto-detect) - switchable at runtime
+- **Settings Drawer** - 36 controls across 5 cards for branding, thresholds, layout, chart, and timeline configuration
+- **Global Search & Filter** - search/filter across all issue tables, timeline swimlanes, and dependency graphs
+- **JSON & CSV Export** - export workload data, risk registers, and full issue lists in structured formats
+- **Zoom & Navigation** - timeline zoom controls, today marker, sprint boundaries, and swimlane filtering
+- **Responsive Layout** - density modes (compact, comfortable, spacious) with field-level visibility controls
+- **Config Import/Export** - save and restore dashboard settings as JSON with schema validation
 
 ### Capacity Simulation
 
-- **What-If Scenarios** — model the impact of adding or removing team members before making staffing decisions
-- **Preset Scenarios** — auto-generated "add one person to each team" presets for quick comparison
-- **Custom Scenarios** — define arbitrary resource changes across multiple teams in a single simulation run
-- **Metric Deltas** — instant before/after comparison of average load, max load, overloaded count, collisions, and utilization
-- **Team Impact Analysis** — per-team scoring showing which teams benefit most from proposed changes
-- **Auto-Recommendations** — engine-generated hiring, capacity pressure, and blocker resolution advice
+- **What-If Scenarios** - model the impact of adding or removing team members before making staffing decisions
+- **Preset Scenarios** - auto-generated "add one person to each team" presets for quick comparison
+- **Custom Scenarios** - define arbitrary resource changes across multiple teams in a single simulation run
+- **Metric Deltas** - instant before/after comparison of average load, max load, overloaded count, collisions, and utilization
+- **Team Impact Analysis** - per-team scoring showing which teams benefit most from proposed changes
+- **Auto-Recommendations** - engine-generated hiring, capacity pressure, and blocker resolution advice
 
 ### Scrum Analytics
 
-- **Sprint Health Dashboard** — progress bars, completion percentages, and velocity indicators per sprint
-- **Goal Tracking** — sprint goal completion status with blocked goal alerts
-- **Blocker Analysis** — blocked item identification with aging duration and dependency chain context
-- **Carry-Over Risk** — flags items at risk of spilling into the next sprint based on progress and remaining effort
-- **Aging Detection** — highlights work items that have exceeded configurable age thresholds
+- **Sprint Health Dashboard** - progress bars, completion percentages, and velocity indicators per sprint
+- **Goal Tracking** - sprint goal completion status with blocked goal alerts
+- **Blocker Analysis** - blocked item identification with aging duration and dependency chain context
+- **Carry-Over Risk** - flags items at risk of spilling into the next sprint based on progress and remaining effort
+- **Aging Detection** - highlights work items that have exceeded configurable age thresholds
 
 ---
 
@@ -252,27 +259,27 @@ The dashboard launches with a setup page if no configuration exists, and streams
 
 ### With Jira Configuration
 
-1. **Configure** — copy the example and fill in your Jira details:
+1. **Configure** - copy the example and fill in your Jira details:
    ```bash
    cp examples/config.example.json config.json
    ```
 
-2. **Validate** — ensure the config is correct before fetching:
+2. **Validate** - ensure the config is correct before fetching:
    ```bash
    flowboard validate-config --config config.json
    ```
 
-3. **Verify** — test connectivity to your Jira instance:
+3. **Verify** - test connectivity to your Jira instance:
    ```bash
    flowboard verify --config config.json
    ```
 
-4. **Generate** — fetch data and produce the dashboard:
+4. **Generate** - fetch data and produce the dashboard:
    ```bash
    flowboard generate --config config.json
    ```
 
-5. **Open** — view the result in any browser:
+5. **Open** - view the result in any browser:
    ```bash
    open output/dashboard.html
    ```
@@ -309,10 +316,10 @@ export FLOWBOARD_JIRA_TOKEN="your-jira-api-token"
 
 ### Configuration Features
 
-- **JSON Schema Validation** — every config file validated against `config.schema.json` before execution
-- **Environment Variable Overrides** — credentials and locale injected via `FLOWBOARD_JIRA_*` variables, never stored in config
-- **Config Import/Export** — share dashboard configurations across teams with portable JSON files
-- **Sensible Defaults** — minimal required config (Jira URL + project key + output path) with everything else optional
+- **JSON Schema Validation** - every config file validated against `config.schema.json` before execution
+- **Environment Variable Overrides** - credentials and locale injected via `FLOWBOARD_JIRA_*` variables, never stored in config
+- **Config Import/Export** - share dashboard configurations across teams with portable JSON files
+- **Sensible Defaults** - minimal required config (Jira URL + project key + output path) with everything else optional
 
 See [docs/configuration.md](docs/configuration.md) for the full configuration reference with all keys, defaults, and examples.
 
@@ -320,10 +327,10 @@ See [docs/configuration.md](docs/configuration.md) for the full configuration re
 
 FlowBoard connects to **Jira Cloud**, **Jira Server**, and **Jira Data Center** via REST API.
 
-- **Basic Auth** — email + API token (Jira Cloud)
-- **Bearer / PAT** — Personal Access Token (Jira Server & Data Center)
-- **Custom Fields** — map organisation-specific fields for story points, sprints, and epics
-- **Environment Variable Override** — inject credentials at runtime without touching config files
+- **Basic Auth** - email + API token (Jira Cloud)
+- **Bearer / PAT** - Personal Access Token (Jira Server & Data Center)
+- **Custom Fields** - map organisation-specific fields for story points, sprints, and epics
+- **Environment Variable Override** - inject credentials at runtime without touching config files
 
 See [docs/jira-enterprise.md](docs/jira-enterprise.md) for setup instructions, field mappings, and authentication details.
 
@@ -357,15 +364,15 @@ app = create_app("config.json", first_run=False, root_path="")
 FlowBoard exposes 16 routes covering health checks, analysis control, data export, and configuration.
 
 **Health & Status**
-- `GET /health/live` — liveness probe
-- `GET /health/ready` — readiness probe
-- `GET /api/status` — version, uptime, and analysis state
+- `GET /health/live` - liveness probe
+- `GET /health/ready` - readiness probe
+- `GET /api/status` - version, uptime, and analysis state
 
-**Analysis** — trigger the Jira fetch + analysis pipeline, cancel running analysis, stream progress via SSE, and retrieve results.
+**Analysis** - trigger the Jira fetch + analysis pipeline, cancel running analysis, stream progress via SSE, and retrieve results.
 
-**Export** — download the dashboard as self-contained HTML, CSV (issues/workload/risks), or JSON snapshot.
+**Export** - download the dashboard as self-contained HTML, CSV (issues/workload/risks), or JSON snapshot.
 
-**Demo & Configuration** — generate demo dashboards from mock data, test Jira connectivity, view current config.
+**Demo & Configuration** - generate demo dashboards from mock data, test Jira connectivity, view current config.
 
 See [docs/usage.md](docs/usage.md) for detailed endpoint documentation and examples.
 
@@ -396,11 +403,11 @@ export FLOWBOARD_ALLOW_FRAMING=true
 
 The dashboard ships with a built-in settings drawer containing **36 controls** across **5 cards**:
 
-- **Branding** — title, subtitle, company name, primary/secondary/tertiary colours
-- **Thresholds** — aging days, overload points, overload issues, WIP limit, capacity per person
-- **Layout** — density mode, visible tabs, field density, chart toggles
-- **Timeline** — default mode, compact view, overlap visibility, sprint boundaries, today marker, default zoom
-- **Actions** — apply, cancel, reset, import config, export config
+- **Branding** - title, subtitle, company name, primary/secondary/tertiary colours
+- **Thresholds** - aging days, overload points, overload issues, WIP limit, capacity per person
+- **Layout** - density mode, visible tabs, field density, chart toggles
+- **Timeline** - default mode, compact view, overlap visibility, sprint boundaries, today marker, default zoom
+- **Actions** - apply, cancel, reset, import config, export config
 
 All settings are persisted in the browser and can be exported/imported as JSON with full schema validation.
 
@@ -431,12 +438,12 @@ src/flowboard/
 
 **Design principles:**
 
-- **Domain isolation** — the domain layer has zero infrastructure imports; all analytics are pure functions on domain objects
-- **Boundary translation** — Jira JSON is normalised at the infrastructure boundary and never leaks into domain or presentation
-- **Snapshot-driven rendering** — the presentation layer consumes a `BoardSnapshot` dataclass, never raw Jira data
-- **Schema-first config** — configuration is loaded once, validated against `config.schema.json`, and threaded through as an immutable object
-- **Self-contained output** — the generated HTML embeds all CSS and JavaScript inline; only Chart.js is loaded via CDN
-- **Extensible i18n** — every user-facing string is a translation key; adding a locale requires only a new JSON file
+- **Domain isolation** - the domain layer has zero infrastructure imports; all analytics are pure functions on domain objects
+- **Boundary translation** - Jira JSON is normalised at the infrastructure boundary and never leaks into domain or presentation
+- **Snapshot-driven rendering** - the presentation layer consumes a `BoardSnapshot` dataclass, never raw Jira data
+- **Schema-first config** - configuration is loaded once, validated against `config.schema.json`, and threaded through as an immutable object
+- **Self-contained output** - the generated HTML embeds all CSS and JavaScript inline; only Chart.js is loaded via CDN
+- **Extensible i18n** - every user-facing string is a translation key; adding a locale requires only a new JSON file
 
 See [docs/architecture.md](docs/architecture.md) for the full design document.
 
@@ -449,10 +456,10 @@ FlowBoard ships with full internationalisation support:
 | `en` | English | 927 |
 | `pl` | Polish | 927 |
 
-- **Auto-detection** — locale resolved from CLI flag → environment variable → config file → system default
-- **Pluralisation** — context-aware plural forms for counts (e.g., "1 issue" vs. "5 issues")
-- **Locale-aware formatting** — dates, numbers, and percentages formatted per locale conventions
-- **Full coverage** — all UI labels, tooltips, risk descriptions, settings, and export headers are translated
+- **Auto-detection** - locale resolved from CLI flag → environment variable → config file → system default
+- **Pluralisation** - context-aware plural forms for counts (e.g., "1 issue" vs. "5 issues")
+- **Locale-aware formatting** - dates, numbers, and percentages formatted per locale conventions
+- **Full coverage** - all UI labels, tooltips, risk descriptions, settings, and export headers are translated
 
 Set the locale via config (`"locale": "pl"`), CLI flag (`--locale pl`), or environment variable (`FLOWBOARD_LOCALE=pl`).
 
@@ -461,11 +468,11 @@ Set the locale via config (`"locale": "pl"`), CLI flag (`--locale pl`), or envir
 FlowBoard integrates with [OpsPortal](../OpsPortal/) as a managed web service:
 
 - **Auto-started** on port `8084` via `flowboard serve --port 8084`
-- **Health monitoring** — OpsPortal polls `GET /health/live`
+- **Health monitoring** - OpsPortal polls `GET /health/live`
 - **Embedded** in the OpsPortal portal UI via iframe
 - **Framing** enabled automatically via `FLOWBOARD_ALLOW_FRAMING=true`
 
-No additional configuration is needed — OpsPortal manages the lifecycle automatically.
+No additional configuration is needed - OpsPortal manages the lifecycle automatically.
 
 ## Troubleshooting
 
@@ -473,25 +480,12 @@ For detailed solutions to common issues, see [docs/troubleshooting.md](docs/trou
 
 | Problem | Quick Fix |
 |---------|-----------|
-| **SSL certificate errors** connecting to Jira | Export corporate CA bundle: `export SSL_CERT_FILE=~/combined-ca-bundle.pem` — see [Corporate Network setup](#corporate-network-zscaler--vpn--proxy) |
+| **SSL certificate errors** connecting to Jira | Export corporate CA bundle: `export SSL_CERT_FILE=~/combined-ca-bundle.pem` - see [Corporate Network setup](#corporate-network-zscaler--vpn--proxy) |
 | **401 Unauthorized** | Regenerate Jira API token, check `auth_method` matches server type |
 | **Connection timeout** | Verify `FLOWBOARD_JIRA_URL`, check proxy settings |
 | **Port already in use** | `lsof -i :8084 -t \| xargs kill -9` or use `--port 9084` |
 
 ## Development
-
-### Pre-commit Hook
-
-A pre-commit hook is provided that runs lint (with auto-fix), format check, and the full test suite before each commit:
-
-```bash
-cp scripts/pre-commit .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit
-```
-
-The hook will:
-1. **Auto-fix** lint issues on staged files (`ruff check --fix`)
-2. **Check formatting** — if issues are found, it auto-formats and exits so you can review and re-stage
-3. **Run the test suite** — commit is blocked if any test fails
 
 ### Linting & Formatting
 
@@ -523,10 +517,29 @@ python -m pytest tests/
 | [docs/testing.md](docs/testing.md) | Test architecture, running tests, coverage, adding new test modules |
 | [docs/troubleshooting.md](docs/troubleshooting.md) | Common issues, Jira connectivity, config errors, dashboard problems |
 
-## Contributing
+---
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup, code standards, branching strategy, and contribution guidelines.
+## Release Notes
+
+See [CHANGELOG.md](CHANGELOG.md) for release history. FlowBoard follows [Semantic Versioning](https://semver.org/).
+
+## Author
+
+Created and maintained by **[POLPROG](https://polprog.pl/)** ([@polprog-tech](https://github.com/polprog-tech)).
+
+- **Report issues:** [GitHub Issues](https://github.com/polprog-tech/FlowBoard/issues)
+- **Feature requests:** [GitHub Discussions](https://github.com/polprog-tech/FlowBoard/discussions)
+- **Documentation:** [docs/architecture.md](docs/architecture.md)
+
+---
+
+## Contributing & Community
+
+- [Contributing Guide](CONTRIBUTING.md) - development setup, code style, PR guidance
+- [Code of Conduct](CODE_OF_CONDUCT.md) - expected behavior for contributors and maintainers
+- [Security Policy](SECURITY.md) - how to privately report security vulnerabilities
+- [Changelog](CHANGELOG.md) - release history and notable changes
 
 ## License
 
-Released under the [GNU Affero General Public License v3.0](LICENSE) (AGPL-3.0-only).
+This project is licensed under the [GNU Affero General Public License v3.0](LICENSE).

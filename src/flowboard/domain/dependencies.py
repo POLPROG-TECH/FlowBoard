@@ -50,7 +50,7 @@ def build_dependency_chains(dependencies: list[Dependency]) -> list[list[str]]:
 
     def _dfs(node: str, path: list[str], on_stack: set[str]) -> None:
         if node in on_stack:
-            # Cycle detected — record the path so far and stop.
+            # Cycle detected - record the path so far and stop.
             if len(path) > 1:
                 chains.append(list(path))
             return
@@ -61,7 +61,7 @@ def build_dependency_chains(dependencies: list[Dependency]) -> list[list[str]]:
             for neighbor in neighbors:
                 _dfs(neighbor, path, on_stack)
         else:
-            # Leaf node — record the full root-to-leaf path.
+            # Leaf node - record the full root-to-leaf path.
             if len(path) > 1:
                 chains.append(list(path))
         path.pop()

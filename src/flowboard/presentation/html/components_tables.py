@@ -60,7 +60,7 @@ def workload_table(
         rows.append(
             f"<tr{overload_cls}>"
             f'<td data-sort-value="{_esc(wr.person.display_name)}">{_esc(wr.person.display_name)}{overload_icon}</td>'
-            f'<td data-sort-value="{_esc(wr.team or "")}">{_esc(wr.team) if wr.team else "—"}</td>'
+            f'<td data-sort-value="{_esc(wr.team or "")}">{_esc(wr.team) if wr.team else "-"}</td>'
             f'<td data-sort-value="{wr.issue_count}">{wr.issue_count}</td>'
             f'<td data-sort-value="{wr.story_points}"><strong>{wr.story_points:.0f}</strong></td>'
             f'<td data-sort-value="{wr.in_progress_count}">{wr.in_progress_count}</td>'
@@ -176,10 +176,10 @@ def issues_table(issues: list[Issue], *, max_rows: int = 200, t: Translator | No
     _cat_order = {"In Progress": 0, "To Do": 1, "Done": 2}
     rows = []
     for issue in issues[:max_rows]:
-        assignee = _esc(issue.assignee.display_name) if issue.assignee else "—"
-        sprint_name = _esc(issue.sprint.name) if issue.sprint else "—"
+        assignee = _esc(issue.assignee.display_name) if issue.assignee else "-"
+        sprint_name = _esc(issue.sprint.name) if issue.sprint else "-"
         age = issue.age_days if issue.age_days is not None else -1
-        age_display = _esc(t("format.age_days", days=age)) if age >= 0 else "—"
+        age_display = _esc(t("format.age_days", days=age)) if age >= 0 else "-"
         blocked_cls = ' class="row-blocked"' if issue.is_blocked else ""
         blocked_icon = (
             f' <span title="{_esc(t("table.blocked"))}" aria-label="{_esc(t("table.blocked"))}">🚫</span>'
@@ -349,14 +349,14 @@ def deps_blockers_detail(
                 if age > 14
                 else ("color:var(--color-warning);font-weight:600" if age > 7 else "")
             )
-            assignee = _esc(issue.assignee.display_name) if issue.assignee else "—"
+            assignee = _esc(issue.assignee.display_name) if issue.assignee else "-"
             blocker_keys = (
                 ", ".join(
                     _esc(lnk.target_key)
                     for lnk in issue.links
                     if lnk.link_type in (LinkType.IS_BLOCKED_BY, LinkType.DEPENDS_ON)
                 )
-                or "—"
+                or "-"
             )
             rows.append(
                 f"<tr>"

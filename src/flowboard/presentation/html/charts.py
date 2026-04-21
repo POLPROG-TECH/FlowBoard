@@ -57,7 +57,7 @@ def _json(obj: object) -> str:
     """JSON-serialize for safe embedding inside HTML <script> tags."""
     s = json.dumps(obj, default=str)
     # Escape characters that could break out of a <script> block or
-    # interfere with HTML parsing — prevents stored XSS via Jira field values.
+    # interfere with HTML parsing - prevents stored XSS via Jira field values.
     return s.replace("<", "\\u003c").replace(">", "\\u003e").replace("&", "\\u0026")
 
 

@@ -20,7 +20,7 @@ The schema defines every accepted configuration key, its type, allowed values, a
 ## Validation
 
 - Run: `flowboard validate-config --config config.json`
-- Schema uses `additionalProperties: false` — unknown keys are rejected
+- Schema uses `additionalProperties: false` - unknown keys are rejected
 - Validation powered by the `jsonschema` library
 
 ```bash
@@ -36,7 +36,7 @@ flowboard validate-config --config config.json
 
 Only one field is strictly required:
 
-- **`jira.base_url`** — Jira instance URL (e.g., `https://yourcompany.atlassian.net`)
+- **`jira.base_url`** - Jira instance URL (e.g., `https://yourcompany.atlassian.net`)
 
 All other fields have sensible defaults. A minimal valid configuration:
 

@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://flowboard.internal/config.schema.json",
   "title": "FlowBoard Configuration",
-  "description": "Configuration schema for FlowBoard — Jira-based delivery intelligence dashboard.",
+  "description": "Configuration schema for FlowBoard - Jira-based delivery intelligence dashboard.",
   "type": "object",
   "required": ["jira"],
   "properties": {

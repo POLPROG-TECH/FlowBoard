@@ -30,7 +30,7 @@ flowboard verify --config config.json
 
 ### `flowboard demo`
 
-Generates a demo dashboard from built-in mock data — no Jira needed.
+Generates a demo dashboard from built-in mock data - no Jira needed.
 
 ```bash
 flowboard demo
@@ -172,10 +172,10 @@ These work with horizontal scrolling for navigating wide timelines.
 
 The Simulation mode is accessed via the Timeline tab's mode selector. It provides what-if capacity planning:
 
-1. **Select a scenario** — preset scenarios are auto-generated per team (+1 resource, balanced expansion, focus top teams)
-2. **Compare metrics** — before/after table shows collisions, overload, utilization, and more
-3. **Review team impact** — per-team breakdown identifies where hiring would have the most impact
-4. **Read recommendations** — actionable suggestions with severity and priority
+1. **Select a scenario** - preset scenarios are auto-generated per team (+1 resource, balanced expansion, focus top teams)
+2. **Compare metrics** - before/after table shows collisions, overload, utilization, and more
+3. **Review team impact** - per-team breakdown identifies where hiring would have the most impact
+4. **Read recommendations** - actionable suggestions with severity and priority
 
 Enable simulation in config:
 ```json
@@ -188,15 +188,15 @@ Enable simulation in config:
 
 The Sprints, Workload, and Insights tabs include dedicated Scrum analytics views:
 
-- **Sprint Health** — completion rates, velocity, carry-over, aging issues
-- **Sprint Goals** — goal tracking with item-level completion status
-- **Scope Changes** — added/removed items, story point churn percentage
-- **Capacity vs. Commitment** — allocated vs. completed points per sprint
-- **Backlog Quality** — estimation coverage, size distribution, type balance
-- **Sprint Readiness** — checklist of readiness criteria with pass/fail indicators
-- **Blocker Aging** — blocked items with duration tracking and escalation severity
-- **Delivery Forecast** — epic-level risk scoring with contributing factors
-- **Dependency Heatmap** — cross-team dependency density matrix
+- **Sprint Health** - completion rates, velocity, carry-over, aging issues
+- **Sprint Goals** - goal tracking with item-level completion status
+- **Scope Changes** - added/removed items, story point churn percentage
+- **Capacity vs. Commitment** - allocated vs. completed points per sprint
+- **Backlog Quality** - estimation coverage, size distribution, type balance
+- **Sprint Readiness** - checklist of readiness criteria with pass/fail indicators
+- **Blocker Aging** - blocked items with duration tracking and escalation severity
+- **Delivery Forecast** - epic-level risk scoring with contributing factors
+- **Dependency Heatmap** - cross-team dependency density matrix
 
 ### Internationalization
 

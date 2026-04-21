@@ -71,6 +71,14 @@ line-length = 100
 select = ["E", "F", "I", "N", "W", "UP", "B", "SIM", "RUF"]
 ignore = ["E501", "B008", "RUF001"]
 
+[tool.ruff.format]
+# Tests use a bare-string GIVEN/WHEN/THEN convention that requires no blank
+# line between the GIVEN docstring and the following `def`. Ruff format
+# enforces PEP 8 blank-lines-between-methods, which conflicts with that
+# convention, so we exclude tests/ from auto-formatting. Lint rules
+# (imports, unused, bugs) still apply via `ruff check`.
+exclude = ["tests/**"]
+
 [tool.mypy]
 python_version = "3.12"
 strict = true

@@ -204,7 +204,7 @@ def compute_blockers(
                 team=iss.assignee.team if iss.assignee else "",
                 blocked_days=age,
                 severity=severity,
-                sprint_name=iss.sprint.name if iss.sprint else "—",
+                sprint_name=iss.sprint.name if iss.sprint else "-",
             )
         )
 

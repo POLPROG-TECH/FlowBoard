@@ -5,7 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 
 # ---------------------------------------------------------------------------
-# Typed config objects — Jira / field / teams / thresholds
+# Typed config objects - Jira / field / teams / thresholds
 # ---------------------------------------------------------------------------
 
 
@@ -57,7 +57,7 @@ class OutputConfig:
 
 
 # ---------------------------------------------------------------------------
-# Dashboard configuration — the full UI/presentation config subsystem
+# Dashboard configuration - the full UI/presentation config subsystem
 # ---------------------------------------------------------------------------
 
 _DEFAULT_TABS = [

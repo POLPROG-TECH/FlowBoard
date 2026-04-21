@@ -1,4 +1,4 @@
-"""Extended API routes for FlowBoard — webhooks, snapshots, XLSX export, multi-dashboard.
+"""Extended API routes for FlowBoard - webhooks, snapshots, XLSX export, multi-dashboard.
 
 Improvement #6: Jira webhook listener
 Improvement #8: Snapshot history

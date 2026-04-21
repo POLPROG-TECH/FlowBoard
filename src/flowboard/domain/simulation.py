@@ -1,7 +1,7 @@
 """Capacity simulation / what-if planning engine.
 
 Simulates how adding resources to teams/layers affects workload pressure,
-collisions, timeline congestion, and delivery risk — without mutating
+collisions, timeline congestion, and delivery risk - without mutating
 any real Jira data.  All computation is pure and deterministic.
 
 Split into sub-modules for maintainability:

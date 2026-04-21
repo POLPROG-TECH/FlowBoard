@@ -59,7 +59,7 @@ def _to_wd_set(working_days: list[int] | frozenset[int] | None) -> frozenset[int
         return DEFAULT_WORKING_DAYS
     result = frozenset(working_days) if not isinstance(working_days, frozenset) else working_days
     if not result:
-        raise ValueError("working_days cannot be empty — at least one weekday (1–7) is required")
+        raise ValueError("working_days cannot be empty - at least one weekday (1–7) is required")
     return result
 
 

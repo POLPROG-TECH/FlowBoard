@@ -111,9 +111,11 @@ def _minimal_config() -> dict:
 
 
 class TestJiraClientJsonDecodeHandling:
-    """Covers: non-JSON Jira responses must raise JiraApiError, not crash."""
+    """Tests for jira client json decode handling."""
 
+    """GIVEN jira client json decode handling and the scenario: html response raises jira api error"""
     def test_html_response_raises_jira_api_error(self):
+        """WHEN the code under test is exercised for: html response raises jira api error"""
         from flowboard.infrastructure.config.loader import JiraConfig
         from flowboard.infrastructure.jira.client import JiraApiError, JiraClient
 
@@ -140,15 +142,19 @@ class TestJiraClientJsonDecodeHandling:
 
 
 class TestSprintNormalizationRobustness:
-    """Covers: malformed sprint data must not crash normalization."""
+    """Tests for sprint normalization robustness."""
 
+    """GIVEN sprint normalization robustness and the scenario: sprint missing id raises value error"""
     def test_sprint_missing_id_raises_value_error(self):
+        """WHEN the code under test is exercised for: sprint missing id raises value error"""
         config = load_config_from_dict(_minimal_config())
         normalizer = JiraNormalizer(config)
         with pytest.raises(ValueError, match="missing 'id'"):
             normalizer.normalize_sprint({"name": "No ID Sprint"})
 
+    """GIVEN sprint normalization robustness and the scenario: normalize sprints skips malformed"""
     def test_normalize_sprints_skips_malformed(self):
+        """WHEN the code under test is exercised for: normalize sprints skips malformed"""
         config = load_config_from_dict(_minimal_config())
         normalizer = JiraNormalizer(config)
         sprints = normalizer.normalize_sprints(
@@ -158,6 +164,8 @@ class TestSprintNormalizationRobustness:
                 {"id": 3, "name": "Another Good"},
             ]
         )
+
+        """THEN the expected behaviour holds: normalize sprints skips malformed"""
         assert len(sprints) == 2
         assert sprints[0].name == "Good Sprint"
         assert sprints[1].name == "Another Good"
@@ -169,9 +177,11 @@ class TestSprintNormalizationRobustness:
 
 
 class TestNormalizerNullListFields:
-    """Covers: Jira returning null for list fields must not crash."""
+    """Tests for normalizer null list fields."""
 
+    """GIVEN normalizer null list fields and the scenario: null issuelinks handled"""
     def test_null_issuelinks_handled(self):
+        """WHEN the code under test is exercised for: null issuelinks handled"""
         config = load_config_from_dict(_minimal_config())
         normalizer = JiraNormalizer(config)
         raw = {
@@ -187,12 +197,16 @@ class TestNormalizerNullListFields:
             },
         }
         issue = normalizer.normalize_issue(raw)
+
+        """THEN the expected behaviour holds: null issuelinks handled"""
         assert issue.links == []
         assert issue.labels == []
         assert issue.components == []
         assert issue.fix_versions == []
 
+    """GIVEN normalizer null list fields and the scenario: non dict component filtered"""
     def test_non_dict_component_filtered(self):
+        """WHEN the code under test is exercised for: non dict component filtered"""
         config = load_config_from_dict(_minimal_config())
         normalizer = JiraNormalizer(config)
         raw = {
@@ -205,9 +219,13 @@ class TestNormalizerNullListFields:
             },
         }
         issue = normalizer.normalize_issue(raw)
+
+        """THEN the expected behaviour holds: non dict component filtered"""
         assert issue.components == ["UI", "API"]
 
+    """GIVEN normalizer null list fields and the scenario: parent as string handled"""
     def test_parent_as_string_handled(self):
+        """WHEN the code under test is exercised for: parent as string handled"""
         config = load_config_from_dict(_minimal_config())
         normalizer = JiraNormalizer(config)
         raw = {
@@ -220,6 +238,8 @@ class TestNormalizerNullListFields:
             },
         }
         issue = normalizer.normalize_issue(raw)
+
+        """THEN the expected behaviour holds: parent as string handled"""
         assert issue.parent_key == ""  # safely falls back
 
 
@@ -229,10 +249,14 @@ class TestNormalizerNullListFields:
 
 
 class TestColorDefaultConsistency:
-    """Covers: all code paths must produce the same primary_color default."""
+    """Tests for color default consistency."""
 
+    """GIVEN color default consistency and the scenario: config without color uses fb6400"""
     def test_config_without_color_uses_fb6400(self):
+        """WHEN the code under test is exercised for: config without color uses fb6400"""
         config = load_config_from_dict(_minimal_config())
+
+        """THEN the expected behaviour holds: config without color uses fb6400"""
         assert config.output.primary_color == "#fb6400"
         assert config.dashboard.branding.primary_color == "#fb6400"
 
@@ -243,9 +267,11 @@ class TestColorDefaultConsistency:
 
 
 class TestInvalidStatusMappingHandled:
-    """Covers: invalid status_mapping values must warn, not crash."""
+    """Tests for invalid status mapping handled."""
 
+    """GIVEN invalid status mapping handled and the scenario: invalid status mapping skipped gracefully"""
     def test_invalid_status_mapping_skipped_gracefully(self):
+        """WHEN the code under test is exercised for: invalid status mapping skipped gracefully"""
         from flowboard.infrastructure.config.loader import _build_full_config
 
         # Bypass schema validation to test the normalizer's own defense
@@ -253,6 +279,8 @@ class TestInvalidStatusMappingHandled:
         config = _build_full_config(raw)
         normalizer = JiraNormalizer(config)
         # "Open" should be mapped correctly; "Invalid" should be skipped
+
+        """THEN the expected behaviour holds: invalid status mapping skipped gracefully"""
         assert normalizer._status_map["Open"] == StatusCategory.TODO
         assert "Invalid" not in normalizer._status_map
 
@@ -263,13 +291,17 @@ class TestInvalidStatusMappingHandled:
 
 
 class TestPersonCacheEmptyId:
-    """Covers: empty account IDs must not corrupt the person cache."""
+    """Tests for person cache empty id."""
 
+    """GIVEN person cache empty id and the scenario: different anonymous users are distinct"""
     def test_different_anonymous_users_are_distinct(self):
+        """WHEN the code under test is exercised for: different anonymous users are distinct"""
         config = load_config_from_dict(_minimal_config())
         normalizer = JiraNormalizer(config)
         p1 = normalizer.normalize_person({"displayName": "User A"})
         p2 = normalizer.normalize_person({"displayName": "User B"})
+
+        """THEN the expected behaviour holds: different anonymous users are distinct"""
         assert p1.display_name == "User A"
         assert p2.display_name == "User B"
         assert p1 is not p2  # must be distinct objects
@@ -281,18 +313,26 @@ class TestPersonCacheEmptyId:
 
 
 class TestChartJsonXssSafe:
-    """Covers: chart JSON must escape HTML-significant characters."""
+    """Tests for chart json xss safe."""
 
+    """GIVEN chart json xss safe and the scenario: script tag escaped"""
     def test_script_tag_escaped(self):
+        """WHEN the code under test is exercised for: script tag escaped"""
         malicious = {"label": "</script><script>alert(1)</script>"}
         result = chart_json(malicious)
+
+        """THEN the expected behaviour holds: script tag escaped"""
         assert "</script>" not in result
         assert "\\u003c" in result
         assert "\\u003e" in result
 
+    """GIVEN chart json xss safe and the scenario: ampersand escaped"""
     def test_ampersand_escaped(self):
+        """WHEN the code under test is exercised for: ampersand escaped"""
         data = {"label": "A & B"}
         result = chart_json(data)
+
+        """THEN the expected behaviour holds: ampersand escaped"""
         assert "&" not in result.replace("\\u0026", "")
 
 
@@ -302,11 +342,15 @@ class TestChartJsonXssSafe:
 
 
 class TestConfigJsonXssSafe:
-    """Covers: config JSON must escape HTML-significant characters."""
+    """Tests for config json xss safe."""
 
+    """GIVEN config json xss safe and the scenario: script tag in jql escaped"""
     def test_script_tag_in_jql_escaped(self):
+        """WHEN the code under test is exercised for: script tag in jql escaped"""
         data = {"jql_filter": "</script><img onerror=alert(1)>"}
         result = _json_dumps(data)
+
+        """THEN the expected behaviour holds: script tag in jql escaped"""
         assert "</script>" not in result
         assert "\\u003c" in result
 
@@ -317,21 +361,29 @@ class TestConfigJsonXssSafe:
 
 
 class TestCeremonyHeadlineRobustness:
-    """Covers: malformed ceremony headlines must not IndexError."""
+    """Tests for ceremony headline robustness."""
 
+    """GIVEN ceremony headline robustness and the scenario: short daily headline no crash"""
     def test_short_daily_headline_no_crash(self):
+        """WHEN the code under test is exercised for: short daily headline no crash"""
         from flowboard.presentation.html.components import _format_ceremony_headline
 
         t = Translator("en")
         # Only 2 parts instead of expected 3
         result = _format_ceremony_headline("daily:5", t)
+
+        """THEN the expected behaviour holds: short daily headline no crash"""
         assert result == "daily:5"  # falls through safely
 
+    """GIVEN ceremony headline robustness and the scenario: valid headline translated"""
     def test_valid_headline_translated(self):
+        """WHEN the code under test is exercised for: valid headline translated"""
         from flowboard.presentation.html.components import _format_ceremony_headline
 
         t = Translator("en")
         result = _format_ceremony_headline("daily:3:5", t)
+
+        """THEN the expected behaviour holds: valid headline translated"""
         assert result != "daily:3:5"  # should be translated
 
 
@@ -341,24 +393,36 @@ class TestCeremonyHeadlineRobustness:
 
 
 class TestCssInjectionPrevention:
-    """Covers: CSS variables must be sanitized to safe patterns."""
+    """Tests for css injection prevention."""
 
+    """GIVEN css injection prevention and the scenario: valid color passes"""
     def test_valid_color_passes(self):
+        """THEN the expected behaviour holds: valid color passes"""
         assert _safe_color("#fb6400") == "#fb6400"
         assert _safe_color("#fff") == "#fff"
         assert _safe_color("#002754e6") == "#002754e6"
 
+    """GIVEN css injection prevention and the scenario: injected color blocked"""
     def test_injected_color_blocked(self):
+        """WHEN the code under test is exercised for: injected color blocked"""
         malicious = "red;} body{display:none} :root{--primary:red"
+
+        """THEN the expected behaviour holds: injected color blocked"""
         assert _safe_color(malicious) == "#fb6400"
 
+    """GIVEN css injection prevention and the scenario: valid length passes"""
     def test_valid_length_passes(self):
+        """THEN the expected behaviour holds: valid length passes"""
         assert _safe_css_length("1440px") == "1440px"
         assert _safe_css_length("100%") == "100%"
         assert _safe_css_length("90rem") == "90rem"
 
+    """GIVEN css injection prevention and the scenario: injected length blocked"""
     def test_injected_length_blocked(self):
+        """WHEN the code under test is exercised for: injected length blocked"""
         malicious = "1440px;} body{display:none"
+
+        """THEN the expected behaviour holds: injected length blocked"""
         assert _safe_css_length(malicious) == "1440px"
 
 
@@ -368,25 +432,41 @@ class TestCssInjectionPrevention:
 
 
 class TestTranslatorEdgeCases:
-    """Covers: format_number on NaN/Inf and format string ValueError."""
+    """Tests for translator edge cases."""
 
+    """GIVEN translator edge cases and the scenario: format number nan returns dash"""
     def test_format_number_nan_returns_dash(self):
+        """WHEN the code under test is exercised for: format number nan returns dash"""
         t = Translator("en")
+
+        """THEN the expected behaviour holds: format number nan returns dash"""
         assert t.format_number(float("nan")) == "—"
 
+    """GIVEN translator edge cases and the scenario: format number inf returns dash"""
     def test_format_number_inf_returns_dash(self):
+        """WHEN the code under test is exercised for: format number inf returns dash"""
         t = Translator("en")
+
+        """THEN the expected behaviour holds: format number inf returns dash"""
         assert t.format_number(float("inf")) == "—"
 
+    """GIVEN translator edge cases and the scenario: format number negative inf returns dash"""
     def test_format_number_negative_inf_returns_dash(self):
+        """WHEN the code under test is exercised for: format number negative inf returns dash"""
         t = Translator("en")
+
+        """THEN the expected behaviour holds: format number negative inf returns dash"""
         assert t.format_number(float("-inf")) == "—"
 
+    """GIVEN translator edge cases and the scenario: format string valueerror handled"""
     def test_format_string_valueerror_handled(self):
+        """WHEN the code under test is exercised for: format string valueerror handled"""
         t = Translator("en")
         # Patch translations to contain a malformed format spec
         t._messages["test.bad_format"] = "{0!z}"
         result = t("test.bad_format", some_var="x")
+
+        """THEN the expected behaviour holds: format string valueerror handled"""
         assert result == "[?]"  # malformed placeholder replaced with safe marker, no crash
 
 
@@ -396,9 +476,11 @@ class TestTranslatorEdgeCases:
 
 
 class TestScrumNoneAgeDays:
-    """Covers: Issues with created=None must not crash scrum analytics."""
+    """Tests for scrum none age days."""
 
+    """GIVEN scrum none age days and the scenario: compute blockers with none created"""
     def test_compute_blockers_with_none_created(self):
+        """WHEN the code under test is exercised for: compute blockers with none created"""
         alice = _person("Alice")
         sp = _sprint()
         blocked_link = IssueLink(
@@ -419,10 +501,14 @@ class TestScrumNoneAgeDays:
             links=[blocked_link],
         )
         result = compute_blockers([issue], date(2026, 3, 10))
+
+        """THEN the expected behaviour holds: compute blockers with none created"""
         assert len(result) == 1
         assert result[0].key == "T-1"
 
+    """GIVEN scrum none age days and the scenario: compute ceremonies with none created"""
     def test_compute_ceremonies_with_none_created(self):
+        """WHEN the code under test is exercised for: compute ceremonies with none created"""
         alice = _person("Alice")
         sp = _sprint()
         issue = Issue(
@@ -447,6 +533,8 @@ class TestScrumNoneAgeDays:
             [],
             today=date(2026, 3, 10),
         )
+
+        """THEN the expected behaviour holds: compute ceremonies with none created"""
         assert result is not None
 
 

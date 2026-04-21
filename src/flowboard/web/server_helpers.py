@@ -1,6 +1,6 @@
 """Pure helper functions for the FlowBoard web server.
 
-These are module-level utilities with no state dependency — SSE formatting,
+These are module-level utilities with no state dependency - SSE formatting,
 demo fixture location, demo config generation, and the loading page HTML.
 """
 
@@ -75,7 +75,7 @@ def build_demo_config_dict(
         "dashboard": {
             "branding": {
                 "title": "FlowBoard Demo Dashboard",
-                "subtitle": "Delivery & Workload Intelligence — Demo Mode",
+                "subtitle": "Delivery & Workload Intelligence - Demo Mode",
                 "primary_color": "#fb6400",
                 "company_name": "Acme Corp",
             },
@@ -83,7 +83,7 @@ def build_demo_config_dict(
     }
 
     if methodology == "scrum":
-        base["dashboard"]["branding"]["subtitle"] = "Scrum Dashboard — Demo Mode"
+        base["dashboard"]["branding"]["subtitle"] = "Scrum Dashboard - Demo Mode"
         base["pi"] = {
             "enabled": True,
             "name": "PI 2026.1",
@@ -93,11 +93,11 @@ def build_demo_config_dict(
             "working_days": [1, 2, 3, 4, 5],
         }
     elif methodology == "kanban":
-        base["dashboard"]["branding"]["subtitle"] = "Kanban Flow Dashboard — Demo Mode"
+        base["dashboard"]["branding"]["subtitle"] = "Kanban Flow Dashboard - Demo Mode"
         base["dashboard"]["branding"]["primary_color"] = "#3b82f6"
         base["thresholds"]["wip_limit"] = 3
     elif methodology == "waterfall":
-        base["dashboard"]["branding"]["subtitle"] = "Waterfall Project Dashboard — Demo Mode"
+        base["dashboard"]["branding"]["subtitle"] = "Waterfall Project Dashboard - Demo Mode"
         base["dashboard"]["branding"]["primary_color"] = "#8b5cf6"
 
     return base
@@ -116,7 +116,7 @@ def build_loading_page() -> str:
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>FlowBoard — Loading</title>
+<title>FlowBoard - Loading</title>
 <style>
   :root{--primary:#fb6400;--bg:#0f0f1a;--surface:#1a1a2e;--text:#e0e0e0}
   *{box-sizing:border-box;margin:0;padding:0}

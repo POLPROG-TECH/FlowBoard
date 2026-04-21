@@ -80,7 +80,7 @@ class JiraClient:
             self._session.headers["Authorization"] = f"Bearer {config.auth_token}"
             logger.info("Jira auth configured (Bearer token=…%s)", mask_secret(config.auth_token))
         else:
-            logger.warning("No Jira auth credentials provided — requests may fail.")
+            logger.warning("No Jira auth credentials provided - requests may fail.")
 
     def close(self) -> None:
         """Close the underlying HTTP session."""
@@ -185,7 +185,7 @@ class JiraClient:
             # Blocker #17: warn clearly when pagination limit is reached
             logger.warning(
                 "Pagination safety limit reached (%d pages, %d/%d issues fetched). "
-                "Results are TRUNCATED — consider narrowing the JQL filter.",
+                "Results are TRUNCATED - consider narrowing the JQL filter.",
                 max_pages,
                 start,
                 total_reported,

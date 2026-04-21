@@ -6,7 +6,7 @@ from flowboard.i18n.translator import Translator, get_translator
 from flowboard.presentation.html.components import _esc, _t
 
 # Expose private helpers so ``from components_scrum import *`` re-exports them
-# through the hub — tests import them via components.
+# through the hub - tests import them via components.
 __all__ = [
     "_format_ceremony_headline",
     "_translate_factors",

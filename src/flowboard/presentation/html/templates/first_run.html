@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FlowBoard — {{ t("wizard.title") }}</title>
+<title>FlowBoard - {{ t("wizard.title") }}</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -371,7 +371,7 @@ body {
 
 <script>
 /* ===================================================================
-   FlowBoard Configuration Wizard — Client-side State Machine
+   FlowBoard Configuration Wizard - Client-side State Machine
    =================================================================== */
 
 const T = {
@@ -1002,7 +1002,7 @@ function showConnStatus(ok, info) {
   if (ok === 'loading') {
     s.appendChild(el('div', {class: 'wz-status loading', role: 'status'}, '⏳ ' + T.testing_connection));
   } else if (ok === true) {
-    const text = '✅ ' + T.connection_success + (info ? ` — ${info.server_title || ''} v${info.version || ''} (${info.deployment_type || ''})` : '');
+    const text = '✅ ' + T.connection_success + (info ? ` - ${info.server_title || ''} v${info.version || ''} (${info.deployment_type || ''})` : '');
     s.appendChild(el('div', {class: 'wz-status ok'}, text));
   } else if (ok === false) {
     const row = el('div', {class: 'wz-status fail'});
@@ -1064,7 +1064,7 @@ function renderProjectChips() {
       tabindex: '0',
       role: 'checkbox',
       'aria-checked': sel ? 'true' : 'false',
-      'aria-label': p.key + ' — ' + p.name,
+      'aria-label': p.key + ' - ' + p.name,
       onclick: () => { toggleProject(p.key); },
       onkeydown: (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleProject(p.key); } },
     });
@@ -1262,7 +1262,7 @@ function renderCustomize(c) {
 
   panel.append(el('hr', {class: 'wz-divider'}));
 
-  // Dashboard preferences — theme
+  // Dashboard preferences - theme
   panel.append(el('h4', {class: 'wz-section-title'}, T.dashboard_prefs_title));
   const themeGroup = el('div', {class: 'wz-field'});
   themeGroup.append(el('label', null, T.dashboard_theme));
@@ -1381,7 +1381,7 @@ function renderReview(c) {
     ['URL', W.jira.base_url],
     ['Auth', W.jira.auth_method === 'basic' ? W.jira.auth_email : 'PAT'],
     ['Status', W.verified ? '✅' : '❌'],
-    ['Server', W.serverInfo ? (W.serverInfo.deployment_type || '') + ' v' + (W.serverInfo.version || '') : '—'],
+    ['Server', W.serverInfo ? (W.serverInfo.deployment_type || '') + ' v' + (W.serverInfo.version || '') : '-'],
   ];
   if (W.jira.jql_filter) connRows.push([T.jql_filter, W.jira.jql_filter]);
   panel.appendChild(reviewSection(T.review_connection, 0, connRows));
@@ -1389,9 +1389,9 @@ function renderReview(c) {
   panel.appendChild(reviewSection(T.review_projects, 1, [
     ['Selected', W.selectedProjects.join(', ') || 'All'],
 
-    [T.field_story_points, W.fields.story_points || '—'],
-    [T.field_epic_link, W.fields.epic_link || '—'],
-    [T.field_sprint, W.fields.sprint || '—'],
+    [T.field_story_points, W.fields.story_points || '-'],
+    [T.field_epic_link, W.fields.epic_link || '-'],
+    [T.field_sprint, W.fields.sprint || '-'],
   ]));
   // Methodology + status mapping
   const methLabel = T['methodology_' + W.methodology] || W.methodology;
@@ -1402,14 +1402,14 @@ function renderReview(c) {
   panel.appendChild(reviewSection(T.review_methodology, 2, methRows));
   // Teams
   const teamsData = W.teams.filter(t => t.key && t.name).map(t => [t.name, t.members.length + ' members']);
-  if (teamsData.length === 0) teamsData.push(['—', T.no_teams_note]);
+  if (teamsData.length === 0) teamsData.push(['-', T.no_teams_note]);
   panel.appendChild(reviewSection(T.review_teams, 3, teamsData));
   // Settings + dashboard prefs
   const setsRows = [
     [T.overload_points, String(W.thresholds.overload_points)],
     [T.wip_limit, String(W.thresholds.wip_limit)],
     [T.aging_days, String(W.thresholds.aging_days)],
-    [T.company_name, W.branding.company_name || '—'],
+    [T.company_name, W.branding.company_name || '-'],
     [T.accent_color, W.branding.color],
     [T.dashboard_theme, T['dashboard_theme_' + W.dashboardPrefs.theme] || W.dashboardPrefs.theme],
     [T.layout_density, T['density_' + W.dashboardPrefs.density] || W.dashboardPrefs.density],
@@ -1419,8 +1419,8 @@ function renderReview(c) {
   // PI (if enabled)
   if (W.pi.enabled) {
     panel.appendChild(reviewSection(T.review_pi, 4, [
-      [T.pi_name, W.pi.name || '—'],
-      [T.pi_start_date, W.pi.start_date || '—'],
+      [T.pi_name, W.pi.name || '-'],
+      [T.pi_start_date, W.pi.start_date || '-'],
       [T.pi_sprints, String(W.pi.sprints_per_pi)],
       [T.pi_sprint_length, String(W.pi.sprint_length_days) + ' days'],
     ]));
@@ -1521,7 +1521,7 @@ function buildConfig() {
       },
     },
   };
-  // Status mapping — schema expects { "JiraStatus": "Category", ... }
+  // Status mapping - schema expects { "JiraStatus": "Category", ... }
   const sm = {};
   const categories = [
     ['todo', 'To Do'],

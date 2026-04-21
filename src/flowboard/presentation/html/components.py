@@ -176,15 +176,15 @@ def summary_cards(
     ki = snapshot.kanban_insights
     if ki and ki.flow_metrics:
         fm = ki.flow_metrics
-        ct = f"{fm.avg_cycle_time:.1f}d" if fm.avg_cycle_time else "—"
-        tp = f"{fm.throughput_per_week:.1f}/wk" if fm.throughput_per_week else "—"
+        ct = f"{fm.avg_cycle_time:.1f}d" if fm.avg_cycle_time else "-"
+        tp = f"{fm.throughput_per_week:.1f}/wk" if fm.throughput_per_week else "-"
         wv = fm.wip_violations
         values["avg_cycle_time"] = (ct, "card-default")
         values["throughput"] = (tp, "card-default")
         values["wip_violations"] = (str(wv), "card-red" if wv > 0 else "card-default")
     else:
-        values["avg_cycle_time"] = ("—", "card-default")
-        values["throughput"] = ("—", "card-default")
+        values["avg_cycle_time"] = ("-", "card-default")
+        values["throughput"] = ("-", "card-default")
         values["wip_violations"] = ("0", "card-default")
 
     # Waterfall metrics
@@ -193,15 +193,15 @@ def summary_cards(
         on_track = sum(1 for m in wi.milestones if m.status == "on_track")
         total_ms = len(wi.milestones)
         pp = wi.phase_progress
-        overall_pct = f"{pp.overall_progress_pct:.0f}%" if pp else "—"
+        overall_pct = f"{pp.overall_progress_pct:.0f}%" if pp else "-"
         values["milestones_on_track"] = (
-            f"{on_track}/{total_ms}" if total_ms else "—",
+            f"{on_track}/{total_ms}" if total_ms else "-",
             "card-green" if on_track == total_ms and total_ms > 0 else "card-amber",
         )
         values["phase_progress"] = (overall_pct, "card-default")
     else:
-        values["milestones_on_track"] = ("—", "card-default")
-        values["phase_progress"] = ("—", "card-default")
+        values["milestones_on_track"] = ("-", "card-default")
+        values["phase_progress"] = ("-", "card-default")
 
     visible = cards_cfg.visible if cards_cfg else list(_CARD_DEFS.keys())
 

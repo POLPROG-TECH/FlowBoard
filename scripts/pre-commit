@@ -23,12 +23,12 @@ if [ -n "$STAGED_PY" ]; then
     echo ""
     echo "⚠️  Formatting issues found. Running auto-format..."
     echo "$STAGED_PY" | xargs ruff format
-    echo "📝 Files reformatted — please review and re-stage (git add) before committing."
+    echo "📝 Files reformatted - please review and re-stage (git add) before committing."
     exit 1
   fi
   echo "✅ Format OK"
 else
-  echo "ℹ️  No staged Python files — skipping lint & format."
+  echo "ℹ️  No staged Python files - skipping lint & format."
 fi
 
 echo ""
@@ -37,4 +37,4 @@ python3 -m pytest tests/ -q --tb=short
 echo "✅ Tests passed"
 
 echo ""
-echo "🚀 All checks passed — committing."
+echo "🚀 All checks passed - committing."

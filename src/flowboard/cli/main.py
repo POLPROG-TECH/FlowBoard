@@ -1,4 +1,4 @@
-"""FlowBoard CLI — powered by Typer.
+"""FlowBoard CLI - powered by Typer.
 
 Commands:
   generate        Fetch Jira data and produce the HTML dashboard.
@@ -23,7 +23,7 @@ from flowboard.i18n import get_translator, set_locale
 
 app = typer.Typer(
     name="flowboard",
-    help="FlowBoard — Jira-based delivery & workload intelligence.",
+    help="FlowBoard - Jira-based delivery & workload intelligence.",
     add_completion=False,
 )
 console = Console()
@@ -279,7 +279,7 @@ def demo(
         "dashboard": {
             "branding": {
                 "title": "FlowBoard Demo Dashboard",
-                "subtitle": "Delivery & Workload Intelligence — Demo Mode",
+                "subtitle": "Delivery & Workload Intelligence - Demo Mode",
                 "primary_color": "#fb6400",
                 "company_name": "Acme Corp",
             },
@@ -340,9 +340,9 @@ def serve(
             "Use --host 0.0.0.0 to bind to all interfaces.[/yellow]"
         )
 
-    console.print(f"\n[bold]FlowBoard[/bold] v{__version__} — Web Dashboard")
+    console.print(f"\n[bold]FlowBoard[/bold] v{__version__} - Web Dashboard")
     if first_run:
-        console.print("[yellow]No config file found — starting in demo mode.[/yellow]")
+        console.print("[yellow]No config file found - starting in demo mode.[/yellow]")
     else:
         console.print(f"Config: [cyan]{config}[/cyan]")
     console.print(f"Server: [link=http://{host}:{port}]http://{host}:{port}[/link]\n")
@@ -502,7 +502,7 @@ def schedule(
         _run_once()
         return
 
-    console.print(f"[bold]FlowBoard Scheduler[/bold] — running every {interval} ({interval_secs}s)")
+    console.print(f"[bold]FlowBoard Scheduler[/bold] - running every {interval} ({interval_secs}s)")
     console.print(f"Config: {config}")
     if webhook:
         console.print(f"Webhook: {webhook}")
@@ -541,7 +541,7 @@ def _send_webhook(url: str, message: str, *, error: bool = False) -> None:
     if parsed.scheme not in ("https", "http"):
         console.print(f"[yellow]⚠ Webhook URL must use http(s), got: {parsed.scheme}[/yellow]")
         return
-    # Block obviously private addresses (SSRF prevention — Blocker #3)
+    # Block obviously private addresses (SSRF prevention - Blocker #3)
     hostname = parsed.hostname or ""
     if (
         hostname in ("localhost", "127.0.0.1", "0.0.0.0", "::1")
@@ -549,7 +549,7 @@ def _send_webhook(url: str, message: str, *, error: bool = False) -> None:
         or hostname.startswith("192.168.")
         or hostname.startswith("172.")
     ):
-        console.print("[yellow]⚠ Webhook URL points to a private address — skipping.[/yellow]")
+        console.print("[yellow]⚠ Webhook URL points to a private address - skipping.[/yellow]")
         return
 
     try:

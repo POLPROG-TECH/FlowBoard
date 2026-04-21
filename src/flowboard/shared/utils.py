@@ -15,7 +15,7 @@ def parse_date(value: str | None) -> date | None:
     try:
         return datetime.fromisoformat(value.replace("Z", "+00:00")).date()
     except (ValueError, AttributeError):
-        logger.warning("Failed to parse date value: %r — treating as missing.", value)
+        logger.warning("Failed to parse date value: %r - treating as missing.", value)
         return None
 
 
@@ -26,7 +26,7 @@ def parse_datetime(value: str | None) -> datetime | None:
     try:
         return datetime.fromisoformat(value.replace("Z", "+00:00"))
     except (ValueError, AttributeError):
-        logger.warning("Failed to parse datetime value: %r — treating as missing.", value)
+        logger.warning("Failed to parse datetime value: %r - treating as missing.", value)
         return None
 
 

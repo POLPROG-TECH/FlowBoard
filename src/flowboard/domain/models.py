@@ -1,6 +1,6 @@
 """Core domain models for FlowBoard.
 
-These dataclasses represent the normalized internal model — independent of
+These dataclasses represent the normalized internal model - independent of
 any specific Jira API response shape.  All analytics, presentation, and
 export layers work with these objects.
 """

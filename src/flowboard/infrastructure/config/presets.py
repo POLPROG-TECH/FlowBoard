@@ -1,4 +1,4 @@
-"""Methodology presets — default configuration per project methodology.
+"""Methodology presets - default configuration per project methodology.
 
 Each preset defines which tabs, summary cards, charts, and thresholds
 are most relevant for a given methodology. User configuration always

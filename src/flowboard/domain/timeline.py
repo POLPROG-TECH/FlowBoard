@@ -69,7 +69,7 @@ class TimelineBar:
 
 @dataclass(slots=True)
 class TimelineSwimlane:
-    """A row (swimlane) in the timeline — grouped by person, team, or epic."""
+    """A row (swimlane) in the timeline - grouped by person, team, or epic."""
 
     key: str
     label: str
@@ -223,7 +223,7 @@ def _sprint_boundaries(snapshot: BoardSnapshot) -> list[tuple[str, date, date]]:
 
 
 def build_assignee_timeline(snapshot: BoardSnapshot) -> TimelineData:
-    """Build timeline grouped by assignee — shows personal workload over time."""
+    """Build timeline grouped by assignee - shows personal workload over time."""
     groups: dict[str, list[TimelineBar]] = defaultdict(list)
     all_bars: list[TimelineBar] = []
 
@@ -267,7 +267,7 @@ def build_assignee_timeline(snapshot: BoardSnapshot) -> TimelineData:
 
 
 def build_team_timeline(snapshot: BoardSnapshot) -> TimelineData:
-    """Build timeline grouped by team — shows team-level workstreams."""
+    """Build timeline grouped by team - shows team-level workstreams."""
     groups: dict[str, list[TimelineBar]] = defaultdict(list)
     all_bars: list[TimelineBar] = []
 
@@ -309,7 +309,7 @@ def build_team_timeline(snapshot: BoardSnapshot) -> TimelineData:
 
 
 def build_epic_timeline(snapshot: BoardSnapshot) -> TimelineData:
-    """Build timeline from roadmap items — epic-level time ranges."""
+    """Build timeline from roadmap items - epic-level time ranges."""
     from flowboard.domain.models import StatusCategory
 
     all_bars: list[TimelineBar] = []
@@ -398,7 +398,7 @@ def build_conflict_timeline(snapshot: BoardSnapshot) -> TimelineData:
 
 
 def build_executive_timeline(snapshot: BoardSnapshot) -> TimelineData:
-    """Build a compact executive timeline — top-level summary.
+    """Build a compact executive timeline - top-level summary.
 
     Shows only epics/roadmap items if available, otherwise shows
     team-aggregated work in a compact form (max 15 swimlanes).
@@ -440,7 +440,7 @@ def build_roadmap_timeline(snapshot: BoardSnapshot) -> TimelineData:
         bar = TimelineBar(
             key=ri.key,
             label=ri.title[:60],
-            assignee=ri.owner.display_name if ri.owner else "—",
+            assignee=ri.owner.display_name if ri.owner else "-",
             team=ri.team or "__no_team__",
             start=start,
             end=end,

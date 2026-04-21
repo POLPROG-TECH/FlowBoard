@@ -1,4 +1,4 @@
-"""Kanban UI components — flow metrics, WIP monitor, cycle time, throughput, CFD.
+"""Kanban UI components - flow metrics, WIP monitor, cycle time, throughput, CFD.
 
 Renders HTML fragments for the Kanban methodology dashboard tabs.
 All functions return safe HTML strings (pre-escaped).

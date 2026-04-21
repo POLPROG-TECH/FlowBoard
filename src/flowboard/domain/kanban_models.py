@@ -76,7 +76,7 @@ class FlowMetrics:
 class KanbanInsights:
     """Container for all Kanban-oriented analytics.
 
-    Parallel to :class:`ScrumInsights` — holds methodology-specific
+    Parallel to :class:`ScrumInsights` - holds methodology-specific
     computed metrics for Kanban teams.
     """
 

@@ -57,7 +57,7 @@ class JiraConnector:
                 parts.append(f"project in ({', '.join(safe_keys)})")
         jql_filter = self._config.jira.jql_filter
         if jql_filter:
-            # Blocker #13: sanitize JQL filter — reject obviously dangerous patterns
+            # Blocker #13: sanitize JQL filter - reject obviously dangerous patterns
             forbidden_jql = re.compile(
                 r"(;|--|\bdrop\b|\bdelete\b|\binsert\b|\bupdate\b|\balter\b)",
                 re.IGNORECASE,
@@ -73,7 +73,7 @@ class JiraConnector:
     def _fetch_issues(self) -> list[dict[str, Any]]:
         jql = self._build_jql()
         if not jql:
-            logger.warning("No JQL filter — fetching all accessible issues.")
+            logger.warning("No JQL filter - fetching all accessible issues.")
             jql = "ORDER BY updated DESC"
         else:
             jql += " ORDER BY updated DESC"

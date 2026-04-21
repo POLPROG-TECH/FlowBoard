@@ -1,4 +1,4 @@
-"""Application orchestrator — the main pipeline controller.
+"""Application orchestrator - the main pipeline controller.
 
 Connects the infrastructure (Jira fetch), domain (normalisation + analytics),
 and presentation (HTML rendering) layers into a single coherent workflow.

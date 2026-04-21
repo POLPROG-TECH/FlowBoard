@@ -1,6 +1,6 @@
 # Dashboard Guide
 
-Complete guide to the FlowBoard interactive dashboard — tabs, settings, themes, and user interactions.
+Complete guide to the FlowBoard interactive dashboard - tabs, settings, themes, and user interactions.
 
 ## Table of Contents
 
@@ -21,7 +21,7 @@ Complete guide to the FlowBoard interactive dashboard — tabs, settings, themes
 
 FlowBoard generates a self-contained HTML file with all CSS and JS inline. Chart.js is loaded via CDN. The dashboard is fully interactive with client-side tab navigation, filtering, sorting, settings, and theme switching.
 
-No server is required — open the generated HTML file directly in any modern browser.
+No server is required - open the generated HTML file directly in any modern browser.
 
 ## Main Tabs (8)
 
@@ -47,7 +47,7 @@ Single view with:
 - Product progress
 - Ceremony tracker
 
-### Workload Tab — 3 sub-tabs
+### Workload Tab - 3 sub-tabs
 
 | Sub-tab           | Content                                                |
 | ----------------- | ------------------------------------------------------ |
@@ -55,7 +55,7 @@ Single view with:
 | Backlog Quality   | Unestimated issues, stale items, missing priorities     |
 | Sprint Readiness  | Upcoming sprint capacity and commitment analysis        |
 
-### Sprints Tab — 4 sub-tabs
+### Sprints Tab - 4 sub-tabs
 
 | Sub-tab                 | Content                                          |
 | ----------------------- | ------------------------------------------------ |
@@ -64,7 +64,7 @@ Single view with:
 | Scope Changes           | Issues added/removed mid-sprint                  |
 | Capacity vs Commitment  | Planned vs actual capacity utilization           |
 
-### Timeline Tab — 6 modes
+### Timeline Tab - 6 modes
 
 | Mode        | Swimlanes                                           |
 | ----------- | --------------------------------------------------- |
@@ -82,7 +82,7 @@ Single view with:
 - Feature/epic progress bars
 - Cross-sprint dependency lines
 
-### Insights Tab — 4 sub-tabs
+### Insights Tab - 4 sub-tabs
 
 | Sub-tab           | Content                                             |
 | ----------------- | --------------------------------------------------- |
@@ -91,7 +91,7 @@ Single view with:
 | Blockers          | Blocked issues with dependency chains               |
 | Delivery Forecast | Predicted completion based on velocity              |
 
-### Dependencies Tab — 2 sub-tabs
+### Dependencies Tab - 2 sub-tabs
 
 | Sub-tab            | Content                                            |
 | ------------------ | -------------------------------------------------- |
@@ -142,12 +142,12 @@ Charts adapt to the active theme colors. If Chart.js fails to load, a "Chart una
 
 5 swimlane modes plus a simulation mode:
 
-- **Assignee** — one row per person, shows all their issues
-- **Team** — one row per team, aggregated view
-- **Epic** — one row per epic, shows child issues
-- **Conflict** — highlights resource conflicts and overlaps
-- **Executive** — simplified bars for leadership review
-- **Simulation** — what-if mode for drag-and-drop scenario modeling
+- **Assignee** - one row per person, shows all their issues
+- **Team** - one row per team, aggregated view
+- **Epic** - one row per epic, shows child issues
+- **Conflict** - highlights resource conflicts and overlaps
+- **Executive** - simplified bars for leadership review
+- **Simulation** - what-if mode for drag-and-drop scenario modeling
 
 ### Controls
 
@@ -195,7 +195,7 @@ Opens when clicking a timeline bar or issue row.
 ### Accessibility
 
 - Focus trap while open (Tab cycles within the panel)
-- Keyboard accessible — press `Esc` to close
+- Keyboard accessible - press `Esc` to close
 - Screen reader–friendly labels and structure
 
 ## Settings Drawer
@@ -234,11 +234,11 @@ Opens when clicking a timeline bar or issue row.
 
 | Threshold            | Default | Description                          |
 | -------------------- | ------- | ------------------------------------ |
-| Overload Points      | —       | SP threshold per person for overload |
-| Overload Issues      | —       | Issue count threshold for overload   |
-| WIP Limit            | —       | Work-in-progress limit per person    |
-| Aging Days           | —       | Days before an issue is "stale"      |
-| Capacity per Person  | —       | Expected SP capacity per sprint      |
+| Overload Points      | -       | SP threshold per person for overload |
+| Overload Issues      | -       | Issue count threshold for overload   |
+| WIP Limit            | -       | Work-in-progress limit per person    |
+| Aging Days           | -       | Days before an issue is "stale"      |
+| Capacity per Person  | -       | Expected SP capacity per sprint      |
 
 #### 5. Charts & Display
 
@@ -300,8 +300,8 @@ Themes control:
 | `Enter` / `Space`          | Activate buttons and timeline bars          |
 | `Escape`                   | Close panels and drawers                    |
 | `Tab` from page load       | Skip-to-content link appears                |
-| Focus in settings drawer   | Focus trap — Tab cycles within the drawer   |
-| Focus in detail panel      | Focus trap — Tab cycles within the panel    |
+| Focus in settings drawer   | Focus trap - Tab cycles within the drawer   |
+| Focus in detail panel      | Focus trap - Tab cycles within the panel    |
 
 ## Print Support
 

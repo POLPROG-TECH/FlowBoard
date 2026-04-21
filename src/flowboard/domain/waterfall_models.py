@@ -41,7 +41,7 @@ class Milestone:
 
 @dataclass(slots=True)
 class CriticalPathItem:
-    """An item on the critical path — delay here delays the whole project."""
+    """An item on the critical path - delay here delays the whole project."""
 
     key: str
     summary: str

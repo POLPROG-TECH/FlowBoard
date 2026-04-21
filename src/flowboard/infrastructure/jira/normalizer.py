@@ -75,7 +75,7 @@ class JiraNormalizer:
                 custom_statuses[k] = StatusCategory(v)
             except ValueError:
                 logger.warning(
-                    "Invalid status_mapping value '%s' for '%s' — expected one of: %s. Skipping.",
+                    "Invalid status_mapping value '%s' for '%s' - expected one of: %s. Skipping.",
                     v,
                     k,
                     ", ".join(sc.value for sc in StatusCategory),

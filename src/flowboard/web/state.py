@@ -47,7 +47,7 @@ class AppState:
     _snapshot_obj: object | None = field(default=None, repr=False)
 
     def subscribe(self) -> asyncio.Queue[dict]:
-        """Synchronous subscribe — kept for backward compatibility."""
+        """Synchronous subscribe - kept for backward compatibility."""
         if len(self._sse_subscribers) >= _MAX_SSE_SUBSCRIBERS:
             old = self._sse_subscribers.pop(0)
             with contextlib.suppress(asyncio.QueueFull):
@@ -57,7 +57,7 @@ class AppState:
         return q
 
     def unsubscribe(self, q: asyncio.Queue[dict]) -> None:
-        """Synchronous unsubscribe — kept for backward compatibility."""
+        """Synchronous unsubscribe - kept for backward compatibility."""
         if q in self._sse_subscribers:
             self._sse_subscribers.remove(q)
 

@@ -1,5 +1,5 @@
 /* ================================================================
-   FlowBoard Dashboard — "Calm Intelligence" Design System
+   FlowBoard Dashboard - "Calm Intelligence" Design System
    Modern dashboard: spatial hierarchy, subtle depth,
    intentional restraint. Inspired by Linear / Vercel / Raycast.
    ================================================================ */
@@ -25,7 +25,7 @@
    DESIGN TOKENS
    ================================================================ */
 :root {
-  /* Brand — from Jinja2 */
+  /* Brand - from Jinja2 */
   --primary: {{ primary_color }};
   --secondary: {{ secondary_color }};
   --tertiary: {{ tertiary_color }};
@@ -58,14 +58,14 @@
   --text-secondary: #6B7280;
   --text-tertiary: #9CA3AF;
 
-  /* Radius — softer, contemporary */
+  /* Radius - softer, contemporary */
   --radius-sm: 8px;
   --radius-md: 10px;
   --radius: 14px;
   --radius-lg: 20px;
   --radius-full: 999px;
 
-  /* Shadow — layered, subtle */
+  /* Shadow - layered, subtle */
   --shadow: 0 1px 2px rgba(0,0,0,.04), 0 1px 4px rgba(0,0,0,.03);
   --shadow-md: 0 2px 8px rgba(0,0,0,.06), 0 1px 3px rgba(0,0,0,.04);
   --shadow-lg: 0 8px 24px rgba(0,0,0,.08), 0 2px 8px rgba(0,0,0,.04);
@@ -84,7 +84,7 @@
   --transition-normal: 200ms ease;
   --transition-slow: 300ms cubic-bezier(.4,0,.2,1);
 
-  /* Typography — harmonized 1.125 ratio, refined scale */
+  /* Typography - harmonized 1.125 ratio, refined scale */
   --text-xs: 0.75rem;
   --text-sm: 0.8125rem;
   --text-base: 0.875rem;
@@ -234,7 +234,7 @@ body { font-size: 14px; line-height: 1.6; }
 {% endif %}
 
 /* ================================================================
-   APP HEADER — Clean Surface (no gradient)
+   APP HEADER - Clean Surface (no gradient)
    ================================================================ */
 .app-header {
   background: var(--surface);
@@ -290,7 +290,7 @@ body { font-size: 14px; line-height: 1.6; }
 .header-controls { display: flex; align-items: center; gap: 12px; }
 
 /* ================================================================
-   SETTINGS BUTTON — Subtle icon style
+   SETTINGS BUTTON - Subtle icon style
    ================================================================ */
 .settings-btn {
   background: transparent;
@@ -313,7 +313,7 @@ body { font-size: 14px; line-height: 1.6; }
 }
 
 /* ================================================================
-   SETTINGS DRAWER — Glass morphism
+   SETTINGS DRAWER - Glass morphism
    ================================================================ */
 .settings-overlay {
   display: none;
@@ -522,7 +522,7 @@ button:disabled {
 }
 
 /* ================================================================
-   TAB NAVIGATION — Modern Pill Style
+   TAB NAVIGATION - Modern Pill Style
    ================================================================ */
 .tab-nav {
   background: var(--surface);
@@ -611,7 +611,7 @@ button:disabled {
 }
 
 /* ================================================================
-   SUMMARY CARDS — Left-aligned, left-border accent
+   SUMMARY CARDS - Left-aligned, left-border accent
    ================================================================ */
 .summary-grid {
   display: grid;
@@ -654,7 +654,7 @@ button:disabled {
 .card-amber { border-left: 3px solid var(--color-warning); }
 
 /* ================================================================
-   DATA TABLES — Frameless modern
+   DATA TABLES - Frameless modern
    ================================================================ */
 .data-table {
   width: 100%;
@@ -691,7 +691,7 @@ button:disabled {
 .table-scroll .data-table { min-width: 600px; }
 
 /* ================================================================
-   CHIPS & BADGES — Softer
+   CHIPS & BADGES - Softer
    ================================================================ */
 .chip {
   display: inline-flex;
@@ -717,7 +717,7 @@ button:disabled {
 .text-white { color: #fff; }
 
 /* ================================================================
-   PROGRESS BARS — Thinner, elegant
+   PROGRESS BARS - Thinner, elegant
    ================================================================ */
 .progress-bar {
   background: var(--border-subtle);
@@ -746,7 +746,7 @@ button:disabled {
 .pct-label { font-size: var(--text-sm); font-weight: 600; color: var(--text-secondary); margin-left: 6px; vertical-align: middle; }
 
 /* ================================================================
-   SPRINT CARDS — Refined
+   SPRINT CARDS - Refined
    ================================================================ */
 .sprint-grid {
   display: grid;
@@ -876,7 +876,7 @@ button:disabled {
 .scrum-goal-health { margin-top: 8px; font-weight: 700; font-size: var(--text-base); }
 
 /* ================================================================
-   CHARTS — Clean, bordered
+   CHARTS - Clean, bordered
    ================================================================ */
 .chart-grid {
   display: grid;
@@ -935,7 +935,7 @@ button:disabled {
 }
 
 /* ================================================================
-   EMPTY STATE — Better
+   EMPTY STATE - Better
    ================================================================ */
 .empty-state {
   color: var(--text-secondary);
@@ -955,7 +955,7 @@ button:disabled {
 }
 
 /* ================================================================
-   FOOTER — Minimal
+   FOOTER - Minimal
    ================================================================ */
 .app-footer {
   border-top: 1px solid var(--border);
@@ -1364,7 +1364,7 @@ select.input-valid { border-color: var(--color-success) !important; }
 .phase-table .wip-bar-track { min-width: 100px; display: inline-block; vertical-align: middle; margin-right: 8px; }
 
 /* ================================================================
-   DEMO TOOLBAR — Refined, light integrated
+   DEMO TOOLBAR - Refined, light integrated
    ================================================================ */
 .demo-toolbar {
   position: sticky;

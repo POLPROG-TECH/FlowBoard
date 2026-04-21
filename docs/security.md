@@ -11,13 +11,13 @@ FlowBoard supports two authentication modes:
 1. **Basic Auth** (Jira Cloud): `email + API token`
 2. **Bearer Token** (Jira Data Center): `PAT`
 
-These are configured via environment variables — never hardcoded.
+These are configured via environment variables - never hardcoded.
 
 ## Secret Handling Rules
 
 ### ✅ Do
 - Store tokens in environment variables (`FLOWBOARD_JIRA_TOKEN`, `FLOWBOARD_JIRA_EMAIL`)
-- Use the example config (`examples/config.example.json`) as a template — it contains only placeholders
+- Use the example config (`examples/config.example.json`) as a template - it contains only placeholders
 - Validate config before running: `flowboard validate-config`
 
 ### ❌ Don't
@@ -66,7 +66,7 @@ The default `.gitignore` excludes:
 
 3. **Rotate tokens** periodically as per your company's security policy.
 
-4. **Use read-only tokens** — FlowBoard only needs read access to Jira.
+4. **Use read-only tokens** - FlowBoard only needs read access to Jira.
 
 ## Content Security Policy (CSP)
 
@@ -89,7 +89,7 @@ Content-Security-Policy:
 - **`script-src 'unsafe-inline'`** is required because the dashboard embeds JavaScript directly in the HTML file.
 - **`https://cdn.jsdelivr.net`** is required for the Chart.js library loaded from CDN.
 - **`style-src 'unsafe-inline'`** is required because all CSS is embedded in the HTML file.
-- **`connect-src 'none'`** is safe — the dashboard makes no network requests after loading.
+- **`connect-src 'none'`** is safe - the dashboard makes no network requests after loading.
 
 ### Nonce-Based CSP (Future)
 

@@ -106,7 +106,7 @@ def simulation_view(
     parts.append("</div></div>")
 
     # ══════════════════════════════════════════════════════════════
-    # SUMMARY VIEW — scenario comparison cards + metrics
+    # SUMMARY VIEW - scenario comparison cards + metrics
     # ══════════════════════════════════════════════════════════════
     parts.append('<div class="sim-panel" id="simPanel-summary">')
 
@@ -214,7 +214,7 @@ def simulation_view(
             if isinstance(delta_val, (int, float)):
                 imp_cls = "sim-improved" if delta_val > 0 else "sim-worse" if delta_val < 0 else ""
                 delta_display = (
-                    f"{'+' if delta_val > 0 else ''}{delta_val}" if delta_val != 0 else "—"
+                    f"{'+' if delta_val > 0 else ''}{delta_val}" if delta_val != 0 else "-"
                 )
             else:
                 imp_cls = (
@@ -236,7 +236,7 @@ def simulation_view(
     parts.append("</div>")  # /simPanel-summary
 
     # ══════════════════════════════════════════════════════════════
-    # DETAIL VIEW — team impact + workload changes + recommendations
+    # DETAIL VIEW - team impact + workload changes + recommendations
     # ══════════════════════════════════════════════════════════════
     parts.append('<div class="sim-panel" id="simPanel-detail" style="display:none">')
 
@@ -362,7 +362,7 @@ def simulation_view(
     parts.append("</div>")  # /simPanel-detail
 
     # ══════════════════════════════════════════════════════════════
-    # TIMELINE VIEW — before/after comparison
+    # TIMELINE VIEW - before/after comparison
     # ══════════════════════════════════════════════════════════════
     parts.append('<div class="sim-panel" id="simPanel-timeline" style="display:none">')
 

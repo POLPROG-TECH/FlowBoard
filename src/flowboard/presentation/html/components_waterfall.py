@@ -1,4 +1,4 @@
-"""Waterfall UI components — phases, milestones, critical path.
+"""Waterfall UI components - phases, milestones, critical path.
 
 Renders HTML fragments for the Waterfall methodology dashboard tabs.
 """
@@ -60,7 +60,7 @@ def phase_progress_cards(insights: WaterfallInsights | None, *, t: Translator) -
         ),
         (
             t("waterfall.current_phase", fallback="Current Phase"),
-            pp.current_phase or "—",
+            pp.current_phase or "-",
             "current",
         ),
         (
@@ -156,7 +156,7 @@ def milestone_timeline(insights: WaterfallInsights | None, *, t: Translator) -> 
     parts = ['<div class="milestone-list">']
     for ms in insights.milestones:
         status_cls = _status_class(ms.status)
-        date_str = ms.target_date.isoformat() if ms.target_date else "—"
+        date_str = ms.target_date.isoformat() if ms.target_date else "-"
         parts.append(
             f'<div class="milestone-item {status_cls}">'
             f'<span class="milestone-icon">{_status_icon(ms.status)}</span>'

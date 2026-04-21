@@ -83,7 +83,7 @@ def create_app(
     async def _lifespan(_app: FastAPI):
         yield
         # Shutdown logic
-        _log.info("Shutting down — cancelling in-flight tasks")
+        _log.info("Shutting down - cancelling in-flight tasks")
         if state._analysis_task and not state._analysis_task.done():
             state._analysis_task.cancel()
             with contextlib.suppress(asyncio.CancelledError, Exception):
@@ -218,7 +218,7 @@ def create_app(
 
         # Done
         state.analysis_progress.phase = AnalysisPhase.COMPLETED
-        state.analysis_progress.detail = f"Done — {len(snapshot.issues)} issues analysed."
+        state.analysis_progress.detail = f"Done - {len(snapshot.issues)} issues analysed."
         state.analysis_progress.completed_at = time.time()
         await state.broadcast(
             "analysis_complete",

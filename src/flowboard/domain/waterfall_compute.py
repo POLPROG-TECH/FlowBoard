@@ -1,4 +1,4 @@
-"""Waterfall analytics — phases, milestones, critical path.
+"""Waterfall analytics - phases, milestones, critical path.
 
 Computes Waterfall-specific metrics from a list of issues.
 Phases are inferred from fix_versions or epic groupings.
@@ -20,7 +20,7 @@ from flowboard.domain.waterfall_models import (
 from flowboard.shared.types import StatusCategory
 
 # ---------------------------------------------------------------------------
-# Phase detection — infer phases from fix_versions or epics
+# Phase detection - infer phases from fix_versions or epics
 # ---------------------------------------------------------------------------
 
 
@@ -86,7 +86,7 @@ def _infer_phases(issues: list[Issue], today: date) -> list[Phase]:
 
 
 # ---------------------------------------------------------------------------
-# Milestone detection — infer from fix_versions with due dates
+# Milestone detection - infer from fix_versions with due dates
 # ---------------------------------------------------------------------------
 
 
@@ -124,7 +124,7 @@ def _infer_milestones(
 
 
 # ---------------------------------------------------------------------------
-# Critical path — simplified: longest chain of blocked/dependent items
+# Critical path - simplified: longest chain of blocked/dependent items
 # ---------------------------------------------------------------------------
 
 

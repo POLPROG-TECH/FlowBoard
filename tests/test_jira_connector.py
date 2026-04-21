@@ -20,9 +20,11 @@ def jira_config() -> JiraConfig:
 
 
 class TestJiraClient:
+    """GIVEN jira client and the scenario: search issues paginates"""
+
     @responses.activate
     def test_search_issues_paginates(self, jira_config: JiraConfig) -> None:
-        # GIVEN two pages of results
+        """WHEN the code under test is exercised for: search issues paginates"""
         responses.add(
             responses.GET,
             "https://test.atlassian.net/rest/api/2/search",
@@ -35,16 +37,18 @@ class TestJiraClient:
         )
         client = JiraClient(jira_config)
 
-        # WHEN
         issues = list(client.search_issues("project = TEST"))
 
-        # THEN both pages fetched
+        """THEN the expected behaviour holds: search issues paginates"""
         assert len(issues) == 2
         assert issues[0]["key"] == "T-1"
         assert issues[1]["key"] == "T-2"
 
+    """GIVEN jira client and the scenario: auth error raises"""
+
     @responses.activate
     def test_auth_error_raises(self, jira_config: JiraConfig) -> None:
+        """WHEN the code under test is exercised for: auth error raises"""
         responses.add(
             responses.GET,
             "https://test.atlassian.net/rest/api/2/serverInfo",
@@ -54,8 +58,11 @@ class TestJiraClient:
         with pytest.raises(JiraAuthError):
             client.verify_connection()
 
+    """GIVEN jira client and the scenario: verify connection success"""
+
     @responses.activate
     def test_verify_connection_success(self, jira_config: JiraConfig) -> None:
+        """WHEN the code under test is exercised for: verify connection success"""
         responses.add(
             responses.GET,
             "https://test.atlassian.net/rest/api/2/serverInfo",
@@ -67,8 +74,12 @@ class TestJiraClient:
         )
         client = JiraClient(jira_config)
         info = client.verify_connection()
+
+        """THEN the expected behaviour holds: verify connection success"""
         assert info["version"] == "9.0"
 
+    """GIVEN jira client and the scenario: missing base url raises"""
     def test_missing_base_url_raises(self) -> None:
+        """WHEN the code under test is exercised for: missing base url raises"""
         with pytest.raises(ValueError, match="base_url"):
             JiraClient(JiraConfig())

@@ -43,15 +43,15 @@ def roadmap_timeline(items: list[RoadmapItem], t: Translator | None = None) -> s
             if pct >= 40
             else "progress-fill-danger"
         )
-        start = t.format_date_short(ri.start_date) if ri.start_date else "—"
-        target = t.format_date_short(ri.target_date) if ri.target_date else "—"
-        owner = _esc(ri.owner.display_name) if ri.owner else "—"
+        start = t.format_date_short(ri.start_date) if ri.start_date else "-"
+        target = t.format_date_short(ri.target_date) if ri.target_date else "-"
+        owner = _esc(ri.owner.display_name) if ri.owner else "-"
         risk_badges = " ".join(severity_badge(r.severity, t) for r in ri.risk_signals[:3])
         rows.append(
             f"<tr>"
             f'<td class="cell-key"><strong>{_esc(ri.key)}</strong></td>'
             f"<td>{truncate_html(ri.title, 60)}</td>"
-            f"<td>{_esc(ri.team) if ri.team else '—'}</td>"
+            f"<td>{_esc(ri.team) if ri.team else '-'}</td>"
             f"<td>{owner}</td>"
             f"<td>{start}</td>"
             f"<td>{target}</td>"

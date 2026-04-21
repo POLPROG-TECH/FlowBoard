@@ -1,4 +1,4 @@
-"""Kanban analytics — cycle time, throughput, WIP, flow efficiency, CFD.
+"""Kanban analytics - cycle time, throughput, WIP, flow efficiency, CFD.
 
 Computes Kanban-specific metrics from a :class:`BoardSnapshot`.
 All functions are pure (no side effects) and operate on domain models.

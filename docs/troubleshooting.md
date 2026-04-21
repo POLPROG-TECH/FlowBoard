@@ -19,13 +19,13 @@ Common issues and solutions when using FlowBoard.
 
 **Cause:** Corporate proxy (Zscaler, Netskope, etc.) intercepts HTTPS and uses its own CA certificate that Python/requests doesn't trust.
 
-**Fix — find and export your corporate CA bundle:**
+**Fix - find and export your corporate CA bundle:**
 
 <details>
 <summary><b>macOS / Linux</b></summary>
 
 ```bash
-# macOS — export system certificates (includes Zscaler CA)
+# macOS - export system certificates (includes Zscaler CA)
 security find-certificate -a -p \
   /Library/Keychains/System.keychain \
   /System/Library/Keychains/SystemRootCertificates.keychain \
@@ -73,7 +73,7 @@ flowboard verify --config flowboard.json
 
 **Symptom:** `pip install -e ".[dev]"` fails with SSL errors.
 
-**Cause:** Same corporate proxy issue — `pip` also needs the CA bundle.
+**Cause:** Same corporate proxy issue - `pip` also needs the CA bundle.
 
 **Fix:** Set `SSL_CERT_FILE` and `REQUESTS_CA_BUNDLE` before running pip (see above).
 
@@ -95,7 +95,7 @@ $env:HTTPS_PROXY = "http://proxy.example.com:8080"
 $env:NO_PROXY = "localhost,127.0.0.1,.internal.example.com"
 ```
 
-No additional FlowBoard configuration is needed — `requests` picks up these env vars automatically.
+No additional FlowBoard configuration is needed - `requests` picks up these env vars automatically.
 
 ## Jira Connection Issues
 
@@ -132,7 +132,7 @@ No additional FlowBoard configuration is needed — `requests` picks up these en
 **Symptom:** Dashboard generates but shows empty tables and zero counts.
 
 **Causes:**
-- Wrong project keys — keys are case-sensitive (`PROJ` not `proj`)
+- Wrong project keys - keys are case-sensitive (`PROJ` not `proj`)
 - `jql_filter` is too restrictive
 - Issues are outside the configured date range
 - Project exists but has no issues matching the query
@@ -279,7 +279,7 @@ No additional FlowBoard configuration is needed — `requests` picks up these en
 
 **Symptom:** "Chart unavailable" message instead of charts.
 
-**Cause:** Chart.js CDN failed to load — typically due to network restrictions, firewall, or Content Security Policy (CSP).
+**Cause:** Chart.js CDN failed to load - typically due to network restrictions, firewall, or Content Security Policy (CSP).
 
 **Solution:**
 - Ensure network access to `cdn.jsdelivr.net`.
@@ -380,7 +380,7 @@ Add a JQL filter to your config:
 
 ### Can I run FlowBoard without a Jira connection?
 
-Yes — use `flowboard demo` to generate a dashboard with sample data, or `flowboard serve` and click "Try Demo" in the wizard.
+Yes - use `flowboard demo` to generate a dashboard with sample data, or `flowboard serve` and click "Try Demo" in the wizard.
 
 ### How do I change the dashboard language?
 
@@ -406,7 +406,7 @@ docker run -p 8084:8084 \
 
 ### How do I set up automated dashboard generation?
 
-Use `flowboard schedule` with a cron expression, or add a GitHub Actions workflow — see `.github/workflows/ci.yml` for an example.
+Use `flowboard schedule` with a cron expression, or add a GitHub Actions workflow - see `.github/workflows/ci.yml` for an example.
 
 ### The dashboard is too large / slow in the browser
 
@@ -415,6 +415,6 @@ Reduce the dataset with `jql_filter` or limit `projects` in config. For 5000+ is
 ### How do I export data programmatically?
 
 When running in server mode (`flowboard serve`), use the API endpoints:
-- `GET /api/export/csv` — CSV format
-- `GET /api/export/json` — JSON format
-- `GET /api/export/html` — Standalone HTML file
+- `GET /api/export/csv` - CSV format
+- `GET /api/export/json` - JSON format
+- `GET /api/export/html` - Standalone HTML file

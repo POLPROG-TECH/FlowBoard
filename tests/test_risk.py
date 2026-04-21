@@ -14,8 +14,9 @@ from flowboard.shared.types import (
 
 
 class TestOverloadRisks:
+    """GIVEN overload risks and the scenario: sp overload detected"""
     def test_sp_overload_detected(self, alice, make_issue) -> None:
-        # GIVEN Alice assigned 25 SP (threshold=15)
+        """WHEN the code under test is exercised for: sp overload detected"""
         issues = [
             make_issue(
                 "T-1", assignee=alice, story_points=25, status_category=StatusCategory.IN_PROGRESS
@@ -26,17 +27,19 @@ class TestOverloadRisks:
 
         records = compute_workload_records(issues, thresholds)
 
-        # WHEN
         risks = detect_all_risks(issues, records, [], [], thresholds, today=date(2026, 3, 15))
 
-        # THEN
         overload = [r for r in risks if r.category == RiskCategory.OVERLOAD]
+
+        """THEN the expected behaviour holds: sp overload detected"""
         assert len(overload) >= 1
         assert "Alice" in overload[0].title
 
 
 class TestAgingRisks:
+    """GIVEN aging risks and the scenario: aging issue flagged"""
     def test_aging_issue_flagged(self, make_issue) -> None:
+        """WHEN the code under test is exercised for: aging issue flagged"""
         old_issue = make_issue(
             "OLD-1",
             status_category=StatusCategory.TODO,
@@ -45,11 +48,15 @@ class TestAgingRisks:
         thresholds = Thresholds(aging_days=10)
         risks = detect_all_risks([old_issue], [], [], [], thresholds, today=date(2026, 3, 15))
         aging = [r for r in risks if r.category == RiskCategory.AGING]
+
+        """THEN the expected behaviour holds: aging issue flagged"""
         assert len(aging) >= 1
 
 
 class TestRoadmapRisks:
+    """GIVEN roadmap risks and the scenario: overdue epic flagged"""
     def test_overdue_epic_flagged(self) -> None:
+        """WHEN the code under test is exercised for: overdue epic flagged"""
         item = RoadmapItem(
             key="E-1",
             title="Late Epic",
@@ -60,5 +67,7 @@ class TestRoadmapRisks:
         thresholds = Thresholds()
         risks = detect_all_risks([], [], [], [item], thresholds, today=date(2026, 3, 15))
         scope = [r for r in risks if r.category == RiskCategory.SCOPE_CREEP]
+
+        """THEN the expected behaviour holds: overdue epic flagged"""
         assert len(scope) >= 1
         assert "overdue" in scope[0].title.lower()

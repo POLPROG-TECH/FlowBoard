@@ -70,7 +70,7 @@ Environment variables always take precedence over values in the config file.
 
 | Field | Type | Required | Default | Description |
 |-------|------|----------|---------|-------------|
-| `jira` | object | **yes** | — | Jira connection and query settings |
+| `jira` | object | **yes** | - | Jira connection and query settings |
 | `field_mappings` | object | no | `{}` | Custom field ID mappings |
 | `status_mapping` | object | no | `{}` | Jira status → category mapping |
 | `teams` | array | no | `[]` | Team definitions for grouping |
@@ -144,8 +144,8 @@ Array of team definitions for grouping people in workload and timeline views.
 
 | Field | Type | Required | Default | Description |
 |-------|------|----------|---------|-------------|
-| `key` | string | **yes** | — | Unique team identifier |
-| `name` | string | **yes** | — | Display name |
+| `key` | string | **yes** | - | Unique team identifier |
+| `name` | string | **yes** | - | Display name |
 | `members` | string[] | no | `[]` | Jira account IDs or display names |
 
 ```json
@@ -191,7 +191,7 @@ The `dashboard` section controls all presentation aspects of the generated HTML 
 
 ### Theme
 
-`dashboard.theme` — global colour scheme.
+`dashboard.theme` - global colour scheme.
 
 | Value | Description |
 |-------|-------------|
@@ -205,7 +205,7 @@ Default: `"system"`. Invalid values fall back to `"light"`.
 
 ### Branding
 
-`dashboard.branding` — header and identity.
+`dashboard.branding` - header and identity.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
@@ -218,7 +218,7 @@ Default: `"system"`. Invalid values fall back to `"light"`.
 
 ### Layout
 
-`dashboard.layout` — spacing and width.
+`dashboard.layout` - spacing and width.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
@@ -227,7 +227,7 @@ Default: `"system"`. Invalid values fall back to `"light"`.
 
 ### Tabs
 
-`dashboard.tabs` — tab visibility and ordering.
+`dashboard.tabs` - tab visibility and ordering.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
@@ -239,7 +239,7 @@ Default: `"system"`. Invalid values fall back to `"light"`.
 
 ### Summary Cards
 
-`dashboard.summary_cards` — executive summary bar.
+`dashboard.summary_cards` - executive summary bar.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
@@ -249,7 +249,7 @@ Default: `"system"`. Invalid values fall back to `"light"`.
 
 ### Charts
 
-`dashboard.charts` — chart toggles.
+`dashboard.charts` - chart toggles.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
@@ -263,7 +263,7 @@ Default: `"system"`. Invalid values fall back to `"light"`.
 
 ### Tables
 
-`dashboard.tables` — issues table configuration.
+`dashboard.tables` - issues table configuration.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
@@ -274,7 +274,7 @@ Default: `"system"`. Invalid values fall back to `"light"`.
 
 ### Filters
 
-`dashboard.filters` — default filter values applied on load.
+`dashboard.filters` - default filter values applied on load.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
@@ -286,7 +286,7 @@ Default: `"system"`. Invalid values fall back to `"light"`.
 
 ### Risk Display
 
-`dashboard.risk_display` — risk presentation options.
+`dashboard.risk_display` - risk presentation options.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
@@ -296,7 +296,7 @@ Default: `"system"`. Invalid values fall back to `"light"`.
 
 ### Roadmap
 
-`dashboard.roadmap` — roadmap view settings.
+`dashboard.roadmap` - roadmap view settings.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
@@ -307,7 +307,7 @@ Default: `"system"`. Invalid values fall back to `"light"`.
 
 ### Timeline
 
-`dashboard.timeline` — interactive Gantt-style timeline with overlap detection.
+`dashboard.timeline` - interactive Gantt-style timeline with overlap detection.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
@@ -323,23 +323,23 @@ Default: `"system"`. Invalid values fall back to `"light"`.
 
 | Mode | Description |
 |------|-------------|
-| `assignee` | Swimlanes per person — shows parallel work, overload |
-| `team` | Swimlanes per team — shows cross-team pressure |
-| `epic` | Swimlanes per epic — shows roadmap execution |
-| `conflict` | Highlights overlapping items only — collision focus |
+| `assignee` | Swimlanes per person - shows parallel work, overload |
+| `team` | Swimlanes per team - shows cross-team pressure |
+| `epic` | Swimlanes per epic - shows roadmap execution |
+| `conflict` | Highlights overlapping items only - collision focus |
 | `executive` | Compact leadership view capped at 15 swimlanes |
 
 Each mode supports filtering by team, project, assignee, priority, and search text. Overlap severity is colour-coded: medium (2 items), high (3), critical (4+).
 
 ### Sections Collapsed
 
-`dashboard.sections_collapsed` — array of section IDs to start collapsed on load.
+`dashboard.sections_collapsed` - array of section IDs to start collapsed on load.
 
 Default: `[]` (all sections expanded).
 
 ### Refresh Metadata
 
-`dashboard.refresh_metadata` — boolean, default `true`.
+`dashboard.refresh_metadata` - boolean, default `true`.
 
 When enabled, the dashboard shows a "generated at" timestamp in the header.
 
@@ -418,10 +418,10 @@ The generated HTML dashboard includes a settings drawer accessible via the gear 
 
 **Actions available:**
 
-- **Apply** — apply changes to the current view.
-- **Reset to Defaults** — restore all settings to defaults.
-- **Export JSON** — download the current configuration (secrets are stripped).
-- **Import JSON** — upload a JSON config file to apply.
+- **Apply** - apply changes to the current view.
+- **Reset to Defaults** - restore all settings to defaults.
+- **Export JSON** - download the current configuration (secrets are stripped).
+- **Import JSON** - upload a JSON config file to apply.
 
 Changes made in the settings drawer are applied locally to the current session. To persist changes across regenerations, export the JSON and save it as your `config.json`.
 
@@ -437,14 +437,14 @@ flowboard validate-config --config config.json
 
 Validation rules:
 
-- **Schema validation** — JSON Schema draft-07 with `additionalProperties: false`. Any typo or unknown field produces a clear error.
-- **Import validation** — imported config must be a valid JSON object.
-- **Locale validation** — invalid locale values fall back to `"en"`.
-- **Theme validation** — invalid theme values fall back to `"light"`.
+- **Schema validation** - JSON Schema draft-07 with `additionalProperties: false`. Any typo or unknown field produces a clear error.
+- **Import validation** - imported config must be a valid JSON object.
+- **Locale validation** - invalid locale values fall back to `"en"`.
+- **Theme validation** - invalid theme values fall back to `"light"`.
 
 ---
 
 ## Examples
 
-- [`examples/config.minimal.json`](../examples/config.minimal.json) — minimal configuration (Jira URL, projects, output path).
-- [`examples/config.example.json`](../examples/config.example.json) — full configuration with all sections populated.
+- [`examples/config.minimal.json`](../examples/config.minimal.json) - minimal configuration (Jira URL, projects, output path).
+- [`examples/config.example.json`](../examples/config.example.json) - full configuration with all sections populated.

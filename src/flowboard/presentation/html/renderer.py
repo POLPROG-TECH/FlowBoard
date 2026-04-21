@@ -47,7 +47,7 @@ def _build_env() -> Environment:
 
 
 def _json_serializer(obj: object) -> str:
-    """Strict JSON default handler — only serialises known safe types."""
+    """Strict JSON default handler - only serialises known safe types."""
     if isinstance(obj, datetime):
         return obj.isoformat()
     if isinstance(obj, date):
@@ -110,7 +110,7 @@ def render_dashboard(
         "pi_snapshot": pi_snap,
         "t": t,
         "locale": t.locale,
-        # Pre-rendered component HTML (marked safe — already escaped by component builders)
+        # Pre-rendered component HTML (marked safe - already escaped by component builders)
         "summary_cards_html": Markup(
             components.summary_cards(
                 snapshot,
@@ -196,7 +196,7 @@ def render_dashboard(
                 t=t,
             )
         ),
-        # Chart data (JSON strings — marked safe for template embedding)
+        # Chart data (JSON strings - marked safe for template embedding)
         "workload_chart_data": Markup(charts.workload_chart_data(snapshot, t=t)),
         "status_chart_data": Markup(charts.status_distribution_data(snapshot, t=t)),
         "type_chart_data": Markup(charts.type_distribution_data(snapshot, t=t)),
@@ -256,7 +256,7 @@ def _render_error_page(error_detail: str, locale: str = "en") -> str:
 
     t = get_translator(locale)
     safe_detail = escape(error_detail)
-    title = escape(t("error.page_title", fallback="FlowBoard — Error"))
+    title = escape(t("error.page_title", fallback="FlowBoard - Error"))
     heading = escape(t("error.heading", fallback="Dashboard could not be rendered"))
     description = escape(
         t(

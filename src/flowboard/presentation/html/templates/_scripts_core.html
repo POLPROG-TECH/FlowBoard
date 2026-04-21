@@ -57,7 +57,7 @@ function setTheme(theme) {
   document.querySelectorAll('[data-theme-btn]').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.themeBtn === theme);
   });
-  // Re-render charts for new theme — must destroy old instances first
+  // Re-render charts for new theme - must destroy old instances first
   if (typeof Chart !== 'undefined') {
     Object.values(Chart.instances || {}).forEach(c => { try { c.destroy(); } catch(e){} });
     chartsInitialized = false;
@@ -200,7 +200,7 @@ const _chartIds = ['chartStatus', 'chartTypes', 'chartRisks', 'chartTeams', 'cha
 function initCharts() {
   if (chartsInitialized) return;
   if (typeof Chart === 'undefined') {
-    // Chart.js CDN failed — show error on all chart containers
+    // Chart.js CDN failed - show error on all chart containers
     _chartIds.forEach(_showChartError);
     return;
   }
